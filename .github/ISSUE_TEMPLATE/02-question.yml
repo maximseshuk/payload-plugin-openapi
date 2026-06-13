@@ -1,0 +1,41 @@
+name: Question / Support
+description: Ask a question or get help with using the plugin
+title: '[Question]: '
+labels: ['question']
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Before asking:** Please check the [documentation](https://github.com/maximseshuk/payload-plugin-openapi#readme) and [existing issues](https://github.com/maximseshuk/payload-plugin-openapi/issues).
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Your Question
+      description: What do you need help with?
+      placeholder: |
+        Please tell us:
+        - What you're trying to accomplish
+        - What problem you're encountering
+        - What you've tried so far
+        - Any error messages you're seeing
+    validations:
+      required: true
+
+  - type: textarea
+    id: current-config
+    attributes:
+      label: Current Configuration (if relevant)
+      description: Share your plugin setup
+      placeholder: |
+        ```typescript
+        openapi({
+          metadata: {
+            title: 'My API',
+            version: '1.0.0',
+          },
+        })
+        ```
+      render: typescript

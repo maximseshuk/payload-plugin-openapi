@@ -1,0 +1,862 @@
+import { Validator } from '@seriousme/openapi-schema-validator'
+import type {
+  Config,
+  Endpoint,
+  Field,
+  PayloadRequest,
+  Plugin,
+  SanitizedCollectionConfig,
+  SanitizedConfig,
+} from 'payload'
+import type { I18n } from '@payloadcms/translations'
+import { describe, expect, it } from 'vitest'
+
+import { resolveOptions } from '../src/options.js'
+import { PLUGIN_NAME } from '../src/constants.js'
+import { buildDocument } from '../src/spec/buildDocument.js'
+import { flattenFields } from '../src/spec/fields.js'
+import { filterOperations, shouldIncludeCollection, shouldIncludeGlobal } from '../src/spec/filters.js'
+import { rewriteRefs, schemaName } from '../src/spec/names.js'
+import {
+  NAV_COLLECTIONS,
+  NAV_GLOBALS,
+  NAV_SYSTEM,
+  authTagName,
+  buildTagHierarchy,
+  entityTagName,
+  versionsTagName,
+} from '../src/spec/tags.js'
+import type { Translate } from '../src/translations/types.js'
+import { buildCustomEndpointPaths } from '../src/spec/paths/custom.js'
+import { buildCollectionPaths } from '../src/spec/paths/collections.js'
+import type { Document, PathsObject, SchemaObject } from '@scalar/openapi-types/3.2'
+import type { OpenApiExtension, ResolvedFilters } from '../src/types.js'
+import { baseInput, ctx, i18nStub, t } from './helpers.js'
+
+describe('spec/names', () => {
+  describe('schemaName', () => {
+    it('turns a slug into PascalCase', () => {
+      expect(schemaName('blog-posts')).toBe('BlogPosts')
+      expect(schemaName('users')).toBe('Users')
+    })
+  })
+
+  describe('rewriteRefs', () => {
+    it('rewrites `definitions` and `$defs` refs to `components/schemas`', () => {
+      const input = { a: { $ref: '#/definitions/Post' }, b: { $ref: '#/$defs/User' } }
+      expect(rewriteRefs(input)).toEqual({
+        a: { $ref: '#/components/schemas/Post' },
+        b: { $ref: '#/components/schemas/User' },
+      })
+    })
+
+    it('leaves unrelated refs untouched', () => {
+      const input = { $ref: '#/components/schemas/X' }
+      expect(rewriteRefs(input)).toEqual(input)
+    })
+  })
+})
+
+describe('spec/fields', () => {
+  describe('flattenFields', () => {
+    it('reads through `row` and `collapsible` containers', () => {
+      const fields = [
+        { name: 'title', type: 'text' },
+        {
+          type: 'row',
+          fields: [
+            { name: 'a', type: 'text' },
+            { name: 'b', type: 'number' },
+          ],
+        },
+      ] as Field[]
+      const names = flattenFields(fields)
+        .map((f) => ('name' in f ? f.name : undefined))
+        .filter(Boolean)
+      expect(names).toEqual(['title', 'a', 'b'])
+    })
+
+    it('drops `ui` fields', () => {
+      const fields = [
+        { name: 'title', type: 'text' },
+        { name: 'preview', type: 'ui' },
+      ] as Field[]
+      const names = flattenFields(fields).map((f) => ('name' in f ? f.name : undefined))
+      expect(names).toEqual(['title'])
+    })
+  })
+})
+
+const baseFilters: ResolvedFilters = {
+  include: [],
+  exclude: [],
+  includeHidden: false,
+  includeSystem: false,
+  includeCustom: true,
+  includeAuth: true,
+  includeAdminAuth: false,
+  includeVersions: true,
+  includeJobs: true,
+  excludeOperations: [],
+}
+const f = (over: Partial<ResolvedFilters> = {}): ResolvedFilters => ({ ...baseFilters, ...over })
+const coll = (slug: string, extra: Partial<SanitizedCollectionConfig> = {}): SanitizedCollectionConfig =>
+  ({ slug, ...extra }) as SanitizedCollectionConfig
+
+describe('spec/filters', () => {
+  describe('shouldIncludeCollection', () => {
+    it('hides system `payload-` collections unless `includeSystem` is set', () => {
+      expect(shouldIncludeCollection(coll('payload-preferences'), f())).toBe(false)
+      expect(shouldIncludeCollection(coll('payload-preferences'), f({ includeSystem: true }))).toBe(true)
+      expect(shouldIncludeCollection(coll('posts'), f())).toBe(true)
+    })
+
+    it('hides hidden collections unless `includeHidden` is set', () => {
+      const hidden = coll('drafts', { admin: { hidden: true } })
+      expect(shouldIncludeCollection(hidden, f())).toBe(false)
+      expect(shouldIncludeCollection(hidden, f({ includeHidden: true }))).toBe(true)
+    })
+
+    it('treats a function that returns hidden as hidden', () => {
+      const hidden = coll('drafts', { admin: { hidden: () => false } })
+      expect(shouldIncludeCollection(hidden, f())).toBe(false)
+    })
+
+    it('honors an allowlist and excludes by string, regex, and kind', () => {
+      expect(shouldIncludeCollection(coll('posts'), f({ include: ['users'] }))).toBe(false)
+      expect(shouldIncludeCollection(coll('posts'), f({ exclude: ['posts'] }))).toBe(false)
+      expect(shouldIncludeCollection(coll('temp-x'), f({ exclude: [/^temp-/] }))).toBe(false)
+      expect(shouldIncludeCollection(coll('posts'), f({ exclude: [{ kind: 'global', slug: 'posts' }] }))).toBe(true)
+    })
+  })
+
+  describe('shouldIncludeGlobal', () => {
+    it('excludes a global by kind without touching the collection', () => {
+      const filters = f({ exclude: [{ kind: 'global', slug: 'posts' }] })
+      expect(shouldIncludeGlobal(coll('posts') as unknown as Parameters<typeof shouldIncludeGlobal>[0], filters)).toBe(
+        false,
+      )
+      expect(shouldIncludeCollection(coll('posts'), filters)).toBe(true)
+    })
+  })
+
+  describe('filterOperations', () => {
+    const paths = (): PathsObject => ({
+      '/api/posts': { get: {}, post: {}, patch: {}, delete: {} },
+      '/api/posts/{id}': { get: {}, patch: {}, delete: {} },
+    })
+
+    it('drops a method across all paths and removes the emptied paths', () => {
+      const out = filterOperations({
+        paths: paths(),
+        slug: 'posts',
+        kind: 'collection',
+        filters: f({ excludeOperations: [{ method: 'delete' }] }),
+      })
+      expect(out['/api/posts']?.delete).toBeUndefined()
+      expect(out['/api/posts/{id}']?.delete).toBeUndefined()
+      expect(out['/api/posts']?.get).toBeDefined()
+    })
+
+    it('targets a single entity by slug', () => {
+      const out = filterOperations({
+        paths: paths(),
+        slug: 'tags',
+        kind: 'collection',
+        filters: f({ excludeOperations: [{ method: 'post', slug: 'posts' }] }),
+      })
+      expect(out['/api/posts']?.post).toBeDefined()
+    })
+
+    it('matches a path by regex to tell list from by-id', () => {
+      const out = filterOperations({
+        paths: paths(),
+        slug: 'posts',
+        kind: 'collection',
+        filters: f({ excludeOperations: [{ method: 'get', path: /\/\{id\}$/ }] }),
+      })
+      expect(out['/api/posts']?.get).toBeDefined()
+      expect(out['/api/posts/{id}']?.get).toBeUndefined()
+    })
+
+    it('removes a path entirely when all of its methods are excluded', () => {
+      const out = filterOperations({
+        paths: paths(),
+        slug: 'posts',
+        kind: 'collection',
+        filters: f({ excludeOperations: [{ path: /\/posts\/\{id\}$/ }] }),
+      })
+      expect(out['/api/posts/{id}']).toBeUndefined()
+      expect(out['/api/posts']).toBeDefined()
+    })
+
+    it('respects `kind` so globals and collections do not collide', () => {
+      const out = filterOperations({
+        paths: paths(),
+        slug: 'posts',
+        kind: 'collection',
+        filters: f({ excludeOperations: [{ slug: 'posts', kind: 'global' }] }),
+      })
+      expect(out['/api/posts']?.get).toBeDefined()
+    })
+
+    it('applies the `excludeWhen` predicate', () => {
+      const out = filterOperations({
+        paths: paths(),
+        slug: 'posts',
+        kind: 'collection',
+        filters: f({ excludeWhen: ({ method }) => method === 'patch' }),
+      })
+      expect(out['/api/posts']?.patch).toBeUndefined()
+      expect(out['/api/posts']?.get).toBeDefined()
+    })
+  })
+})
+
+describe('spec/tags', () => {
+  it('builds the entity, auth, and versions tag names', () => {
+    expect(entityTagName('Posts')).toBe('Posts')
+    expect(authTagName('Users')).toBe('Users Auth')
+    expect(versionsTagName('Posts')).toBe('Posts Versions')
+  })
+
+  it('builds a nested tag tree with parents and translated summaries', () => {
+    const tt = ((key: string) => key) as Translate
+    const tags = buildTagHierarchy({
+      collections: [{ base: 'Posts', hasAuth: false, hasVersions: true, description: 'Blog posts' }],
+      globals: [{ base: 'GlobalSettings', hasVersions: false }],
+      hasJobs: true,
+      t: tt,
+      nested: true,
+    })
+    const byName = Object.fromEntries(tags.map((tag) => [tag.name, tag]))
+
+    expect(byName[NAV_COLLECTIONS]?.kind).toBe('nav')
+    expect(byName[NAV_GLOBALS]?.kind).toBe('nav')
+    expect(byName[NAV_SYSTEM]?.kind).toBe('nav')
+
+    expect(byName['Posts']?.parent).toBe(NAV_COLLECTIONS)
+    expect(byName['Posts']?.description).toBe('Blog posts')
+    expect(byName['GlobalSettings']?.parent).toBe(NAV_GLOBALS)
+
+    expect(byName['Posts Versions']?.parent).toBe('Posts')
+    expect(byName['Posts Auth']).toBeUndefined()
+    expect(byName['Jobs']?.parent).toBe(NAV_SYSTEM)
+  })
+
+  it('builds a flat list of entity tags with descriptions when not nested', () => {
+    const tt = ((key: string) => key) as Translate
+    const tags = buildTagHierarchy({
+      collections: [{ base: 'Posts', hasAuth: true, hasVersions: true, description: 'Blog posts' }],
+      globals: [{ base: 'GlobalSettings', hasVersions: true, description: 'Site config' }],
+      hasJobs: true,
+      t: tt,
+      nested: false,
+    })
+    const byName = Object.fromEntries(tags.map((tag) => [tag.name, tag]))
+
+    expect(tags.map((tag) => tag.name)).toEqual(['Posts', 'GlobalSettings'])
+    expect(byName['Posts']?.description).toBe('Blog posts')
+    expect(byName['GlobalSettings']?.description).toBe('Site config')
+
+    expect(byName[NAV_COLLECTIONS]).toBeUndefined()
+    expect(byName[NAV_GLOBALS]).toBeUndefined()
+    expect(byName[NAV_SYSTEM]).toBeUndefined()
+    expect(byName['Posts Auth']).toBeUndefined()
+    expect(byName['Posts Versions']).toBeUndefined()
+    expect(byName['Jobs']).toBeUndefined()
+    expect(byName['Posts']?.kind).toBeUndefined()
+    expect(byName['Posts']?.parent).toBeUndefined()
+  })
+})
+
+describe('spec/buildDocument', () => {
+  it('builds a minimal valid document', async () => {
+    const doc = await buildDocument(baseInput())
+    expect(doc.openapi).toBe('3.2.0')
+    expect(doc.info.title).toBe('Test API')
+    expect(doc.info.version).toBe('1.0.0')
+    expect(doc.components?.securitySchemes?.PayloadToken).toBeDefined()
+    const result = await new Validator().validate(structuredClone(doc))
+    expect(result.valid).toBe(true)
+  })
+
+  it('merges extension paths and applies the `transform`', async () => {
+    const doc = await buildDocument(
+      baseInput({
+        options: resolveOptions({
+          metadata: { title: 'T', version: '1.0.0' },
+          extensions: [
+            { paths: { '/api/custom': { get: { responses: { '200': { description: 'ok' } } } } } },
+            { transform: (d) => ({ ...d, info: { ...d.info, title: 'Transformed' } }) },
+          ],
+        }),
+      }),
+    )
+    expect(doc.paths?.['/api/custom']).toBeDefined()
+    expect(doc.info.title).toBe('Transformed')
+  })
+
+  it('keeps building when an extension throws', async () => {
+    const doc = await buildDocument(
+      baseInput({
+        options: resolveOptions({
+          metadata: { title: 'T', version: '1.0.0' },
+          extensions: [
+            {
+              transform: () => {
+                throw new Error('boom')
+              },
+            },
+          ],
+        }),
+      }),
+    )
+    expect(doc.info.title).toBe('T')
+  })
+})
+
+describe('spec/paths/jobs', () => {
+  describe('buildJobsPaths', () => {
+    it('adds the run endpoint only when tasks or workflows are set up', async () => {
+      const { buildJobsPaths } = await import('../src/spec/paths/jobs.js')
+      const jobsCtx = { defaultIDType: 'text' as const, locales: [], apiRoute: '/api', i18n: i18nStub }
+      const cfg = (jobs: SanitizedConfig['jobs']): SanitizedConfig => ({ jobs }) as SanitizedConfig
+      expect(buildJobsPaths({ config: cfg({} as SanitizedConfig['jobs']), ctx: jobsCtx })).toEqual({})
+      const withJobs = buildJobsPaths({
+        config: cfg({ tasks: [{}] } as SanitizedConfig['jobs']),
+        ctx: jobsCtx,
+      })
+      expect(withJobs['/api/payload-jobs/run']?.get).toBeDefined()
+    })
+  })
+})
+
+describe('spec/paths/custom', () => {
+  describe('buildCustomEndpointPaths', () => {
+    it('keeps only endpoints with `custom.openapi` and turns params into placeholders', () => {
+      const config = {
+        endpoints: [
+          {
+            path: '/health',
+            method: 'get',
+            handler: () => new Response(),
+            custom: { openapi: { responses: { '200': { description: 'ok' } } } },
+          },
+          { path: '/secret', method: 'get', handler: () => new Response() },
+        ],
+      } as unknown as SanitizedConfig
+
+      const collection = {
+        slug: 'posts',
+        endpoints: [
+          {
+            path: '/:id/tracking',
+            method: 'get',
+            handler: () => new Response(),
+            custom: { openapi: { responses: { '200': { description: 'ok' } } } },
+          },
+        ],
+      } as unknown as SanitizedCollectionConfig
+
+      const paths = buildCustomEndpointPaths({ config, collections: [collection], globals: [], ctx })
+      expect(paths['/health']).toBeDefined()
+      expect(paths['/secret']).toBeUndefined()
+      expect(paths['/api/posts/{id}/tracking']).toBeDefined()
+    })
+  })
+})
+
+describe('spec/paths/collections', () => {
+  const postsColl = (extra: Partial<SanitizedCollectionConfig> = {}): SanitizedCollectionConfig =>
+    ({ slug: 'posts', fields: [], ...extra }) as unknown as SanitizedCollectionConfig
+
+  it('documents bulk ops and duplicate by default', () => {
+    const paths = buildCollectionPaths({ collection: postsColl(), ctx })
+    expect(paths['/api/posts']?.patch).toBeDefined()
+    expect(paths['/api/posts']?.delete).toBeDefined()
+    expect(paths['/api/posts/{id}/duplicate']?.post).toBeDefined()
+  })
+
+  it('drops bulk update/delete when `disableBulkEdit` is set, keeping by-id ops', () => {
+    const paths = buildCollectionPaths({ collection: postsColl({ disableBulkEdit: true }), ctx })
+    expect(paths['/api/posts']?.patch).toBeUndefined()
+    expect(paths['/api/posts']?.delete).toBeUndefined()
+    expect(paths['/api/posts']?.post).toBeDefined()
+    expect(paths['/api/posts/{id}']?.patch).toBeDefined()
+    expect(paths['/api/posts/{id}']?.delete).toBeDefined()
+  })
+
+  it('drops the duplicate route when `disableDuplicate` is set', () => {
+    const paths = buildCollectionPaths({ collection: postsColl({ disableDuplicate: true }), ctx })
+    expect(paths['/api/posts/{id}/duplicate']).toBeUndefined()
+    expect(paths['/api/posts/{id}']?.get).toBeDefined()
+  })
+})
+
+describe('spec/params', () => {
+  it('uses `ctx.t` for descriptions so a custom translation flows through', async () => {
+    const { buildSelectSchema } = await import('../src/spec/params.js')
+    const custom = { ...ctx, i18n: { ...ctx.i18n, t: (() => 'ÜBERSETZT') as unknown as I18n['t'] } }
+    const schema = buildSelectSchema({ fields: [{ name: 'title', type: 'text' }] as Field[], ctx: custom })
+    expect(schema.description).toBe('ÜBERSETZT')
+  })
+})
+
+type Loose = Record<string, unknown>
+
+describe('spec/downconvert', () => {
+  describe('toOpenApi30', () => {
+    it('rewrites the version and nullable type arrays, leaving non-null types alone', async () => {
+      const { toOpenApi30 } = await import('../src/spec/downconvert.js')
+      const doc: Document = {
+        openapi: '3.1.2',
+        info: { title: 'T', version: '1' },
+        paths: {},
+        components: {
+          schemas: {
+            A: {
+              type: 'object',
+              properties: {
+                title: { type: ['string', 'null'] },
+                count: { type: 'integer' },
+                tag: { const: 'x' },
+              },
+            },
+          },
+        },
+      }
+      const out = toOpenApi30(doc)
+      expect(out.openapi).toBe('3.0.4')
+      const schemaA = out.components!.schemas!.A as { properties: Record<string, SchemaObject & Loose> }
+      const props = schemaA.properties
+      expect(props.title).toEqual({ type: 'string', nullable: true })
+      expect(props.count).toEqual({ type: 'integer' })
+      expect(props.tag).toEqual({ enum: ['x'] })
+    })
+
+    it('converts content and example keywords and drops the ones 3.0 rejects', async () => {
+      const { toOpenApi30 } = await import('../src/spec/downconvert.js')
+      const doc: Document = {
+        openapi: '3.1.2',
+        info: { title: 'T', version: '1' },
+        paths: {},
+        components: {
+          schemas: {
+            A: {
+              $schema: 'https://json-schema.org/draft/2020-12/schema',
+              type: 'object',
+              properties: {
+                file: { type: 'string', contentMediaType: 'application/octet-stream' },
+                data: { type: 'string', contentEncoding: 'base64' },
+                status: { type: 'string', examples: ['active', 'archived'] },
+              },
+            },
+          },
+        },
+      }
+      const out = toOpenApi30(doc)
+      const a = out.components!.schemas!.A as {
+        $schema?: unknown
+        properties: Record<string, SchemaObject & Loose>
+      }
+      expect(a.$schema).toBeUndefined()
+      expect(a.properties.file).toEqual({ type: 'string', format: 'binary' })
+      expect(a.properties.data).toEqual({ type: 'string', format: 'byte' })
+      expect(a.properties.status.example).toBe('active')
+      expect(a.properties.status['x-examples']).toEqual(['active', 'archived'])
+      expect(a.properties.status.contentMediaType).toBeUndefined()
+    })
+
+    it('leaves a 3.0 examples map untouched when it is already an object', async () => {
+      const { toOpenApi30 } = await import('../src/spec/downconvert.js')
+      const doc: Document = {
+        openapi: '3.1.2',
+        info: { title: 'T', version: '1' },
+        paths: {
+          '/x': {
+            get: {
+              responses: {
+                '200': {
+                  description: 'ok',
+                  content: {
+                    'application/json': { examples: { sample: { value: { ok: true } } } },
+                  },
+                },
+              },
+            },
+          },
+        },
+      }
+      const out = toOpenApi30(doc)
+      const xPath = out.paths!['/x'] as Loose
+      const media = xPath.get as {
+        responses: { '200': { content: { 'application/json': { examples?: unknown } } } }
+      }
+      expect(media.responses['200'].content['application/json'].examples).toEqual({
+        sample: { value: { ok: true } },
+      })
+    })
+  })
+
+  describe('toOpenApi31', () => {
+    it('rewrites the `openapi` version field to 3.1.2', async () => {
+      const { toOpenApi31 } = await import('../src/spec/downconvert.js')
+      const doc: Document = { openapi: '3.2.0', info: { title: 'Test', version: '1.0' }, paths: {} }
+      const result = toOpenApi31(doc)
+      expect(result.openapi).toBe('3.1.2')
+      expect(result.info).toEqual({ title: 'Test', version: '1.0' })
+    })
+
+    it('returns a new document instead of mutating the input', async () => {
+      const { toOpenApi31 } = await import('../src/spec/downconvert.js')
+      const doc: Document = { openapi: '3.2.0', info: { title: 'T', version: '1' }, paths: {} }
+      expect(toOpenApi31(doc)).not.toBe(doc)
+    })
+
+    it('strips the 3.2-only `kind` and `parent` fields from tags', async () => {
+      const { toOpenApi31 } = await import('../src/spec/downconvert.js')
+      const doc: Document = {
+        openapi: '3.2.0',
+        info: { title: 'T', version: '1' },
+        paths: {},
+        tags: [
+          { name: 'Collections', kind: 'nav' },
+          { name: 'Posts', parent: 'Collections', description: 'Blog posts' },
+        ],
+      }
+      const result = toOpenApi31(doc)
+      expect(result.tags).toEqual([{ name: 'Collections' }, { name: 'Posts', description: 'Blog posts' }])
+    })
+  })
+
+  describe('OpenApiExtension', () => {
+    it('accepts the 3.2 tag fields', () => {
+      const ext: OpenApiExtension = {
+        tags: [
+          { name: 'users', summary: 'User operations', kind: 'nav' },
+          { name: 'admin', parent: 'users', kind: 'nav' },
+        ],
+      }
+      expect(ext.tags).toHaveLength(2)
+    })
+  })
+})
+
+describe('endpoints/spec', () => {
+  describe('specHandler caching', () => {
+    const makeReq = (host: string): PayloadRequest =>
+      ({
+        headers: new Headers({ host }),
+        i18n: { language: 'en', fallbackLanguage: 'en', t: (k: string) => k },
+        payload: {
+          config: { localization: false, globals: [], routes: { api: '/api' } },
+          db: { defaultIDType: 'text' },
+          collections: {},
+          logger: { warn() {} },
+        },
+      }) as unknown as PayloadRequest
+
+    const optionsBase = () => resolveOptions({ metadata: { title: 'T', version: '1.0.0' } })
+
+    it('injects a fresh server URL per request from the cached doc', async () => {
+      const { specHandler } = await import('../src/endpoints/spec.js')
+      const handler = specHandler(optionsBase())
+      const a = await (await handler(makeReq('localhost:3000'))).json()
+      const b = await (await handler(makeReq('api.example.com'))).json()
+      expect(a.servers[0].url).toBe('http://localhost:3000')
+      expect(b.servers[0].url).toBe('https://api.example.com')
+      expect({ ...a, servers: [] }).toEqual({ ...b, servers: [] })
+    })
+
+    it('rebuilds on every request when the cache is off', async () => {
+      const { specHandler } = await import('../src/endpoints/spec.js')
+      const handler = specHandler(resolveOptions({ metadata: { title: 'T', version: '1.0.0' }, cache: false }))
+      const res = await (await handler(makeReq('localhost:3000'))).json()
+      expect(res.openapi).toBe('3.2.0')
+    })
+
+    it('serves 3.0 when `openapiVersion` is `3.0`', async () => {
+      const { specHandler } = await import('../src/endpoints/spec.js')
+      const handler = specHandler(resolveOptions({ metadata: { title: 'T', version: '1.0.0' }, openapiVersion: '3.0' }))
+      const res = await (await handler(makeReq('localhost:3000'))).json()
+      expect(res.openapi).toBe('3.0.4')
+    })
+
+    it('serves 3.1 when `openapiVersion` is `3.1`', async () => {
+      const { specHandler } = await import('../src/endpoints/spec.js')
+      const handler = specHandler(resolveOptions({ metadata: { title: 'T', version: '1.0.0' }, openapiVersion: '3.1' }))
+      const res = await (await handler(makeReq('localhost:3000'))).json()
+      expect(res.openapi).toBe('3.1.2')
+    })
+
+    it('defaults to 3.2 when `openapiVersion` is not set', async () => {
+      const { specHandler } = await import('../src/endpoints/spec.js')
+      const handler = specHandler(optionsBase())
+      const res = await (await handler(makeReq('localhost:3000'))).json()
+      expect(res.openapi).toBe('3.2.0')
+    })
+  })
+})
+
+describe('ui/html', () => {
+  const renderHtml = async (plugin: Plugin): Promise<string> => {
+    const out = await plugin({ routes: { api: '/api' } } as unknown as Config)
+    const endpoint = (out.endpoints ?? []).at(-1) as Endpoint
+    const handler = endpoint.handler as () => Response | Promise<Response>
+    return (await handler()).text()
+  }
+
+  it('passes Scalar configuration into the init call', async () => {
+    const { scalar } = await import('../src/ui/scalar.js')
+    const html = await renderHtml(scalar({ configuration: { theme: 'purple', hideModels: true } }))
+    expect(html).toContain('Scalar.createApiReference')
+    expect(html).toContain('"theme":"purple"')
+    expect(html).toContain('"hideModels":true')
+  })
+
+  it('passes Swagger UI configuration into `SwaggerUIBundle`', async () => {
+    const { swaggerUi } = await import('../src/ui/swagger.js')
+    const html = await renderHtml(swaggerUi({ configuration: { docExpansion: 'none' } }))
+    expect(html).toContain('SwaggerUIBundle')
+    expect(html).toContain('"docExpansion":"none"')
+  })
+
+  it('escapes `<` in configuration so a string value cannot break out of the script', async () => {
+    const { swaggerUi } = await import('../src/ui/swagger.js')
+    const html = await renderHtml(swaggerUi({ configuration: { x: '</script>' } }))
+    expect(html).not.toContain('</script>"')
+    expect(html).toContain('\\u003c/script>')
+  })
+
+  it('forwards the docs page `?lang=` onto the spec URL it loads', async () => {
+    const { scalar } = await import('../src/ui/scalar.js')
+    const { swaggerUi } = await import('../src/ui/swagger.js')
+    for (const html of [await renderHtml(scalar()), await renderHtml(swaggerUi())]) {
+      expect(html).toContain("new URLSearchParams(location.search).get('lang')")
+      expect(html).toContain("'lang='+encodeURIComponent(l)")
+    }
+  })
+})
+
+describe('translations', () => {
+  describe('registration', () => {
+    const NS = PLUGIN_NAME
+
+    type Translations = Record<string, Record<string, Record<string, string>>>
+
+    it('registers plugin defaults over the user namespace and keeps sibling namespaces', async () => {
+      const { openapi } = await import('../src/index.js')
+      const plugin = openapi({ metadata: { title: 'T', version: '1.0.0' } })
+      const applied = await plugin({
+        i18n: {
+          translations: {
+            en: { [NS]: { paramDraft: 'MINE' }, general: { hello: 'world' } },
+          },
+        },
+      } as unknown as Config)
+      const translations = applied.i18n?.translations as unknown as Translations
+      const enNs = translations.en[NS]
+      expect(enNs.paramDraft).not.toBe('MINE')
+      expect(enNs.paramSort).toContain('sort by')
+      expect(translations.en.general.hello).toBe('world')
+    })
+
+    it('registers only the languages the config supports', async () => {
+      const { openapi } = await import('../src/index.js')
+      const plugin = openapi({ metadata: { title: 'T', version: '1.0.0' } })
+      const applied = await plugin({
+        i18n: { supportedLanguages: { de: {} }, translations: {} },
+      } as unknown as Config)
+      const translations = applied.i18n?.translations as unknown as Translations
+      expect(translations.en).toBeUndefined()
+    })
+  })
+
+  describe('resolveLocalizedStrings', () => {
+    const deI18n = { ...i18nStub, language: 'de' }
+    const deCtx = { ...ctx, i18n: deI18n }
+
+    it('resolves a locale-keyed string under a text key to the active language', async () => {
+      const { resolveLocalizedStrings } = await import('../src/spec/entitySchemas.js')
+      const override = { description: { en: 'Phone', de: 'Telefon' } }
+      expect(resolveLocalizedStrings(override, ctx)).toEqual({ description: 'Phone' })
+      expect(resolveLocalizedStrings(override, deCtx)).toEqual({ description: 'Telefon' })
+    })
+
+    it('resolves locale maps under every whitelisted text key (description, title, summary)', async () => {
+      const { resolveLocalizedStrings } = await import('../src/spec/entitySchemas.js')
+      const override = {
+        title: { en: 'Title', de: 'Titel' },
+        summary: { en: 'Summary', de: 'Zusammenfassung' },
+        description: { en: 'Desc', de: 'Beschreibung' },
+      }
+      expect(resolveLocalizedStrings(override, deCtx)).toEqual({
+        title: 'Titel',
+        summary: 'Zusammenfassung',
+        description: 'Beschreibung',
+      })
+    })
+
+    it('leaves plain strings under text keys alone', async () => {
+      const { resolveLocalizedStrings } = await import('../src/spec/entitySchemas.js')
+      const override = { type: 'string', example: 'x', description: 'A plain string' }
+      expect(resolveLocalizedStrings(override, ctx)).toEqual(override)
+    })
+
+    it('resolves only the whitelisted text key in a mixed object', async () => {
+      const { resolveLocalizedStrings } = await import('../src/spec/entitySchemas.js')
+      const override = { type: 'string', example: 'x', description: { en: 'A', de: 'B' } }
+      expect(resolveLocalizedStrings(override, ctx)).toEqual({
+        type: 'string',
+        example: 'x',
+        description: 'A',
+      })
+    })
+
+    it('only resolves under whitelisted keys, never under arbitrary locale-named keys', async () => {
+      const { resolveLocalizedStrings } = await import('../src/spec/entitySchemas.js')
+      const override = { example: { en: 'A', de: 'B' } }
+      expect(resolveLocalizedStrings(override, ctx)).toEqual(override)
+    })
+
+    it('recurses into nested structures and resolves text keys at any depth', async () => {
+      const { resolveLocalizedStrings } = await import('../src/spec/entitySchemas.js')
+      const override = {
+        properties: {
+          phone: { type: 'string', description: { en: 'Phone', de: 'Telefon' } },
+        },
+        items: { description: { en: 'Item', de: 'Eintrag' } },
+      }
+      expect(resolveLocalizedStrings(override, deCtx)).toEqual({
+        properties: { phone: { type: 'string', description: 'Telefon' } },
+        items: { description: 'Eintrag' },
+      })
+    })
+
+    it('calls a function under a text key with { t, i18n } and uses its return value', async () => {
+      const { resolveLocalizedStrings } = await import('../src/spec/entitySchemas.js')
+      const description = ({ i18n }: { i18n: { language: string } }) =>
+        i18n.language === 'de' ? 'Aus Funktion' : 'From function'
+      expect(resolveLocalizedStrings({ description }, ctx)).toEqual({ description: 'From function' })
+      expect(resolveLocalizedStrings({ description }, deCtx)).toEqual({ description: 'Aus Funktion' })
+    })
+
+    it('does not call a function under a non-whitelisted key', async () => {
+      const { resolveLocalizedStrings } = await import('../src/spec/entitySchemas.js')
+      const fn = () => 'should not run'
+      const override = { example: fn }
+      expect(resolveLocalizedStrings(override, ctx)).toEqual(override)
+    })
+
+    it('drops the key when a text-key function throws', async () => {
+      const { resolveLocalizedStrings } = await import('../src/spec/entitySchemas.js')
+      const description = () => {
+        throw new Error('boom')
+      }
+      expect(resolveLocalizedStrings({ type: 'string', description }, ctx)).toEqual({ type: 'string' })
+    })
+
+    it('drops the key when a text-key function returns a non-string or empty string', async () => {
+      const { resolveLocalizedStrings } = await import('../src/spec/entitySchemas.js')
+      const nonString = { description: () => 42 as unknown as string, type: 'string' }
+      expect(resolveLocalizedStrings(nonString, ctx)).toEqual({ type: 'string' })
+      const empty = { description: () => '', type: 'string' }
+      expect(resolveLocalizedStrings(empty, ctx)).toEqual({ type: 'string' })
+    })
+
+    it('passes locale maps through untouched when no locales are configured', async () => {
+      const { resolveLocalizedStrings } = await import('../src/spec/entitySchemas.js')
+      const noLocales = { ...ctx, locales: [] }
+      const override = { description: { en: 'A', de: 'B' } }
+      expect(resolveLocalizedStrings(override, noLocales)).toEqual(override)
+    })
+  })
+
+  describe('translate helper', () => {
+    it('fills `{{var}}` placeholders, such as the jobs queue list', () => {
+      expect(t('jobsQueue', { queues: '`default`, `email`' })).toContain('`default`, `email`')
+      expect(t('jobsQueue', { queues: 'x' })).not.toContain('{{queues}}')
+    })
+  })
+})
+
+describe('bin/generateSpec', () => {
+  describe('parseArgs', () => {
+    it('reads `--lang`, `--out`, and `--server` in both spaced and `=` forms', async () => {
+      const { parseArgs } = await import('../src/bin/generateSpec.js')
+      expect(parseArgs(['--lang', 'de', '--out', 'spec.json', '--server', 'https://api.example.com'])).toEqual({
+        lang: 'de',
+        out: 'spec.json',
+        server: 'https://api.example.com',
+      })
+      expect(parseArgs(['--lang=all'])).toEqual({ lang: 'all' })
+      expect(parseArgs(['--server=https://api.example.com'])).toEqual({ server: 'https://api.example.com' })
+      expect(parseArgs(['node', 'script.js'])).toEqual({})
+    })
+  })
+
+  describe('auto-registering the CLI bin entry', () => {
+    it('adds a bin entry and stashes resolved options on `config.custom`', async () => {
+      const { openapi } = await import('../src/index.js')
+      const existingBin = { key: 'seed', scriptPath: '/abs/seed.ts' }
+      const incoming = {
+        collections: [],
+        bin: [existingBin],
+        custom: { user: { keep: 'me' } },
+      } as unknown as Config
+
+      const result = await openapi({ metadata: { title: 'API', version: '1.0.0' } })(incoming)
+
+      const stashed = result.custom?.[PLUGIN_NAME] as ReturnType<typeof resolveOptions>
+      expect(stashed).toEqual(resolveOptions({ metadata: { title: 'API', version: '1.0.0' } }))
+      expect(result.custom?.user).toEqual({ keep: 'me' })
+
+      const ours = result.bin?.find((entry) => entry.key === 'openapi:generate')
+      expect(ours).toBeDefined()
+      expect(ours?.scriptPath).toMatch(/[\\/]bin[\\/]generateSpec\.(ts|js)$/)
+      expect(result.bin).toContainEqual(existingBin)
+    })
+
+    it('skips registration when `enabled` is false', async () => {
+      const { openapi } = await import('../src/index.js')
+      const incoming = { collections: [] } as unknown as Config
+      const result = await openapi({
+        metadata: { title: 'API', version: '1.0.0' },
+        enabled: false,
+      })(incoming)
+      expect(result.bin).toBeUndefined()
+      expect(result.custom?.[PLUGIN_NAME]).toBeUndefined()
+    })
+
+    it('registers the CLI bin but mounts no endpoints when `serve` is false', async () => {
+      const { openapi } = await import('../src/index.js')
+      const incoming = {
+        collections: [],
+        i18n: { supportedLanguages: { de: {} }, translations: {} },
+      } as unknown as Config
+      const result = await openapi({
+        metadata: { title: 'API', version: '1.0.0' },
+        serve: false,
+        interactiveAuth: true,
+      })(incoming)
+
+      // bin + stashed options stay, so `payload openapi:generate` still works…
+      expect(result.bin?.some((entry) => entry.key === 'openapi:generate')).toBe(true)
+      expect(result.custom?.[PLUGIN_NAME]).toBeDefined()
+      // …including its multi-language output: translations are merged regardless of `serve`.
+      const translations = result.i18n?.translations as unknown as Record<string, Record<string, unknown>>
+      expect(translations.de[PLUGIN_NAME]).toBeDefined()
+      // …but nothing is served at runtime, not even the interactive-auth endpoint.
+      expect(result.endpoints ?? []).toEqual([])
+    })
+
+    it('mounts the spec endpoint by default (`serve` defaults to true)', async () => {
+      const { openapi } = await import('../src/index.js')
+      const incoming = { collections: [] } as unknown as Config
+      const result = await openapi({ metadata: { title: 'API', version: '1.0.0' } })(incoming)
+      const paths = (result.endpoints ?? []).map((e) => e.path)
+      expect(paths).toContain('/openapi.json')
+    })
+  })
+})
