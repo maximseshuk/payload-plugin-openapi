@@ -33,6 +33,7 @@
   - [OpenAPI Version](#openapi-version)
   - [Filters](#filters)
   - [Interactive Auth](#interactive-auth)
+  - [Security Marking](#security-marking)
   - [Caching](#caching)
 - [Docs UI](#docs-ui)
 - [Documenting Custom Endpoints](#documenting-custom-endpoints)
@@ -99,18 +100,19 @@ Prefer Swagger UI? Swap `scalar()` for `swaggerUi()` — or mount both on differ
 
 ### Plugin Options
 
-| Option            | Type                      | Default           | Description                                                                                                                |
-| ----------------- | ------------------------- | ----------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `metadata`        | `OpenApiMetadata`         | —                 | API title, version, and description. **Required.**                                                                         |
-| `openapiVersion`  | `'3.0' \| '3.1' \| '3.2'` | `'3.2'`           | Spec version to serve                                                                                                      |
-| `specEndpoint`    | `string`                  | `'/openapi.json'` | Path the spec is served from (relative to the API route)                                                                   |
-| `enabled`         | `boolean`                 | `true`            | Set `false` to disable the plugin entirely                                                                                 |
-| `serve`           | `boolean`                 | `true`            | Set `false` to register only the CLI generator and serve nothing over HTTP ([details](#generate-only-no-runtime-endpoint)) |
-| `filters`         | `FilterOptions`           | see below         | Which entities and operations to document ([details](#filters))                                                            |
-| `interactiveAuth` | `boolean \| { endpoint }` | `false`           | Username/password login for the docs UI                                                                                    |
-| `nestedTags`      | `boolean`                 | `false`           | Emit an OpenAPI 3.2 nested tag hierarchy (see below)                                                                       |
-| `cache`           | `boolean`                 | `true`            | Cache the built document for the life of the process                                                                       |
-| `extensions`      | `OpenApiExtension[]`      | `[]`              | Inject paths, components, tags, or transform the document                                                                  |
+| Option            | Type                            | Default           | Description                                                                                                                |
+| ----------------- | ------------------------------- | ----------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `metadata`        | `OpenApiMetadata`               | —                 | API title, version, and description. **Required.**                                                                         |
+| `openapiVersion`  | `'3.0' \| '3.1' \| '3.2'`       | `'3.2'`           | Spec version to serve                                                                                                      |
+| `specEndpoint`    | `string`                        | `'/openapi.json'` | Path the spec is served from (relative to the API route)                                                                   |
+| `enabled`         | `boolean`                       | `true`            | Set `false` to disable the plugin entirely                                                                                 |
+| `serve`           | `boolean`                       | `true`            | Set `false` to register only the CLI generator and serve nothing over HTTP ([details](#generate-only-no-runtime-endpoint)) |
+| `filters`         | `FilterOptions`                 | see below         | Which entities and operations to document ([details](#filters))                                                            |
+| `interactiveAuth` | `boolean \| { endpoint }`       | `false`           | Username/password login for the docs UI                                                                                    |
+| `nestedTags`      | `boolean`                       | `false`           | Emit an OpenAPI 3.2 nested tag hierarchy (see below)                                                                       |
+| `securityWhen`    | `(ctx) => boolean \| undefined` | —                 | Override the auto-detected security marking per operation ([details](#security-marking))                                   |
+| `cache`           | `boolean`                       | `true`            | Cache the built document for the life of the process                                                                       |
+| `extensions`      | `OpenApiExtension[]`            | `[]`              | Inject paths, components, tags, or transform the document                                                                  |
 
 ### Metadata
 
@@ -266,6 +268,47 @@ The endpoint logs in against your first auth-enabled collection (falling back to
 
 > [!WARNING]
 > The interactive auth endpoint exchanges credentials for a live JWT. Only enable it on docs you intend real users to authenticate against, and serve them over HTTPS.
+
+### Security Marking
+
+Each operation in the spec is marked either public or secured (referencing the `PayloadToken` scheme). The marking is a **static hint**, not a live access check — it tells a reader which endpoints need a token.
+
+By default the plugin figures this out per operation by probing your Payload access functions as an **anonymous request** (`user: null`): an operation is marked public only if its access function settles on `true`. The probe is deliberately conservative:
+
+- An `async` access function is awaited — `async () => true` is correctly public.
+- A function that returns a `Where` query (partial access), throws, or times out is marked secured.
+- A function that reaches into the database (`req.payload.find(...)`) is marked secured — the probe never runs live queries, so DB-driven access always errs on the side of a padlock.
+
+The marking is per operation: `read` covers list/find-by-id/count, `create` covers create/duplicate, `update` covers update and bulk update, `delete` covers delete and bulk delete.
+
+When the guess is wrong, override it — two ways, override wins over the probe:
+
+**Per entity, with `custom.openapi.security`** on a collection or global:
+
+```ts
+export const Posts: CollectionConfig = {
+  slug: 'posts',
+  custom: {
+    openapi: {
+      // true → all operations public; false → all secured; or per operation:
+      security: { read: true, create: false, update: false, delete: false },
+    },
+  },
+  // ...
+}
+```
+
+**Across the whole document, with `securityWhen`** — an escape hatch mirroring `filters.excludeWhen`. Return `true` to mark an operation public, `false` to mark it secured, or `undefined` to keep the detected marking. It runs last, after `custom.openapi.security` and the probe, over collection, global, auth, and version operations alike:
+
+```ts
+openapi({
+  metadata: { title: 'My API', version: '1.0.0' },
+  securityWhen: ({ slug, method }) => (slug === 'public-feed' && method === 'get' ? true : undefined),
+})
+```
+
+> [!NOTE]
+> This is public-access marking only — the plugin never runs per-user access checks. The generated spec matches what the HTTP endpoint enforces at runtime; the marking just documents it.
 
 ### Caching
 

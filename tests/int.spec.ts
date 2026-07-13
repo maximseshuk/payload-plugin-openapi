@@ -1,4 +1,5 @@
 import { getPayload } from 'payload'
+import type { Access, SanitizedCollectionConfig } from 'payload'
 import type {
   Document,
   ParameterObject,
@@ -548,5 +549,58 @@ describe('filters', () => {
     const d = await build({ includeJobs: false, includeVersions: false })
     expect(d.paths['/api/payload-jobs/run']).toBeUndefined()
     expect(d.paths['/api/globals/settings/versions']).toBeUndefined()
+  })
+})
+
+describe('security marking', () => {
+  const secured = [{ PayloadToken: [] }]
+
+  const buildWithReadAccess = async (
+    read: Access,
+    options = resolveOptions({ metadata: { title: 'T', version: '1.0.0' } }),
+  ): Promise<Document> => {
+    const payload = await getPayload({ config: await configPromise })
+    const base = Object.values(payload.collections).find((c) => c.config.slug === 'tags')!.config
+    const collection = { ...base, access: { ...base.access, read } } as SanitizedCollectionConfig
+    return buildDocument({
+      options,
+      servers: [{ url: 'http://localhost' }],
+      collections: [collection],
+      globals: [],
+      config: payload.config,
+      ctx: { defaultIDType: 'text', locales: [], apiRoute: '/api', docLanguages: ['en'], i18n: i18nStub },
+      logger: payload.logger,
+    })
+  }
+
+  it('marks a collection whose read access hits the DB as secured', async () => {
+    const dbRead: Access = async ({ req }) => {
+      const { totalDocs } = await req.payload.count({ collection: 'tags' })
+      return totalDocs >= 0
+    }
+    const d = await buildWithReadAccess(dbRead)
+    expect(d.paths?.['/api/tags']?.get?.security).toEqual(secured)
+  })
+
+  it('marks a plain public read function as public, leaving other operations secured', async () => {
+    const d = await buildWithReadAccess(() => true)
+    expect(d.paths?.['/api/tags']?.get?.security).toBeUndefined()
+    expect(d.paths?.['/api/tags']?.post?.security).toEqual(secured)
+    expect(d.paths?.['/api/tags/{id}']?.delete?.security).toEqual(secured)
+  })
+
+  it('lets securityWhen override the marking per operation in both directions', async () => {
+    const options = resolveOptions({
+      metadata: { title: 'T', version: '1.0.0' },
+      securityWhen: ({ method }) => {
+        if (method === 'get') return false
+        if (method === 'post') return true
+        return undefined
+      },
+    })
+    const d = await buildWithReadAccess(() => true, options)
+    expect(d.paths?.['/api/tags']?.get?.security).toEqual(secured)
+    expect(d.paths?.['/api/tags']?.post?.security).toBeUndefined()
+    expect(d.paths?.['/api/tags/{id}']?.delete?.security).toEqual(secured)
   })
 })

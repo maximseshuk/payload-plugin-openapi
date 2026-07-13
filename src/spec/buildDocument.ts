@@ -37,6 +37,7 @@ import {
   updateSchemaName,
 } from './names.js'
 import { buildParamSchemas, buildQueryOperationsSchema, collectionHasFilters } from './params.js'
+import { applySecurityWhen, resolveEntitySecurity } from './security.js'
 import { buildTagHierarchy, type CollectionTagInfo, type GlobalTagInfo } from './tags.js'
 import { buildAuthPaths } from './paths/auth.js'
 import { buildCollectionPaths } from './paths/collections.js'
@@ -113,7 +114,12 @@ export const buildDocument = async (input: BuildInput): Promise<Document> => {
       }
       registerParamSchemas(schemas, base, collection.fields, ctx)
 
-      const collectionPaths: PathsObject = { ...buildCollectionPaths({ collection, ctx }) }
+      const security = await resolveEntitySecurity({
+        entity: collection,
+        operations: ['read', 'create', 'update', 'delete'],
+        locale: ctx.locales[0],
+      })
+      const collectionPaths: PathsObject = { ...buildCollectionPaths({ collection, ctx, security }) }
 
       if (filters.includeAuth) {
         Object.assign(
@@ -143,9 +149,20 @@ export const buildDocument = async (input: BuildInput): Promise<Document> => {
         )
       }
 
+      const filteredCollectionPaths = filterOperations({
+        paths: collectionPaths,
+        slug: collection.slug,
+        kind: 'collection',
+        filters,
+      })
       Object.assign(
         paths,
-        filterOperations({ paths: collectionPaths, slug: collection.slug, kind: 'collection', filters }),
+        applySecurityWhen({
+          paths: filteredCollectionPaths,
+          slug: collection.slug,
+          kind: 'collection',
+          securityWhen: options.securityWhen,
+        }),
       )
     } catch (error) {
       logger.warn(`${PLUGIN_NAME}: skipped collection "${collection.slug}": ${(error as Error).message}`)
@@ -165,7 +182,12 @@ export const buildDocument = async (input: BuildInput): Promise<Document> => {
       schemas[updateSchemaName(gbase)] = update
       registerParamSchemas(schemas, gbase, global.fields, ctx)
 
-      const globalPaths: PathsObject = { ...buildGlobalPaths({ global, ctx }) }
+      const security = await resolveEntitySecurity({
+        entity: global,
+        operations: ['read', 'update'],
+        locale: ctx.locales[0],
+      })
+      const globalPaths: PathsObject = { ...buildGlobalPaths({ global, ctx, security }) }
 
       if (filters.includeVersions && global.versions) {
         const { version, versionList } = versionComponentSchemas({
@@ -187,7 +209,16 @@ export const buildDocument = async (input: BuildInput): Promise<Document> => {
         )
       }
 
-      Object.assign(paths, filterOperations({ paths: globalPaths, slug: global.slug, kind: 'global', filters }))
+      const filteredGlobalPaths = filterOperations({ paths: globalPaths, slug: global.slug, kind: 'global', filters })
+      Object.assign(
+        paths,
+        applySecurityWhen({
+          paths: filteredGlobalPaths,
+          slug: global.slug,
+          kind: 'global',
+          securityWhen: options.securityWhen,
+        }),
+      )
     } catch (error) {
       logger.warn(`${PLUGIN_NAME}: skipped global "${global.slug}": ${(error as Error).message}`)
     }

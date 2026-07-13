@@ -15,6 +15,10 @@ export type IDType = 'text' | 'number'
 
 export type Entity = SanitizedCollectionConfig | SanitizedGlobalConfig
 
+export type EntityOperation = 'read' | 'create' | 'update' | 'delete'
+
+export type EntitySecurityOverride = boolean | Partial<Record<EntityOperation, boolean>>
+
 // Plugin options
 
 export interface OpenApiMetadata {
@@ -130,6 +134,12 @@ export type OpenApiPluginOptions = {
    */
   nestedTags?: boolean
   /**
+   * Override the security marking per operation: `true` marks it public, `false`
+   * secured (`PayloadToken`), `undefined` keeps the detected marking. Runs last,
+   * after `custom.openapi.security` and the probe, across every operation group.
+   */
+  securityWhen?: (ctx: OperationContext) => boolean | undefined
+  /**
    * Cache the built document for the life of the process. The Payload config is
    * static after boot, so the spec is the same every time apart from the server
    * URL, which is filled in fresh per response. Default true; set false in dev to
@@ -184,6 +194,7 @@ export interface ResolvedOptions {
   filters: ResolvedFilters
   interactiveAuth: { enabled: boolean; endpoint: string }
   nestedTags: boolean
+  securityWhen?: (ctx: OperationContext) => boolean | undefined
   cache: boolean
   extensions: OpenApiExtension[]
 }

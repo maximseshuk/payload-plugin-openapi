@@ -35,8 +35,15 @@ const anyMatch = (matchers: EntityMatcher[], entity: EntityRef): boolean =>
 
 const isHiddenCollection = (collection: SanitizedCollectionConfig): boolean => {
   if ((collection as { hidden?: unknown }).hidden === true) return true
-  const adminHidden = collection.admin?.hidden
-  return adminHidden === true || typeof adminHidden === 'function'
+  const hidden = collection.admin?.hidden
+  if (typeof hidden === 'function') {
+    try {
+      return hidden({ user: null } as never) === true
+    } catch {
+      return false
+    }
+  }
+  return hidden === true
 }
 
 const passesIncludeExclude = (entity: EntityRef, filters: ResolvedFilters): boolean => {

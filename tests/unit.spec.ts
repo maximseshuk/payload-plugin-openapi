@@ -7,6 +7,7 @@ import type {
   Plugin,
   SanitizedCollectionConfig,
   SanitizedConfig,
+  SanitizedGlobalConfig,
 } from 'payload'
 import type { I18n } from '@payloadcms/translations'
 import { describe, expect, it } from 'vitest'
@@ -29,6 +30,7 @@ import {
 import type { Translate } from '../src/translations/types.js'
 import { buildCustomEndpointPaths } from '../src/spec/paths/custom.js'
 import { buildCollectionPaths } from '../src/spec/paths/collections.js'
+import { applySecurityWhen, evaluateAccess, resolveEntitySecurity } from '../src/spec/security.js'
 import type { Document, PathsObject, SchemaObject } from '@scalar/openapi-types/3.2'
 import type { OpenApiExtension, ResolvedFilters } from '../src/types.js'
 import { baseInput, ctx, i18nStub, t } from './helpers.js'
@@ -117,9 +119,23 @@ describe('spec/filters', () => {
       expect(shouldIncludeCollection(hidden, f({ includeHidden: true }))).toBe(true)
     })
 
-    it('treats a function that returns hidden as hidden', () => {
-      const hidden = coll('drafts', { admin: { hidden: () => false } })
-      expect(shouldIncludeCollection(hidden, f())).toBe(false)
+    it('probes a function-valued `admin.hidden` as anonymous: true hides, false documents', () => {
+      const hiddenFromAnon = coll('drafts', { admin: { hidden: () => true } })
+      const visibleToAnon = coll('drafts', { admin: { hidden: () => false } })
+      expect(shouldIncludeCollection(hiddenFromAnon, f())).toBe(false)
+      expect(shouldIncludeCollection(visibleToAnon, f())).toBe(true)
+      expect(shouldIncludeCollection(hiddenFromAnon, f({ includeHidden: true }))).toBe(true)
+    })
+
+    it('keeps a collection whose `admin.hidden` function throws', () => {
+      const thrower = coll('drafts', {
+        admin: {
+          hidden: () => {
+            throw new Error('boom')
+          },
+        },
+      })
+      expect(shouldIncludeCollection(thrower, f())).toBe(true)
     })
 
     it('honors an allowlist and excludes by string, regex, and kind', () => {
@@ -391,6 +407,167 @@ describe('spec/paths/collections', () => {
     const paths = buildCollectionPaths({ collection: postsColl({ disableDuplicate: true }), ctx })
     expect(paths['/api/posts/{id}/duplicate']).toBeUndefined()
     expect(paths['/api/posts/{id}']?.get).toBeDefined()
+  })
+})
+
+describe('spec/security', () => {
+  const secured = [{ PayloadToken: [] }]
+
+  describe('evaluateAccess', () => {
+    it('treats a missing access fn as secured', async () => {
+      expect(await evaluateAccess(undefined)).toBe(false)
+    })
+
+    it('marks a sync `() => true` as public and `() => false` as secured', async () => {
+      expect(await evaluateAccess(() => true)).toBe(true)
+      expect(await evaluateAccess(() => false)).toBe(false)
+    })
+
+    it('marks the default authenticated-only access (reads req.user) as secured', async () => {
+      const access = ({ req }: { req: { user: unknown } }) => Boolean(req.user)
+      expect(await evaluateAccess(access as never)).toBe(false)
+    })
+
+    it('awaits an async `() => true` and marks it public', async () => {
+      expect(await evaluateAccess(async () => true)).toBe(true)
+    })
+
+    it('runs an async fn that reads req.user and returns true for the anonymous role', async () => {
+      const access = async ({ req }: { req: { user?: { role?: string } } }) => {
+        const role = req.user?.role ?? 'anonymous'
+        return role === 'anonymous'
+      }
+      expect(await evaluateAccess(access as never)).toBe(true)
+    })
+
+    it('treats a Where-returning access fn as secured', async () => {
+      const access = () => ({ id: { equals: 1 } })
+      expect(await evaluateAccess(access as never)).toBe(false)
+    })
+
+    it('treats a throwing access fn as secured', async () => {
+      const access = () => {
+        throw new Error('boom')
+      }
+      expect(await evaluateAccess(access as never)).toBe(false)
+    })
+
+    it('treats access that reaches into req.payload as secured', async () => {
+      const access = async ({ req }: { req: { payload: { find: (a: unknown) => unknown } } }) =>
+        Boolean(await req.payload.find({}))
+      expect(await evaluateAccess(access as never)).toBe(false)
+    })
+
+    it('treats a never-settling promise as secured once the timeout elapses', async () => {
+      const access = () => new Promise<boolean>(() => {})
+      expect(await evaluateAccess(access as never, { timeoutMs: 10 })).toBe(false)
+    })
+  })
+
+  describe('resolveEntitySecurity', () => {
+    it('probes each operation independently', async () => {
+      const entity = {
+        slug: 'posts',
+        access: { read: () => true, create: ({ req }: { req: { user: unknown } }) => Boolean(req.user) },
+      } as unknown as SanitizedCollectionConfig
+      const sec = await resolveEntitySecurity({ entity, operations: ['read', 'create'] })
+      expect(sec.read).toBeUndefined()
+      expect(sec.create).toEqual(secured)
+    })
+
+    it('lets a boolean custom.openapi.security override the probe for all operations', async () => {
+      const entity = {
+        slug: 'posts',
+        access: { read: () => true },
+        custom: { openapi: { security: false } },
+      } as unknown as SanitizedCollectionConfig
+      const sec = await resolveEntitySecurity({ entity, operations: ['read'] })
+      expect(sec.read).toEqual(secured)
+    })
+
+    it('lets a per-operation override win over the probe in both directions', async () => {
+      const entity = {
+        slug: 'posts',
+        access: { read: () => false, create: () => true },
+        custom: { openapi: { security: { read: true, create: false } } },
+      } as unknown as SanitizedCollectionConfig
+      const sec = await resolveEntitySecurity({ entity, operations: ['read', 'create'] })
+      expect(sec.read).toBeUndefined()
+      expect(sec.create).toEqual(secured)
+    })
+
+    it('falls back to the probe for operations the override omits', async () => {
+      const entity = {
+        slug: 'posts',
+        access: { read: () => true, create: () => true },
+        custom: { openapi: { security: { read: false } } },
+      } as unknown as SanitizedCollectionConfig
+      const sec = await resolveEntitySecurity({ entity, operations: ['read', 'create'] })
+      expect(sec.read).toEqual(secured)
+      expect(sec.create).toBeUndefined()
+    })
+  })
+
+  describe('applySecurityWhen', () => {
+    const paths = (): PathsObject => ({
+      '/api/posts': { get: { security: undefined }, post: { security: [{ PayloadToken: [] }] } },
+    })
+
+    it('is a no-op when securityWhen is not set', () => {
+      const p = paths()
+      expect(applySecurityWhen({ paths: p, slug: 'posts', kind: 'collection' })).toBe(p)
+    })
+
+    it('opens an operation when the predicate returns true', () => {
+      const out = applySecurityWhen({ paths: paths(), slug: 'posts', kind: 'collection', securityWhen: () => true })
+      expect(out['/api/posts']?.post?.security).toBeUndefined()
+    })
+
+    it('closes an operation when the predicate returns false', () => {
+      const out = applySecurityWhen({ paths: paths(), slug: 'posts', kind: 'collection', securityWhen: () => false })
+      expect(out['/api/posts']?.get?.security).toEqual(secured)
+    })
+
+    it('leaves an operation untouched when the predicate returns undefined', () => {
+      const out = applySecurityWhen({
+        paths: paths(),
+        slug: 'posts',
+        kind: 'collection',
+        securityWhen: () => undefined,
+      })
+      expect(out['/api/posts']?.get?.security).toBeUndefined()
+      expect(out['/api/posts']?.post?.security).toEqual(secured)
+    })
+  })
+
+  describe('per-operation marking in path builders', () => {
+    it('marks collection ops per operation from resolved security', async () => {
+      const collection = {
+        slug: 'posts',
+        fields: [],
+        access: { read: () => true, create: ({ req }: { req: { user: unknown } }) => Boolean(req.user) },
+      } as unknown as SanitizedCollectionConfig
+      const security = await resolveEntitySecurity({
+        entity: collection,
+        operations: ['read', 'create', 'update', 'delete'],
+      })
+      const paths = buildCollectionPaths({ collection, ctx, security })
+      expect(paths['/api/posts']?.get?.security).toBeUndefined()
+      expect(paths['/api/posts']?.post?.security).toEqual(secured)
+    })
+
+    it('marks global get/post from read/update security', async () => {
+      const { buildGlobalPaths } = await import('../src/spec/paths/globals.js')
+      const global = {
+        slug: 'settings',
+        fields: [],
+        access: { read: () => true, update: ({ req }: { req: { user: unknown } }) => Boolean(req.user) },
+      } as unknown as SanitizedGlobalConfig
+      const security = await resolveEntitySecurity({ entity: global, operations: ['read', 'update'] })
+      const paths = buildGlobalPaths({ global, ctx, security })
+      expect(paths['/api/globals/settings']?.get?.security).toBeUndefined()
+      expect(paths['/api/globals/settings']?.post?.security).toEqual(secured)
+    })
   })
 })
 

@@ -77,10 +77,13 @@ export { swaggerUi } from './ui/swagger.js'
 
 export type {
   BuildContext,
+  EntityOperation,
+  EntitySecurityOverride,
   FilterOptions,
   OpenApiExtension,
   OpenApiMetadata,
   OpenApiPluginOptions,
   OpenApiVersion,
+  OperationContext,
   UiPluginOptions,
 } from './types.js'

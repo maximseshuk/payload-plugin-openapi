@@ -9,23 +9,19 @@ import type {
 
 import type { BuildContext } from '../../types.js'
 import { makeT } from '../../translations/index.js'
-import {
-  ERRORS,
-  SECURITY_SCHEME_NAME,
-  errorResponses,
-  isOpenToPublic,
-  jsonOk,
-  uploadRequestBody,
-} from '../components.js'
+import { ERRORS, errorResponses, jsonOk, uploadRequestBody } from '../components.js'
 import { createSchemaName, listSchemaName, refTo, schemaName, updateSchemaName } from '../names.js'
 import { buildListParams, buildParamSchemas, commonReadParams, type ReadParamRefs } from '../params.js'
+import type { EntitySecurity } from '../security.js'
 
 export const buildCollectionPaths = ({
   collection,
   ctx,
+  security = {},
 }: {
   collection: SanitizedCollectionConfig
   ctx: BuildContext
+  security?: EntitySecurity
 }): PathsObject => {
   const t = makeT(ctx.i18n)
   const name = schemaName(collection.slug)
@@ -35,7 +31,7 @@ export const buildCollectionPaths = ({
   const createRef: ReferenceObject = { $ref: refTo(createSchemaName(name)) }
   const updateRef: ReferenceObject = { $ref: refTo(updateSchemaName(name)) }
   const idType = ctx.defaultIDType === 'number' ? 'integer' : 'string'
-  const secured = isOpenToPublic(collection.access?.read) ? undefined : [{ [SECURITY_SCHEME_NAME]: [] }]
+  const { read: secRead, create: secCreate, update: secUpdate, delete: secDelete } = security
 
   const allowBulk = collection.disableBulkEdit !== true
   const allowDuplicate = collection.disableDuplicate !== true
@@ -122,14 +118,14 @@ export const buildCollectionPaths = ({
           parameters: bulkParams,
           requestBody: requestBody(updateRef, false),
           responses: bulkUpdateResponse,
-          security: secured,
+          security: secUpdate,
         },
         delete: {
           tags: [name],
           operationId: `delete${name}`,
           parameters: bulkParams,
           responses: bulkDeleteResponse,
-          security: secured,
+          security: secDelete,
         },
       }
     : {}
@@ -141,14 +137,14 @@ export const buildCollectionPaths = ({
         operationId: `find${name}`,
         parameters: buildListParams({ base: name, fields: collection.fields, ctx, refs }),
         responses: listResponse,
-        security: secured,
+        security: secRead,
       },
       post: {
         tags: [name],
         operationId: `create${name}`,
         requestBody: requestBody(createRef, fileRequiredOnCreate),
         responses: createResponse,
-        security: secured,
+        security: secCreate,
       },
       ...bulkOps,
     },
@@ -158,7 +154,7 @@ export const buildCollectionPaths = ({
         operationId: `count${name}`,
         parameters: bulkParams,
         responses: countResponse,
-        security: secured,
+        security: secRead,
       },
     },
     [`${base}/{id}`]: {
@@ -168,16 +164,16 @@ export const buildCollectionPaths = ({
         operationId: `find${name}ById`,
         parameters: commonReadParams({ base: name, ctx, refs }),
         responses: findByIdResponse,
-        security: secured,
+        security: secRead,
       },
       patch: {
         tags: [name],
         operationId: `update${name}ById`,
         requestBody: requestBody(updateRef, false),
         responses: updateResponse,
-        security: secured,
+        security: secUpdate,
       },
-      delete: { tags: [name], operationId: `delete${name}ById`, responses: deleteResponse, security: secured },
+      delete: { tags: [name], operationId: `delete${name}ById`, responses: deleteResponse, security: secDelete },
     },
   }
 
@@ -188,7 +184,7 @@ export const buildCollectionPaths = ({
         tags: [name],
         operationId: `duplicate${name}`,
         responses: { ...jsonOk(t('collectionDuplicated'), mutationSchema), ...errorResponses(ERRORS.create, t) },
-        security: secured,
+        security: secCreate,
       },
     }
   }

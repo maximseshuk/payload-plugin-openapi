@@ -1,4 +1,3 @@
-import type { Access } from 'payload'
 import type {
   ReferenceObject,
   RequestBodyObject,
@@ -173,21 +172,3 @@ export const securityScheme = ({ cookiePrefix, t }: { cookiePrefix: string; t: T
   bearerFormat: 'JWT',
   description: t('securityBearer', { cookiePrefix }),
 })
-
-// If the access fn reads `req`, treat the op as non-public. Default to secured.
-export const isOpenToPublic = (access: Access | undefined): boolean => {
-  if (!access) return true
-  const trap = new Proxy(
-    {},
-    {
-      get() {
-        throw new Error('req accessed')
-      },
-    },
-  )
-  try {
-    return access({ req: trap } as never) === true
-  } catch {
-    return false
-  }
-}

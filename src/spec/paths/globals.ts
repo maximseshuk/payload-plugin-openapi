@@ -3,22 +3,25 @@ import type { PathsObject, ReferenceObject } from '@scalar/openapi-types/3.2'
 
 import type { BuildContext } from '../../types.js'
 import { makeT } from '../../translations/index.js'
-import { ERRORS, SECURITY_SCHEME_NAME, errorResponses, isOpenToPublic, jsonOk } from '../components.js'
+import { ERRORS, errorResponses, jsonOk } from '../components.js'
 import { globalSchemaName, refTo, updateSchemaName } from '../names.js'
 import { buildParamSchemas, commonReadParams, type ReadParamRefs } from '../params.js'
+import type { EntitySecurity } from '../security.js'
 
 export const buildGlobalPaths = ({
   global,
   ctx,
+  security = {},
 }: {
   global: SanitizedGlobalConfig
   ctx: BuildContext
+  security?: EntitySecurity
 }): PathsObject => {
   const t = makeT(ctx.i18n)
   const name = globalSchemaName(global.slug)
   const docRef: ReferenceObject = { $ref: refTo(name) }
   const updateRef: ReferenceObject = { $ref: refTo(updateSchemaName(name)) }
-  const secured = isOpenToPublic(global.access?.read) ? undefined : [{ [SECURITY_SCHEME_NAME]: [] }]
+  const { read: secRead, update: secUpdate } = security
 
   const paramSchemas = buildParamSchemas({ fields: global.fields, ctx })
   const refs: ReadParamRefs = {
@@ -36,14 +39,14 @@ export const buildGlobalPaths = ({
         operationId: `find${name}`,
         parameters: commonReadParams({ base: name, ctx, refs }),
         responses: { ...okDoc, ...errorResponses(ERRORS.globalRead, t) },
-        security: secured,
+        security: secRead,
       },
       post: {
         tags: [name],
         operationId: `update${name}`,
         requestBody: { content: { 'application/json': { schema: updateRef } } },
         responses: { ...okDoc, ...errorResponses(ERRORS.globalUpdate, t) },
-        security: secured,
+        security: secUpdate,
       },
     },
   }

@@ -38,6 +38,7 @@ export const resolveOptions = (options: OpenApiPluginOptions): ResolvedOptions =
     filters: resolveFilters(options.filters),
     interactiveAuth: resolveInteractiveAuth(options.interactiveAuth),
     nestedTags: options.nestedTags ?? false,
+    securityWhen: options.securityWhen,
     cache: options.cache ?? true,
     extensions: options.extensions ?? [],
   }
