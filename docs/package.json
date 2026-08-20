@@ -1,0 +1,17 @@
+{
+  "name": "docs",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check-links": "mint broken-links",
+    "dev": "mint dev",
+    "validate": "mint validate"
+  },
+  "devDependencies": {
+    "mint": "^4.2.810"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  }
+}

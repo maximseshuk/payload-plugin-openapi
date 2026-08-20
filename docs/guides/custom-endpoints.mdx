@@ -1,0 +1,154 @@
+---
+title: 'Custom endpoints'
+description: 'Document custom Payload endpoints with a standard OpenAPI Operation Object on custom.openapi — no wrapper, no registry.'
+---
+
+Any custom Payload endpoint that carries `custom.openapi` metadata is picked up automatically. The metadata is a standard OpenAPI [Operation Object](https://spec.openapis.org/oas/v3.1.0#operation-object) — `summary`, `tags`, `parameters`, `requestBody`, `responses`, and so on. Endpoints without it are skipped, so nothing internal leaks into the spec by accident.
+
+```ts payload.config.ts
+import type { Endpoint } from 'payload'
+
+const healthEndpoint: Endpoint = {
+  path: '/health',
+  method: 'get',
+  handler: () => Response.json({ ok: true }),
+  custom: {
+    openapi: {
+      summary: 'Health check',
+      tags: ['System'],
+      responses: {
+        '200': { description: 'Service is healthy' },
+      },
+    },
+  },
+}
+```
+
+<Note>
+  This is the same `custom.openapi` convention that Payload's own [agent
+  skills](https://github.com/payloadcms/payload/blob/main/tools/claude-plugin/skills/payload/reference/ENDPOINTS.md#openapi-documentation)
+  document. The plugin reads exactly that shape — no plugin-specific wrapper, no separate registry to keep in sync.
+  Endpoints already documented this way show up with zero changes.
+</Note>
+
+## Where endpoints are collected from
+
+The plugin walks every endpoint list in the sanitized config:
+
+| Source                       | Spec path                 |
+| ---------------------------- | ------------------------- |
+| Top-level `config.endpoints` | `/api/...`                |
+| Collection `endpoints`       | `/api/<slug>/...`         |
+| Global `endpoints`           | `/api/globals/<slug>/...` |
+
+The `/api` segment follows your `routes.api` setting. Path params written Express-style (`:id`) are normalized to OpenAPI placeholders (`{id}`), so a collection endpoint at `/:id/tracking` on `posts` is documented as `/api/posts/{id}/tracking`.
+
+<Warning>
+  Custom endpoints are documented only while `filters.includeCustom` stays on. It defaults to `true`; turning it off
+  drops every `custom.openapi` endpoint from the spec. See [Filters](/configuration/filters).
+</Warning>
+
+## Examples
+
+### Request body
+
+```ts collections/Posts.ts
+import type { CollectionConfig } from 'payload'
+
+export const Posts: CollectionConfig = {
+  slug: 'posts',
+  endpoints: [
+    {
+      path: '/import',
+      method: 'post',
+      handler: importHandler,
+      custom: {
+        openapi: {
+          summary: 'Bulk import posts',
+          requestBody: {
+            required: true,
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'array',
+                  items: { $ref: '#/components/schemas/PostsCreate' },
+                },
+              },
+            },
+          },
+          responses: {
+            '202': { description: 'Import queued' },
+          },
+        },
+      },
+    },
+  ],
+  fields: [{ name: 'title', type: 'text', required: true }],
+}
+```
+
+### Path parameters
+
+Declare params under `parameters` exactly as in any OpenAPI operation. The `:id` in the Payload path and the `{id}` in the parameter refer to the same thing:
+
+```ts collections/Posts.ts
+{
+  path: '/:id/tracking',
+  method: 'get',
+  handler: trackingHandler,
+  custom: {
+    openapi: {
+      summary: 'Tracking events for a post',
+      parameters: [
+        {
+          name: 'id',
+          in: 'path',
+          required: true,
+          schema: { type: 'string' },
+        },
+      ],
+      responses: {
+        '200': { description: 'Tracking events' },
+      },
+    },
+  },
+}
+```
+
+### Tags
+
+Tags group operations in the docs UI. Reuse an existing entity tag to file the operation alongside the generated CRUD routes, or introduce your own:
+
+```ts globals/Settings.ts
+{
+  path: '/refresh',
+  method: 'post',
+  handler: refreshHandler,
+  custom: {
+    openapi: {
+      summary: 'Refresh cached settings',
+      tags: ['Maintenance'],
+      responses: {
+        '204': { description: 'Cache refreshed' },
+      },
+    },
+  },
+}
+```
+
+<Tip>
+  `description` and `summary` in the operation object are localizable — pass a translation function or a locale-keyed
+  object and they resolve against the request language. See [Field metadata](/guides/field-metadata#localized-strings)
+  for the shape and [i18n](/guides/i18n) for the language plumbing.
+</Tip>
+
+## Related
+
+<Columns cols={2}>
+  <Card title="Filters" href="/configuration/filters">
+    Control which entities and operations end up in the spec, including `includeCustom`.
+  </Card>
+  <Card title="For plugin authors" href="/guides/plugin-authors">
+    Ship documented endpoints from your own plugin with no dependency on this package.
+  </Card>
+</Columns>

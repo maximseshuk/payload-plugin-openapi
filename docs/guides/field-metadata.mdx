@@ -1,0 +1,166 @@
+---
+title: 'Field metadata'
+description: 'Refine inferred field schemas with custom.openapi: descriptions, examples, formats, constraints, and localized strings.'
+---
+
+The plugin infers a JSON Schema for every field from its Payload type — a `text` field becomes a string, a `number` field a number, a `select` an enum, and so on. You rarely need to touch that. When you do, put a partial Schema Object under the field's `custom.openapi` key.
+
+Whatever you put there is **deep-merged on top of the inferred schema, and your keys win**. You only change what you name; everything else the plugin inferred stays intact. The merge applies wherever the field appears — the read, create, and update schemas alike.
+
+## Annotating a field
+
+```ts collections/Posts.ts
+import type { Field } from 'payload'
+
+const slug: Field = {
+  name: 'slug',
+  type: 'text',
+  custom: {
+    openapi: {
+      description: 'URL-safe identifier, lowercase with dashes.',
+      pattern: '^[a-z0-9-]+$',
+      example: 'hello-world',
+    },
+  },
+}
+```
+
+Any Schema Object keyword works — `format`, `deprecated`, length and range constraints, or a full type override:
+
+<CodeGroup>
+
+```ts format + example
+{
+  name: 'website',
+  type: 'text',
+  custom: {
+    openapi: { format: 'uri', example: 'https://example.com' },
+  },
+}
+```
+
+```ts deprecated
+{
+  name: 'legacyField',
+  type: 'text',
+  custom: {
+    openapi: { deprecated: true },
+  },
+}
+```
+
+```ts constraints
+{
+  name: 'phone',
+  type: 'text',
+  custom: {
+    openapi: {
+      format: 'phone',
+      pattern: '^\\+[1-9]\\d{1,14}$',
+      example: '+14155552671',
+    },
+  },
+}
+```
+
+```ts type override
+// The plugin infers `string` for a text field. If your hooks store
+// structured data instead, override the inferred type entirely:
+{
+  name: 'coordinates',
+  type: 'json',
+  custom: {
+    openapi: {
+      type: 'object',
+      properties: {
+        lat: { type: 'number' },
+        lng: { type: 'number' },
+      },
+      required: ['lat', 'lng'],
+    },
+  },
+}
+```
+
+</CodeGroup>
+
+<Tip>
+  Fields nested in `row`, `tabs`, and other layout fields are annotated the same way — the plugin flattens layout fields
+  when it looks for `custom.openapi`.
+</Tip>
+
+## Localized strings
+
+`description`, `title`, and `summary` under `custom.openapi` are localizable. Give them a function or a locale-keyed object instead of a plain string, and they resolve against the request language — the same way Payload labels do:
+
+<CodeGroup>
+
+```ts function collections/Posts.ts
+const slug: Field = {
+  name: 'slug',
+  type: 'text',
+  custom: {
+    openapi: {
+      description: ({ t }) => t('fields:slugHelp'),
+    },
+  },
+}
+```
+
+```ts locale map collections/Posts.ts
+const phone: Field = {
+  name: 'phone',
+  type: 'text',
+  custom: {
+    openapi: {
+      description: {
+        en: 'E.164 formatted phone number',
+        de: 'Telefonnummer im E.164-Format',
+      },
+    },
+  },
+}
+```
+
+</CodeGroup>
+
+The function receives `{ t, i18n }` for the active request language. A locale map is any object whose keys are your project's locales and whose values are strings. Resolution happens per request: `GET /api/openapi.json?lang=de` returns the German descriptions. See [i18n](/guides/i18n) for how the language is picked.
+
+<Note>
+  Only `description`, `title`, and `summary` are treated this way. Other keys keep their values as-is, so an object
+  under `properties` named `en` is never mistaken for a locale map.
+</Note>
+
+## Entity-level metadata
+
+Collections and globals accept a `custom.openapi` key too. At the entity level the plugin reads `security` — a per-operation override of the automatic public/secured marking:
+
+```ts collections/Posts.ts
+export const Posts: CollectionConfig = {
+  slug: 'posts',
+  custom: {
+    openapi: {
+      // Reads are public; every write shows a padlock.
+      security: { read: true, create: false, update: false, delete: false },
+    },
+  },
+  fields: [
+    /* … */
+  ],
+}
+```
+
+Pass a boolean to mark every operation at once, or a partial `{ read, create, update, delete }` map. See [Security marking](/configuration/security-marking) for how this interacts with the access-function probe and `securityWhen`.
+
+The title and description shown on an entity's tag in the docs UI come from Payload's own config: the tag description is the collection's or global's `admin.description`, which is also resolved against the request language.
+
+## Related
+
+<Columns cols={2}>
+  <Card title="Security marking" href="/configuration/security-marking">
+    How operations get their public/secured marking and every way to override it.
+  </Card>
+  <Card title="Custom endpoints" href="/guides/custom-endpoints">
+    The same `custom.openapi` convention on endpoints, as a full Operation Object.
+  </Card>
+</Columns>

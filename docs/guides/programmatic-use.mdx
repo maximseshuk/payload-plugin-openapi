@@ -1,0 +1,98 @@
+---
+title: 'Programmatic use'
+description: 'Build the OpenAPI document in your own code with buildOpenApiDocument and downconvert it with toOpenApi30 / toOpenApi31.'
+---
+
+Need the document in your own code — a custom build step, a test, a deploy script? `buildOpenApiDocument` builds it from a live Payload instance, and the downconverters are exported alongside it. Everything comes from the main entry point (see [Exports](/reference/exports)).
+
+## Signature
+
+```ts
+import type { BasePayload } from 'payload'
+import type { I18n } from '@payloadcms/translations'
+import type { Document } from '@scalar/openapi-types/3.2'
+
+interface BuildOpenApiInput {
+  payload: BasePayload
+  options: ResolvedOptions
+  language?: string
+  i18n?: I18n
+  servers?: { url: string }[]
+}
+
+declare const buildOpenApiDocument: (input: BuildOpenApiInput) => Promise<Document>
+```
+
+| Property   | Type                | Description                                                                                                  |
+| ---------- | ------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `payload`  | `BasePayload`       | A live Payload instance (from `getPayload`).                                                                 |
+| `options`  | `ResolvedOptions`   | The plugin's resolved options — read them from `config.custom` (below).                                      |
+| `language` | `string`            | Optional locale for translated descriptions. Defaults to `i18n.fallbackLanguage`.                            |
+| `i18n`     | `I18n`              | Optional pre-built i18n instance. When set, `language` is not used to create one.                            |
+| `servers`  | `{ url: string }[]` | Base URLs written to the spec's `servers`. Omit to leave it empty — a file has no request to derive it from. |
+
+The returned document already honors `options.openapiVersion`: `'3.0'` and `'3.1'` are downconverted before the promise resolves, so you only call `toOpenApi30` / `toOpenApi31` yourself when you need an extra version of a 3.2 document.
+
+## Where `options` comes from
+
+`buildOpenApiDocument` takes **resolved** options — the internal shape with every default filled in — not the raw object you pass to `openapi()`. You never construct it by hand. The plugin resolves your options once at config build time and stashes the result on `config.custom` under the package name; read it from there:
+
+```ts
+const options = payload.config.custom?.['@seshuk/payload-plugin-openapi']
+```
+
+This is exactly what the [`openapi:generate` CLI](/cli/generate) does internally, and it means your script always builds with the same options the runtime endpoint uses — one source of truth.
+
+<Note>
+  `ResolvedOptions` is an internal type and is not exported. Keep the `config.custom` value opaque and pass it straight
+  through to `buildOpenApiDocument` — its parameter type checks the shape for you.
+</Note>
+
+## Example script
+
+```ts scripts/build-spec.ts
+import { writeFile } from 'node:fs/promises'
+import { getPayload } from 'payload'
+import { buildOpenApiDocument, toOpenApi30 } from '@seshuk/payload-plugin-openapi'
+import config from '../src/payload.config.js'
+
+const payload = await getPayload({ config: await config })
+
+const options = payload.config.custom?.['@seshuk/payload-plugin-openapi']
+if (!options) throw new Error('openapi() is not registered in payload.config')
+
+const doc = await buildOpenApiDocument({
+  payload,
+  options,
+  language: 'en', // optional
+  servers: [{ url: 'https://api.example.com' }],
+})
+
+// Need an extra 3.0 variant of a 3.2 document? Downconvert it yourself.
+const v30 = toOpenApi30(doc)
+
+await writeFile('openapi.json', JSON.stringify(doc, null, 2))
+await writeFile('openapi.3.0.json', JSON.stringify(v30, null, 2))
+
+await payload.destroy()
+```
+
+<Tip>
+  If all you want is the document on disk, you don't need a script — the [`openapi:generate` CLI](/cli/generate) covers
+  that, including one file per language with `--lang all`.
+</Tip>
+
+## Downconverters
+
+| Function      | Signature                     | Description                       |
+| ------------- | ----------------------------- | --------------------------------- |
+| `toOpenApi30` | `(doc: Document) => Document` | Downconvert a 3.2 document to 3.0 |
+| `toOpenApi31` | `(doc: Document) => Document` | Downconvert a 3.2 document to 3.1 |
+
+The plugin always builds 3.2 and downconverts from there — the same passes run when you set [`openapiVersion`](/configuration/openapi-version).
+
+## See also
+
+- [Generate command](/cli/generate) — the no-code path to a spec file
+- [Exports](/reference/exports) — the full public API surface
+- [OpenAPI version](/configuration/openapi-version) — how the 3.2-first build works

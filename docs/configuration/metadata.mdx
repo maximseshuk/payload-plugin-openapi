@@ -1,0 +1,31 @@
+---
+title: 'Metadata'
+description: 'The metadata object sets the API title, version, and description written to the spec info block.'
+---
+
+`metadata` fills the `info` block of the generated document. It is the only required plugin option.
+
+```ts payload.config.ts
+openapi({
+  metadata: {
+    title: 'My API',
+    version: '1.0.0',
+    description: 'Public API for the example app.',
+  },
+})
+```
+
+| Option        | Type     | Default | Description                                |
+| ------------- | -------- | ------- | ------------------------------------------ |
+| `title`       | `string` | —       | API title. **Required.**                   |
+| `version`     | `string` | —       | Your API's version. **Required.**          |
+| `description` | `string` | —       | Optional description for the `info` block. |
+
+<Warning>`metadata.title` and `metadata.version` are required. The plugin throws on boot if either is missing.</Warning>
+
+## The base URL is not metadata
+
+`metadata` carries the API's title, version, and description only — never its URL. Keeping the base URL out of the config is what lets the same document work behind any host, proxy, or environment.
+
+- **Over HTTP**, the spec's `servers` field is filled in per request from the incoming `Host` header. There is nothing to configure.
+- **Writing to a file**, there is no request to read a host from, so you set it yourself with the CLI's `--server` flag (see [Generate](/cli/generate)) or an explicit `servers` array when building the document in your own code (see [Programmatic use](/guides/programmatic-use)).

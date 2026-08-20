@@ -1,0 +1,51 @@
+---
+title: 'Exports'
+description: 'The full public API surface of @seshuk/payload-plugin-openapi — plugins, functions, and types from the single entry point.'
+---
+
+Everything is exported from the single main entry point:
+
+```ts
+import {
+  openapi,
+  scalar,
+  swaggerUi,
+  buildOpenApiDocument,
+  toOpenApi30,
+  toOpenApi31,
+} from '@seshuk/payload-plugin-openapi'
+```
+
+## Values
+
+| Export                 | Kind     | Description                                                                                    |
+| ---------------------- | -------- | ---------------------------------------------------------------------------------------------- |
+| `openapi`              | plugin   | The main plugin — generates and serves the spec, registers the [CLI](/cli/generate)            |
+| `scalar`               | plugin   | Mounts a Scalar API reference UI ([Docs UI](/configuration/docs-ui))                           |
+| `swaggerUi`            | plugin   | Mounts a Swagger UI ([Docs UI](/configuration/docs-ui))                                        |
+| `buildOpenApiDocument` | function | Build the document from a live Payload instance ([Programmatic use](/guides/programmatic-use)) |
+| `toOpenApi30`          | function | Downconvert a 3.2 document to 3.0                                                              |
+| `toOpenApi31`          | function | Downconvert a 3.2 document to 3.1                                                              |
+
+## Types
+
+All public types come from the same entry point, so editor autocomplete picks them up on `import type { … } from '@seshuk/payload-plugin-openapi'`.
+
+| Type                     | Description                                                                                                                              |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `OpenApiPluginOptions`   | The options object accepted by `openapi()`                                                                                               |
+| `OpenApiMetadata`        | API `title`, `version`, and optional `description`                                                                                       |
+| `OpenApiVersion`         | `'3.0' \| '3.1' \| '3.2'`                                                                                                                |
+| `FilterOptions`          | The `filters` object — entity include/exclude, endpoint-group toggles, operation rules ([Filters](/configuration/filters))               |
+| `OperationContext`       | `{ method, path, slug, kind }` passed to `filters.excludeWhen` and `securityWhen`                                                        |
+| `EntityOperation`        | `'read' \| 'create' \| 'update' \| 'delete'`                                                                                             |
+| `EntitySecurityOverride` | Shape of `custom.openapi.security` on an entity — a boolean or a per-operation map ([Security marking](/configuration/security-marking)) |
+| `OpenApiExtension`       | Extra `paths`/`components`/`tags` and a `transform` hook ([Extensions](/configuration/extensions))                                       |
+| `BuildContext`           | Build-time context passed to extension `transform` hooks — locales, API route, doc languages, active i18n                                |
+| `BuildOpenApiInput`      | The input object of `buildOpenApiDocument` ([Programmatic use](/guides/programmatic-use))                                                |
+| `UiPluginOptions`        | Options shared by `scalar()` and `swaggerUi()` — `path`, `specEndpoint`, `cdnBase`, `configuration`, `enabled`                           |
+
+<Note>
+  Document types (the return type of `buildOpenApiDocument` and the downconverters) come from
+  `@scalar/openapi-types/3.2` — the plugin's only runtime dependency.
+</Note>

@@ -1,0 +1,69 @@
+---
+title: 'Security marking'
+description: 'How each operation in the spec is marked public or secured, and how to override the automatic detection.'
+---
+
+Every operation in the generated document is marked either **public** or **secured**. A secured operation references the `PayloadToken` security scheme, so the docs UI shows a padlock and tells the reader a bearer token is required.
+
+The marking is a **static documentation hint**, not a live access check. The plugin never evaluates per-user permissions and never gates any request. It only records, in the spec, which endpoints an anonymous caller can reach — your Payload access control keeps enforcing the real rules at runtime.
+
+## How detection works
+
+By default the plugin probes each entity's Payload access functions as an **anonymous request** (`user: null`). An operation is marked public only if its access function settles on `true`. The probe is deliberately conservative:
+
+- An `async` access function is awaited — `async () => true` is correctly detected as public.
+- A function that returns a `Where` query (partial access), throws, or times out is marked secured.
+- A function that reaches into the database (`req.payload.find(...)`) is marked secured — the probe never runs live queries, so DB-driven access always errs on the side of a padlock.
+
+## Operation groups
+
+Payload access control is defined per operation, so the marking follows the same grouping. One access function decides the marking for every endpoint in its group:
+
+| Access function | Endpoints covered         |
+| --------------- | ------------------------- |
+| `read`          | list, find by ID, count   |
+| `create`        | create, duplicate         |
+| `update`        | update by ID, bulk update |
+| `delete`        | delete by ID, bulk delete |
+
+## Overriding the detection
+
+When the probe guesses wrong — a `Where`-based rule that is effectively public, or a DB lookup that always allows anonymous reads — override it. Two levels, in precedence order.
+
+### Per entity: `custom.openapi.security`
+
+Set `security` under `custom.openapi` on a collection or global. A boolean covers every operation; an object sets each group individually. `true` marks operations public, `false` marks them secured. This override wins over the probe:
+
+```ts collections/Posts.ts
+import type { CollectionConfig } from 'payload'
+
+export const Posts: CollectionConfig = {
+  slug: 'posts',
+  custom: {
+    openapi: {
+      // true → all operations public; false → all secured; or per operation:
+      security: { read: true, create: false, update: false, delete: false },
+    },
+  },
+  // ...
+}
+```
+
+### Document-wide: `securityWhen`
+
+`securityWhen` is the escape hatch, mirroring `filters.excludeWhen` (see [Filters](/configuration/filters)). It runs **last** — after `custom.openapi.security` and the probe — across every operation group: collection, global, auth, and version operations alike. Return `true` to mark an operation public, `false` to mark it secured, or `undefined` to keep the detected marking:
+
+```ts payload.config.ts
+openapi({
+  metadata: { title: 'My API', version: '1.0.0' },
+  securityWhen: ({ slug, method }) => (slug === 'public-feed' && method === 'get' ? true : undefined),
+})
+```
+
+The callback receives `{ method, path, slug, kind }` for each operation, where `kind` is `'collection'` or `'global'`.
+
+<Note>
+
+This is public-access marking only — the plugin never runs per-user access checks. The generated spec matches what the HTTP endpoint enforces at runtime; the marking only documents it.
+
+</Note>

@@ -1,0 +1,28 @@
+---
+title: 'Changelog'
+description: 'Release history for the OpenAPI plugin for Payload CMS.'
+---
+
+Notable changes per release. For the full commit-level history, see the [GitHub releases](https://github.com/maximseshuk/payload-plugin-openapi/releases).
+
+<Update label="v0.2.0" description="July 13, 2026">
+
+**New features**
+
+- Per-operation [security marking](/configuration/security-marking) derived from your access functions: each operation is probed as an anonymous request and marked public or secured accordingly.
+- Overrides for the detected marking: `custom.openapi.security` per collection or global, and the `securityWhen` option across the whole document.
+
+</Update>
+
+<Update label="v0.1.0" description="June 14, 2026">
+
+Initial release.
+
+- OpenAPI 3.0/3.1/3.2 document built from the sanitized Payload config — collections, globals, auth, versions, and jobs.
+- [Scalar and Swagger UI](/configuration/docs-ui) renderers.
+- [Custom endpoint](/guides/custom-endpoints) and [field metadata](/guides/field-metadata) via `custom.openapi`.
+- [Filters](/configuration/filters), [interactive auth](/configuration/interactive-auth), [extensions](/configuration/extensions), and [caching](/configuration/caching).
+- [`openapi:generate` CLI](/cli/generate) for writing the spec to a file.
+- UI translations for 44 locales.
+
+</Update>

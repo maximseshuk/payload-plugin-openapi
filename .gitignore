@@ -4,8 +4,11 @@
 .claude/settings.local.json
 .DS_Store
 .env*
+.omc
+.playwright-mcp
 coverage
 dist
+docs/.mint
 node_modules
 tests/.next
 tests/node_modules

@@ -1,0 +1,78 @@
+---
+title: 'Quick start'
+description: 'Install the plugin, add openapi() and scalar() to your Payload config, and get a live spec with interactive docs.'
+---
+
+<Steps>
+
+<Step title="Install">
+
+<CodeGroup>
+
+```bash npm
+npm install @seshuk/payload-plugin-openapi
+```
+
+```bash pnpm
+pnpm add @seshuk/payload-plugin-openapi
+```
+
+```bash yarn
+yarn add @seshuk/payload-plugin-openapi
+```
+
+</CodeGroup>
+
+<Info>Requires Payload `^3.53.0` and Node.js 20 or later.</Info>
+
+</Step>
+
+<Step title="Add the plugin">
+
+Add `openapi()` for the spec and `scalar()` for the docs UI:
+
+```ts payload.config.ts
+import { openapi, scalar } from '@seshuk/payload-plugin-openapi'
+import { buildConfig } from 'payload'
+
+export default buildConfig({
+  // ...
+  plugins: [
+    openapi({
+      metadata: {
+        title: 'My API',
+        version: '1.0.0',
+      },
+    }),
+    scalar(),
+  ],
+})
+```
+
+<Note>`metadata.title` and `metadata.version` are required. The plugin throws on boot if either is missing.</Note>
+
+</Step>
+
+<Step title="Open the docs">
+
+Two endpoints are now live:
+
+- `GET /api/openapi.json` — the generated OpenAPI document
+- `GET /api/docs` — interactive API reference (Scalar)
+
+Both are mounted under your Payload API route (`routes.api`, `/api` by default), since the plugin registers them as Payload endpoints. The `path` and `specEndpoint` options you pass are relative to that route.
+
+Prefer Swagger UI? Swap `scalar()` for `swaggerUi()` — or mount both on different paths. See [Docs UI](/configuration/docs-ui).
+
+</Step>
+
+</Steps>
+
+## Next steps
+
+- [Configuration overview](/configuration/overview) — every plugin option
+- [Filters](/configuration/filters) — choose which entities and operations are documented
+- [Security marking](/configuration/security-marking) — how operations get their public/secured padlock
+- [Custom endpoints](/guides/custom-endpoints) — document your own endpoints with `custom.openapi`
+- [CLI generation](/cli/generate) — write the spec to a file for CI or codegen
+- [Examples](/guides/examples) — complete configurations for common setups

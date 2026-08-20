@@ -1,0 +1,143 @@
+---
+title: 'Filters'
+description: 'Control what ends up in the spec: which entities are documented, which internal endpoints appear, and which operations are dropped.'
+---
+
+`filters` decides what the spec contains: which collections and globals are documented, which Payload-internal collections show up, which extra endpoint groups are generated, and which individual operations are dropped. It's one flat object.
+
+| Option              | Type               | Default | Description                                                                     |
+| ------------------- | ------------------ | ------- | ------------------------------------------------------------------------------- |
+| `include`           | `EntityMatcher[]`  | `[]`    | Allowlist. When non-empty, only matching entities are documented                |
+| `exclude`           | `EntityMatcher[]`  | `[]`    | Entities to leave out entirely (schemas and paths)                              |
+| `includeHidden`     | `boolean`          | `false` | Include collections flagged `hidden` / `admin.hidden`                           |
+| `includeSystem`     | `boolean`          | `false` | Include Payload-internal collections (`payload-jobs`, `payload-preferences`, …) |
+| `includeCustom`     | `boolean`          | `true`  | Document endpoints carrying `custom.openapi` metadata                           |
+| `includeAuth`       | `boolean`          | `true`  | Document auth operations (login / logout / me / …)                              |
+| `includeAdminAuth`  | `boolean`          | `false` | Document admin/bootstrap auth endpoints (`/init`, `/access`, first-register)    |
+| `includeVersions`   | `boolean`          | `true`  | Document version operations (`/versions`, `/versions/{id}`)                     |
+| `includeJobs`       | `boolean`          | `true`  | Document jobs endpoints (`/payload-jobs/run`, `/handle-schedules`)              |
+| `excludeOperations` | `OperationRule[]`  | `[]`    | Per-operation removal rules                                                     |
+| `excludeWhen`       | `(ctx) => boolean` | —       | Escape hatch: return `true` to drop an operation                                |
+
+## Choosing entities with `include` and `exclude`
+
+These two lists pick which collections and globals are documented. Each entry is an `EntityMatcher` — one of three shapes:
+
+| Matcher          | Matches                                                        | Example                           |
+| ---------------- | -------------------------------------------------------------- | --------------------------------- |
+| a string         | one entity by its exact slug                                   | `'posts'`                         |
+| a `RegExp`       | every entity whose slug matches the pattern                    | `/^marketing-/`                   |
+| `{ kind, slug }` | one entity, when a collection and a global share the same slug | `{ kind: 'global', slug: 'nav' }` |
+
+Two rules govern how the lists combine:
+
+- `include` is an allowlist. Leave it empty and everything is documented; add anything and only matching entities survive.
+- `exclude` always wins. An entity matching both lists is dropped.
+
+### Document only a few collections
+
+Once `include` has entries, everything else stays out of the spec:
+
+```ts payload.config.ts
+filters: {
+  include: ['posts', 'media', 'categories'],
+}
+```
+
+### Document everything except a few entities
+
+```ts payload.config.ts
+filters: {
+  exclude: ['audit-log', 'internal-settings'],
+}
+```
+
+### Match a group of slugs with a regular expression
+
+The pattern is tested against the slug. This keeps every collection whose slug starts with `public-` and drops everything else:
+
+```ts payload.config.ts
+filters: {
+  // public-posts, public-media, public-authors … all kept; everything else dropped.
+  include: [/^public-/],
+}
+```
+
+Common patterns, for reference:
+
+- `/^public-/` — slug starts with `public-`
+- `/-draft$/` — slug ends with `-draft`
+- `/^(posts|pages)$/` — slug is exactly `posts` or `pages`
+- `/internal/i` — slug contains `internal`, case-insensitive
+
+### Disambiguate a collection from a global
+
+A plain string matches any entity with that slug. When a collection and a global share one, use `{ kind, slug }` to target just one of them:
+
+```ts payload.config.ts
+filters: {
+  // Keep the `settings` collection, drop the `settings` global.
+  exclude: [{ kind: 'global', slug: 'settings' }],
+}
+```
+
+### Mix them
+
+`include` narrows the set first, then `exclude` removes from what's left:
+
+```ts payload.config.ts
+filters: {
+  // Document every `public-*` collection, but never the drafts one.
+  include: [/^public-/],
+  exclude: ['public-drafts'],
+}
+```
+
+<Note>
+  `include` and `exclude` only apply to your own collections and globals. Hidden and Payload-internal collections are
+  governed by `includeHidden` and `includeSystem`, which run **first** — adding `payload-jobs` to `include` won't
+  surface it unless `includeSystem` is on.
+</Note>
+
+## Dropping individual operations
+
+`include` / `exclude` work at the entity level. To remove specific operations — one method on one collection, every `DELETE`, anything under a path prefix — use `excludeOperations` or `excludeWhen`.
+
+### `excludeOperations`
+
+Each rule is a set of conditions. Within one rule, every field you set must match (**AND**). Across rules, an operation is dropped if **any** rule matches it (**OR**). A field you leave out matches anything.
+
+| Field    | Type                         | Matches                                                      |
+| -------- | ---------------------------- | ------------------------------------------------------------ |
+| `method` | `HttpMethod \| HttpMethod[]` | The HTTP method(s); omit to match any                        |
+| `slug`   | `string \| RegExp`           | The entity slug, exact string or pattern; omit to match any  |
+| `kind`   | `'collection' \| 'global'`   | Restrict to collections or globals; omit to match both       |
+| `path`   | `RegExp`                     | Tested against the final route path (e.g. `/api/posts/{id}`) |
+
+```ts payload.config.ts
+filters: {
+  excludeOperations: [
+    // Drop every DELETE, on any entity.
+    { method: 'delete' },
+    // Drop writes to `posts`, but leave its reads alone.
+    { slug: 'posts', method: ['post', 'patch', 'put'] },
+    // Drop anything matching a path, regardless of method or entity.
+    { path: /\/preview$/ },
+  ],
+}
+```
+
+### `excludeWhen`
+
+For logic that doesn't fit a rule, `excludeWhen` is the escape hatch. It runs after `excludeOperations` and receives the `method`, `path`, `slug`, and `kind` of every operation; return `true` to drop it:
+
+```ts payload.config.ts
+filters: {
+  excludeWhen: ({ path, method }) => path.includes('/internal/') || method === 'put',
+}
+```
+
+<Tip>
+  Filters only remove things from the document. To change how a kept operation is marked (public vs. secured), see
+  [Security marking](/configuration/security-marking).
+</Tip>

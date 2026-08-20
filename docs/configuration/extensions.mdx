@@ -1,0 +1,69 @@
+---
+title: 'Extensions'
+description: 'Inject extra paths, components, and tags, or transform the finished document before it is served.'
+---
+
+For anything the generator doesn't produce on its own, pass `extensions`. Each extension can add paths, components, and tags, and/or transform the finished document before it's served or written to a file:
+
+```ts payload.config.ts
+import type { OpenApiExtension } from '@seshuk/payload-plugin-openapi'
+
+const myExtension: OpenApiExtension = {
+  paths: {
+    '/webhooks/stripe': {
+      post: { summary: 'Stripe webhook', responses: { '200': { description: 'OK' } } },
+    },
+  },
+  components: {
+    securitySchemes: {
+      apiKey: { type: 'apiKey', in: 'header', name: 'X-API-Key' },
+    },
+  },
+  tags: [{ name: 'Webhooks', description: 'Inbound webhooks' }],
+  transform: (doc, ctx) => {
+    doc.info.termsOfService = 'https://example.com/terms'
+    return doc
+  },
+}
+
+openapi({
+  metadata: { title: 'My API', version: '1.0.0' },
+  extensions: [myExtension],
+})
+```
+
+## The extension shape
+
+| Option       | Type                     | Default | Description                                                    |
+| ------------ | ------------------------ | ------- | -------------------------------------------------------------- |
+| `paths`      | `PathsObject`            | —       | Extra path items merged into the document's `paths`            |
+| `components` | `ComponentsObject`       | —       | Extra schemas, security schemes, etc. merged into `components` |
+| `tags`       | `TagObject[]`            | —       | Extra tags appended to the document's `tags`                   |
+| `transform`  | `(doc, ctx) => Document` | —       | Post-build hook over the finished document                     |
+
+## The `transform` hook
+
+`transform` receives the full built document and a `BuildContext`, and **must return the document** to serve. Mutate and return the same object, or return a new one — either works, but a missing `return` drops the document.
+
+The `BuildContext` describes the build environment:
+
+| Property        | Type                 | Description                                                                   |
+| --------------- | -------------------- | ----------------------------------------------------------------------------- |
+| `defaultIDType` | `'text' \| 'number'` | The project's ID type                                                         |
+| `locales`       | `string[]`           | Locale codes from the project's `localization` config                         |
+| `apiRoute`      | `string`             | The Payload API route (`routes.api`, `/api` by default)                       |
+| `docLanguages`  | `string[]`           | Languages the docs are available in (the project's `i18n.supportedLanguages`) |
+| `i18n`          | `I18n`               | The active request i18n — resolves translated descriptions                    |
+
+## Extension or `custom.openapi`?
+
+Use the tool that keeps documentation next to what it describes:
+
+- **`custom.openapi` on an endpoint** — documentation for one specific endpoint your config already defines. It lives on the endpoint itself and needs no plugin option. See [Custom endpoints](/guides/custom-endpoints).
+- **An extension** — documentation that isn't tied to a single endpoint or field: shared components, extra tags, paths served outside Payload (webhooks handled elsewhere), or a post-build transform over the whole document.
+
+<Note>
+
+If you're a plugin author, prefer `custom.openapi` on the endpoints you add — it's picked up automatically without depending on this package. Extensions are an opt-in your users wire into their own `openapi({ extensions: [...] })` call. See [For plugin authors](/guides/plugin-authors).
+
+</Note>

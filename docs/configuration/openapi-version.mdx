@@ -1,0 +1,33 @@
+---
+title: 'OpenAPI version'
+description: 'The document is always built as OpenAPI 3.2; openapiVersion downconverts the result to 3.1 or 3.0.'
+---
+
+The builder always produces an OpenAPI 3.2 document. The `openapiVersion` option controls what gets served — `'3.1'` and `'3.0'` each run a downconversion pass on the finished document:
+
+| Version | Behavior                                                                      |
+| ------- | ----------------------------------------------------------------------------- |
+| `'3.2'` | Served as built (default)                                                     |
+| `'3.1'` | A downconversion pass strips 3.2-only fields                                  |
+| `'3.0'` | A downconversion pass to 3.0 (e.g. nullable handling, `examples` → `example`) |
+
+```ts payload.config.ts
+openapi({
+  metadata: { title: 'My API', version: '1.0.0' },
+  openapiVersion: '3.0',
+})
+```
+
+## Nested tags
+
+<Note>
+  Scalar and Swagger UI don't render OpenAPI 3.2 nested tags yet. The `nestedTags` option is **off by default**, so
+  `doc.tags` is a flat list of per-entity tags with descriptions. Turn it on only if your consumer understands the 3.2
+  `kind`/`parent` tag tree.
+</Note>
+
+When `nestedTags: true`, the plugin emits the 3.2 tag hierarchy: navigation groups via `kind`/`parent`, plus per-entity auth and version sub-tags.
+
+## Downconverting yourself
+
+The downconverters are also exported as `toOpenApi30` and `toOpenApi31`, so you can build a 3.2 document programmatically and convert it in your own code. See [Exports](/reference/exports).
