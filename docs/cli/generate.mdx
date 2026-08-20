@@ -1,0 +1,108 @@
+---
+title: 'Generate command'
+sidebarTitle: 'openapi:generate'
+description: 'Write the OpenAPI document to a file with the openapi:generate bin script — no HTTP request required.'
+---
+
+The plugin registers a Payload `bin` script under the `openapi:generate` key. It builds the same document the runtime endpoint serves and writes it to disk — no HTTP request, no running server needed.
+
+```bash
+payload openapi:generate
+```
+
+Writing the spec to a file is useful when you want to:
+
+- **Commit the spec** to the repo, so API changes show up in code review.
+- **Diff schemas in CI** and fail the build on unintended API changes.
+- **Feed a client-code generator** (openapi-typescript, Orval, and friends).
+- **Host a static spec** with no runtime endpoint at all — see [Serve a pre-generated spec](/guides/static-spec).
+
+<Note>
+  The script reads the plugin's resolved options from your Payload config, so `openapi()` must be in your `plugins`
+  array — even with [`serve: false`](/guides/static-spec).
+</Note>
+
+## Flags
+
+| Flag       | Description                                                                                                           |
+| ---------- | --------------------------------------------------------------------------------------------------------------------- |
+| `--lang`   | Locale for translated descriptions, or `all` to write one file per supported language. Defaults to the i18n fallback. |
+| `--out`    | Output path for a single-language run. Default `openapi.json`.                                                        |
+| `--server` | Base URL written to the spec's `servers`. Omit it to leave `servers` empty.                                           |
+
+Flags accept both `--flag value` and `--flag=value`.
+
+### `--lang`
+
+Picks the locale used for translated titles and descriptions. Defaults to your project's `i18n.fallbackLanguage`.
+
+```bash
+payload openapi:generate --lang ru
+```
+
+Pass `all` to write one file per language in your `i18n.supportedLanguages`, named `openapi.<lang>.json`:
+
+```bash
+payload openapi:generate --lang all
+# → openapi.en.json, openapi.ru.json, …
+```
+
+<Note>When `--lang all` writes multiple files, the `openapi.<lang>.json` naming applies and `--out` is ignored.</Note>
+
+See [Internationalization](/guides/i18n) for how language resolution works.
+
+### `--out`
+
+Output path for a single-language run:
+
+```bash
+payload openapi:generate --lang ru --out ./spec/openapi.ru.json
+```
+
+### `--server`
+
+Base URL written to the spec's `servers` array:
+
+```bash
+payload openapi:generate --server https://api.example.com
+```
+
+Over HTTP the `servers` field is filled in per request from the incoming `Host` header, so there is nothing to configure. A file on disk has no request to read the host from — so you set the base URL yourself with `--server`, or leave it out and ship a spec with empty `servers`. `metadata` carries the API's title, version, and description only, never its URL; keeping the base URL out of the spec is what lets the same document work behind any host, proxy, or environment.
+
+<Note>
+  The generated spec reflects public-access marking only — it never runs per-user access checks. This matches the HTTP
+  endpoint exactly. See [Security marking](/configuration/security-marking).
+</Note>
+
+## CI example
+
+Commit the spec, regenerate it in CI, and fail the job when the committed file drifts from the config:
+
+```yaml .github/workflows/openapi.yml
+name: OpenAPI spec check
+
+on: [pull_request]
+
+jobs:
+  spec-diff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm payload openapi:generate --server https://api.example.com --out openapi.json
+      - name: Fail on spec drift
+        run: git diff --exit-code openapi.json
+```
+
+The diff in the failed job output is a readable summary of what changed in your API.
+
+## See also
+
+- [Serve a pre-generated spec](/guides/static-spec) — `serve: false`, static hosting, and pointing the docs UI at a file
+- [Internationalization](/guides/i18n) — locales, `?lang=`, and multi-language generation
+- [Programmatic use](/guides/programmatic-use) — build the document in your own code instead

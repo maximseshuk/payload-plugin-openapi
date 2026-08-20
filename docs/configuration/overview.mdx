@@ -1,0 +1,68 @@
+---
+title: 'Overview'
+description: 'Configure the plugin with a single openapi() call, plus optional scalar() or swaggerUi() for the docs UI.'
+---
+
+You configure the plugin with a single `openapi(...)` call in your Payload config. The docs UI is separate — add `scalar()` or `swaggerUi()` alongside it (see [Docs UI](/configuration/docs-ui)):
+
+```ts payload.config.ts
+import { openapi, scalar } from '@seshuk/payload-plugin-openapi'
+import { buildConfig } from 'payload'
+
+export default buildConfig({
+  // ...
+  plugins: [
+    openapi({
+      metadata: {
+        title: 'My API',
+        version: '1.0.0',
+      },
+    }),
+    scalar(),
+  ],
+})
+```
+
+## Plugin options
+
+| Option            | Type                            | Default           | Description                                                                                                         |
+| ----------------- | ------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `metadata`        | `OpenApiMetadata`               | —                 | API title, version, and description. **Required.** See [Metadata](/configuration/metadata).                         |
+| `openapiVersion`  | `'3.0' \| '3.1' \| '3.2'`       | `'3.2'`           | Spec version to serve. See [OpenAPI version](/configuration/openapi-version).                                       |
+| `specEndpoint`    | `string`                        | `'/openapi.json'` | Path the spec is served from, relative to the API route.                                                            |
+| `enabled`         | `boolean`                       | `true`            | Set `false` to disable the plugin entirely.                                                                         |
+| `serve`           | `boolean`                       | `true`            | Set `false` to register only the CLI generator and serve nothing over HTTP. See [Static spec](/guides/static-spec). |
+| `filters`         | `FilterOptions`                 | see page          | Which entities and operations end up in the spec. See [Filters](/configuration/filters).                            |
+| `interactiveAuth` | `boolean \| { endpoint }`       | `false`           | Username/password login for the docs UI. See [Interactive auth](/configuration/interactive-auth).                   |
+| `nestedTags`      | `boolean`                       | `false`           | Emit an OpenAPI 3.2 nested tag hierarchy. See [OpenAPI version](/configuration/openapi-version#nested-tags).        |
+| `securityWhen`    | `(ctx) => boolean \| undefined` | —                 | Override the auto-detected security marking per operation. See [Security marking](/configuration/security-marking). |
+| `cache`           | `boolean`                       | `true`            | Cache the built document for the life of the process. See [Caching](/configuration/caching).                        |
+| `extensions`      | `OpenApiExtension[]`            | `[]`              | Inject paths, components, tags, or transform the finished document. See [Extensions](/configuration/extensions).    |
+
+## Paths are relative to the API route
+
+The plugin registers its endpoints as Payload endpoints, so everything mounts under your Payload API route (`routes.api`, `/api` by default). The `specEndpoint` you pass — and the `path` you pass to `scalar()`/`swaggerUi()` — are relative to that route. The defaults resolve to:
+
+- `GET /api/openapi.json` — the generated OpenAPI document
+- `GET /api/docs` — the interactive API reference
+
+## The lazy build model
+
+`openapi()` does not build anything at config time. It stashes the resolved options, registers the CLI generator, and mounts the endpoints. The document itself is built per request (or per CLI run) from the fully **sanitized** Payload config.
+
+That means plugin order does not matter: collections, globals, fields, and endpoints added by any other plugin are visible in the spec, whether that plugin runs before or after `openapi()` in your `plugins` array.
+
+<Note>`metadata.title` and `metadata.version` are required. The plugin throws on boot if either is missing.</Note>
+
+## Where to go next
+
+- [Metadata](/configuration/metadata) — title, version, description, and where the base URL comes from
+- [OpenAPI version](/configuration/openapi-version) — 3.2 by default, downconversion to 3.1/3.0
+- [Filters](/configuration/filters) — choose entities and drop operations
+- [Security marking](/configuration/security-marking) — public vs. secured operations
+- [Interactive auth](/configuration/interactive-auth) — Authorize dialog in the docs UI
+- [Caching](/configuration/caching) — when the document is rebuilt
+- [Extensions](/configuration/extensions) — add paths, components, tags, or transform the document
+- [Docs UI](/configuration/docs-ui) — Scalar and Swagger UI options
+
+For copy-ready configurations, see [Examples](/guides/examples).

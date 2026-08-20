@@ -1,0 +1,63 @@
+---
+title: 'Docs UI'
+description: 'Mount a Scalar or Swagger UI API reference next to the generated spec, or both on different paths.'
+sidebarTitle: 'Docs UI'
+---
+
+The plugin ships two UI renderers: `scalar()` and `swaggerUi()`. Each is a separate Payload plugin you add alongside `openapi()` — mount one, or both on different paths:
+
+```ts payload.config.ts
+import { openapi, scalar, swaggerUi } from '@seshuk/payload-plugin-openapi'
+
+plugins: [
+  openapi({ metadata: { title: 'My API', version: '1.0.0' } }),
+  scalar(), // Scalar at /api/docs
+  swaggerUi({ path: '/swagger' }), // Swagger UI at /api/swagger
+]
+```
+
+Each renderer serves a single HTML page that loads the UI library from a CDN and points it at the spec endpoint. Paths are relative to the Payload API route (`routes.api`, `/api` by default).
+
+## Options
+
+Both renderers accept the same options:
+
+| Option          | Type                      | Default                     | Description                                                                       |
+| --------------- | ------------------------- | --------------------------- | --------------------------------------------------------------------------------- |
+| `path`          | `string`                  | `'/docs'`                   | Where the docs UI is served, relative to the API route (so `/docs` → `/api/docs`) |
+| `specEndpoint`  | `string`                  | `'<apiRoute>/openapi.json'` | URL the UI fetches the OpenAPI document from                                      |
+| `cdnBase`       | `string`                  | official jsDelivr package   | CDN base for the UI's assets                                                      |
+| `configuration` | `Record<string, unknown>` | `{}`                        | Extra config merged into the library's init options                               |
+| `enabled`       | `boolean`                 | `true`                      | Set `false` to skip mounting the UI                                               |
+
+The default `cdnBase` is `https://cdn.jsdelivr.net/npm/@scalar/api-reference` for Scalar and `https://cdn.jsdelivr.net/npm/swagger-ui-dist` for Swagger UI.
+
+## Passing UI configuration
+
+`configuration` is passed straight through to the underlying library — Scalar's `createApiReference` config or Swagger UI's `SwaggerUIBundle` options. It must be JSON-serializable; functions aren't supported here.
+
+```ts payload.config.ts
+scalar({
+  configuration: {
+    theme: 'purple',
+    hideDownloadButton: true,
+  },
+})
+```
+
+## Serving a static spec
+
+The UI loads the spec from a URL, and that URL doesn't have to be the plugin's runtime endpoint. Point `specEndpoint` at a pre-generated file and the UI renders it directly:
+
+```ts payload.config.ts
+plugins: [
+  openapi({ metadata: { title: 'My API', version: '1.0.0' }, serve: false }),
+  scalar({ specEndpoint: '/openapi.json' }), // loads public/openapi.json
+]
+```
+
+See [Static spec](/guides/static-spec) for generating the file with the CLI.
+
+## Language switcher
+
+For multi-language docs, point Scalar's `sources` at the spec endpoint with different `?lang=` values. When `sources` is set, the renderer's own `specEndpoint` is ignored. Swagger UI has no built-in switcher — mount one instance per language instead. See [Internationalization](/guides/i18n) for both setups.

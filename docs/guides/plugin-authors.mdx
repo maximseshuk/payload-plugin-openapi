@@ -1,0 +1,91 @@
+---
+title: 'For plugin authors'
+description: 'Make your Payload plugin OpenAPI-ready with custom.openapi metadata — no dependency on this package, no wiring for your users.'
+---
+
+If you maintain a Payload plugin that adds endpoints, collections, or fields, you can make them show up in the generated spec **without depending on this package** — and without your users having to wire anything up. Attach a `custom.openapi` Operation Object to each endpoint you add, and annotate the fields you add the same way.
+
+<Info>
+  `custom.openapi` is a plain convention on Payload's own `custom` key — the same one Payload's agent skills document.
+  Your plugin does not import anything from `@seshuk/payload-plugin-openapi`, so it adds zero dependencies and zero
+  bundle weight.
+</Info>
+
+## A documented plugin
+
+```ts src/index.ts
+import type { Config, Plugin } from 'payload'
+
+import { syncHandler } from './handlers.js'
+
+export const myPlugin =
+  (): Plugin =>
+  (config: Config): Config => ({
+    ...config,
+    endpoints: [
+      ...(config.endpoints ?? []),
+      {
+        path: '/my-feature/sync',
+        method: 'post',
+        handler: syncHandler,
+        custom: {
+          // Picked up automatically if the OpenAPI plugin is installed; ignored otherwise.
+          openapi: {
+            summary: 'Trigger a sync',
+            tags: ['My Feature'],
+            responses: { '202': { description: 'Sync queued' } },
+          },
+        },
+      },
+    ],
+    collections: [
+      ...(config.collections ?? []),
+      {
+        slug: 'sync-log',
+        fields: [
+          {
+            name: 'status',
+            type: 'select',
+            options: ['queued', 'running', 'done'],
+            custom: {
+              openapi: {
+                description: 'Lifecycle state of the sync run.',
+                example: 'queued',
+              },
+            },
+          },
+        ],
+      },
+    ],
+  })
+```
+
+That is the whole integration. When a user has the OpenAPI plugin installed, your endpoint appears in their spec under its own tag, and your field carries its description and example into the generated schemas. See [Custom endpoints](/guides/custom-endpoints) for the operation shape and [Field metadata](/guides/field-metadata) for everything fields support.
+
+## Why plugin order does not matter
+
+The OpenAPI plugin does not read your config when it runs. It builds the document **lazily, on request, from the fully sanitized config**. By the time a request hits `/api/openapi.json`, every plugin in the `plugins` array has already run — so your endpoints, collections, and fields are visible no matter where either plugin sits in the list. There is no ordering constraint to document and nothing for your users to get wrong.
+
+## The key is inert without the plugin
+
+`custom.openapi` is data on Payload's `custom` key, nothing more. If the OpenAPI plugin is not installed, the metadata sits there unused — no runtime cost, no behavior change, no errors. You can ship it unconditionally in your plugin and let each user decide whether they generate a spec.
+
+<Note>
+  Users can still drop your endpoints from their spec with `filters.includeCustom: false` or entity/operation
+  [filters](/configuration/filters) — the metadata is an offer, not an obligation.
+</Note>
+
+## Beyond single endpoints and fields
+
+Anything not tied to one endpoint or field — shared components, extra tags, a post-build transform — belongs in an [extension](/configuration/extensions). Extensions are an opt-in that **users** wire into their own `openapi({ extensions: [...] })` call; there is no implicit cross-plugin channel to maintain. Export an `OpenApiExtension` object from your package if you want to offer one, and document that users pass it themselves.
+
+## Related
+
+<Columns cols={2}>
+  <Card title="Custom endpoints" href="/guides/custom-endpoints">
+    The full Operation Object convention, path normalization, and collection sources.
+  </Card>
+  <Card title="Extensions" href="/configuration/extensions">
+    Shared components, extra tags, and document transforms.
+  </Card>
+</Columns>

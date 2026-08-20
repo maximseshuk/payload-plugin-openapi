@@ -1,0 +1,214 @@
+---
+title: 'Examples'
+description: 'Copy-ready openapi() configurations for public APIs, read-only specs, interactive auth, CI generation, multi-language docs, and extensions.'
+---
+
+Copy-ready configurations for common setups. Each one is a complete `openapi(...)` call — combine pieces as needed for your project.
+
+<Tip>For option-by-option reference, see [Configuration](/configuration/overview).</Tip>
+
+## Basic setup
+
+### Minimal
+
+The smallest working config: `metadata.title` and `metadata.version` are required, everything else has a default.
+
+```ts payload.config.ts
+import { buildConfig } from 'payload'
+import { openapi, scalar } from '@seshuk/payload-plugin-openapi'
+
+export default buildConfig({
+  plugins: [
+    openapi({
+      metadata: {
+        title: 'My API',
+        version: '1.0.0',
+      },
+    }),
+    scalar(), // interactive docs at /api/docs
+  ],
+})
+```
+
+### Scalar and Swagger UI side by side
+
+Each renderer is its own plugin — mount both on different paths against the same spec endpoint.
+
+```ts payload.config.ts
+import { openapi, scalar, swaggerUi } from '@seshuk/payload-plugin-openapi'
+
+plugins: [
+  openapi({
+    metadata: { title: 'My API', version: '1.0.0' },
+  }),
+  scalar(), // Scalar at /api/docs
+  swaggerUi({ path: '/swagger' }), // Swagger UI at /api/swagger
+]
+```
+
+See [Docs UI](/configuration/docs-ui).
+
+## Shaping the spec
+
+### Public API only
+
+Document only the `public-*` collections, and drop one of them by exact slug. `include` is an allowlist: once it's non-empty, only matching entities survive.
+
+```ts payload.config.ts
+openapi({
+  metadata: { title: 'Public API', version: '1.0.0' },
+  filters: {
+    include: [/^public-/], // public-posts, public-media, … all kept
+    exclude: ['public-drafts'], // …except this one
+  },
+})
+```
+
+See [Filters](/configuration/filters) for all matcher forms (slug, RegExp, `{ kind, slug }`).
+
+### Read-only spec
+
+Keep every entity but drop all write operations with `excludeOperations`.
+
+```ts payload.config.ts
+openapi({
+  metadata: { title: 'Read-only API', version: '1.0.0' },
+  filters: {
+    excludeOperations: [{ method: ['post', 'patch', 'put', 'delete'] }],
+  },
+})
+```
+
+Rules combine: add `{ slug: 'posts', method: 'get' }` style entries to target one entity, or `{ path: /\/preview$/ }` to match by route path.
+
+## Auth and security
+
+### Interactive auth for a private docs site
+
+Add a token endpoint and a matching security scheme, so the docs UI shows an **Authorize** dialog where users log in with their Payload credentials instead of pasting a token.
+
+```ts payload.config.ts
+openapi({
+  metadata: { title: 'Internal API', version: '1.0.0' },
+  interactiveAuth: true, // token endpoint at /api/openapi-auth
+  // interactiveAuth: { endpoint: '/login' }, // or a custom path → /api/login
+})
+```
+
+See [Interactive auth](/configuration/interactive-auth).
+
+### Security overrides with `securityWhen`
+
+The plugin marks each operation public or secured by probing your access functions. `securityWhen` runs last and overrides the detected marking: return `true` for public, `false` for secured, `undefined` to keep the detection.
+
+```ts payload.config.ts
+openapi({
+  metadata: { title: 'My API', version: '1.0.0' },
+  securityWhen: ({ slug, method }) => {
+    // The feed read is public even though its access function is dynamic.
+    if (slug === 'public-feed' && method === 'get') return true
+    // Everything under `internal` always shows a padlock.
+    if (slug === 'internal') return false
+    return undefined // keep the detected marking everywhere else
+  },
+})
+```
+
+See [Security marking](/configuration/security-marking).
+
+## Environments
+
+### Development
+
+Turn the cache off so config edits show up without a restart, and surface hidden and Payload-internal collections while debugging.
+
+```ts payload.config.ts
+openapi({
+  metadata: { title: 'My API (dev)', version: '0.0.0' },
+  cache: process.env.NODE_ENV === 'production',
+  filters: {
+    includeHidden: true, // collections flagged hidden/admin.hidden
+    includeSystem: true, // payload-jobs, payload-preferences, …
+  },
+})
+```
+
+See [Caching](/configuration/caching).
+
+### Generate only, for CI
+
+No runtime endpoint at all — the plugin registers just the [`openapi:generate` CLI](/cli/generate), and the file is generated at build time.
+
+```ts payload.config.ts
+openapi({
+  metadata: { title: 'My API', version: '1.0.0' },
+  serve: false, // CLI only; nothing is served over HTTP
+})
+```
+
+```bash
+payload openapi:generate --server https://api.example.com --out ./public/openapi.json
+```
+
+See [Serve a pre-generated spec](/guides/static-spec).
+
+## Multi-language docs site
+
+One runtime endpoint, resolved per request via `?lang=`; Scalar gets a language switcher through `sources`. Swagger UI has no switcher — mount one instance per language instead.
+
+```ts payload.config.ts
+import { openapi, scalar } from '@seshuk/payload-plugin-openapi'
+
+plugins: [
+  openapi({
+    metadata: { title: 'My API', version: '1.0.0' },
+  }),
+  scalar({
+    configuration: {
+      sources: [
+        { title: 'English', url: '/api/openapi.json?lang=en', default: true },
+        { title: 'Русский', url: '/api/openapi.json?lang=ru' },
+      ],
+    },
+  }),
+]
+```
+
+See [Internationalization](/guides/i18n).
+
+## Extensions
+
+Add a webhook path and an API-key security scheme the generator can't know about, plus a post-build transform.
+
+```ts payload.config.ts
+import type { OpenApiExtension } from '@seshuk/payload-plugin-openapi'
+
+const webhooks: OpenApiExtension = {
+  paths: {
+    '/webhooks/stripe': {
+      post: {
+        summary: 'Stripe webhook',
+        tags: ['Webhooks'],
+        responses: { '200': { description: 'OK' } },
+      },
+    },
+  },
+  components: {
+    securitySchemes: {
+      apiKey: { type: 'apiKey', in: 'header', name: 'X-API-Key' },
+    },
+  },
+  tags: [{ name: 'Webhooks', description: 'Inbound webhooks' }],
+  transform: (doc) => {
+    doc.info.termsOfService = 'https://example.com/terms'
+    return doc
+  },
+}
+
+openapi({
+  metadata: { title: 'My API', version: '1.0.0' },
+  extensions: [webhooks],
+})
+```
+
+See [Extensions](/configuration/extensions).
