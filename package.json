@@ -1,19 +1,19 @@
 {
   "name": "@seshuk/payload-plugin-openapi",
   "version": "1.0.0-beta.1",
-  "description": "OpenAPI 3.0/3.1/3.2 spec generator for Payload, with Scalar/Swagger UI.",
+  "description": "Payload plugin that generates OpenAPI 3.0/3.1/3.2 docs, with Scalar or Swagger UI",
   "keywords": [
-    "api-docs",
-    "cms",
+    "api-documentation",
     "openapi",
     "openapi-spec",
     "payload",
+    "payload-cms",
     "payload-plugin",
     "payloadcms",
-    "plugin",
+    "rest-api",
     "scalar",
     "swagger",
-    "typescript"
+    "swagger-ui"
   ],
   "homepage": "https://github.com/maximseshuk/payload-plugin-openapi#readme",
   "bugs": "https://github.com/maximseshuk/payload-plugin-openapi/issues",
