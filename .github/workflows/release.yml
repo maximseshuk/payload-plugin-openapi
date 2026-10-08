@@ -43,4 +43,5 @@ jobs:
         with:
           body: ${{ steps.changelog.outputs.content }}
 
-      - run: npm publish --access public --provenance --tag latest
+      - run: pnpm pack --pack-destination "$RUNNER_TEMP/pack"
+      - run: npm publish "$RUNNER_TEMP"/pack/*.tgz --access public --provenance --tag latest
