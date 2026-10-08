@@ -193,18 +193,16 @@ export const buildAuthPaths = ({
     }
   }
 
-  if (auth.maxLoginAttempts && auth.maxLoginAttempts > 0) {
-    paths[`${base}/unlock`] = {
-      post: op(`unlock${name}`, ERRORS.authAction, {
-        requestBody: jsonBody({
-          type: 'object',
-          additionalProperties: false,
-          properties: { email: { type: 'string', format: 'email' } },
-          required: ['email'],
-        }),
-        responses: messageResponse(t('authUnlock')),
+  paths[`${base}/unlock`] = {
+    post: op(`unlock${name}`, ERRORS.authAction, {
+      requestBody: jsonBody({
+        type: 'object',
+        additionalProperties: false,
+        properties: { email: { type: 'string', format: 'email' } },
+        required: ['email'],
       }),
-    }
+      responses: messageResponse(t('authUnlock')),
+    }),
   }
 
   if (auth.verify) {

@@ -30,6 +30,7 @@ import {
 import type { Translate } from '../src/translations/types.js'
 import { buildCustomEndpointPaths } from '../src/spec/paths/custom.js'
 import { buildCollectionPaths } from '../src/spec/paths/collections.js'
+import { buildAuthPaths } from '../src/spec/paths/auth.js'
 import { applySecurityWhen, evaluateAccess, resolveEntitySecurity } from '../src/spec/security.js'
 import type { Document, PathsObject, SchemaObject } from '@scalar/openapi-types/3.2'
 import type { OpenApiExtension, ResolvedFilters } from '../src/types.js'
@@ -407,6 +408,16 @@ describe('spec/paths/collections', () => {
     const paths = buildCollectionPaths({ collection: postsColl({ disableDuplicate: true }), ctx })
     expect(paths['/api/posts/{id}/duplicate']).toBeUndefined()
     expect(paths['/api/posts/{id}']?.get).toBeDefined()
+  })
+})
+
+describe('spec/paths/auth', () => {
+  const users = (auth: Record<string, unknown>): SanitizedCollectionConfig =>
+    ({ slug: 'users', fields: [], auth }) as unknown as SanitizedCollectionConfig
+
+  it('documents unlock for every auth collection, without `maxLoginAttempts`', () => {
+    const paths = buildAuthPaths({ collection: users({}), ctx, includeAdmin: true, nestedTags: true })
+    expect(paths['/api/users/unlock']?.post).toBeDefined()
   })
 })
 
