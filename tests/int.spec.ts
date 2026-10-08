@@ -164,15 +164,62 @@ describe('generated document', () => {
 
       it('writes relationships as ids in create bodies', () => {
         const author = schema('PostsCreate').properties?.author as SchemaObject
-        expect(author.type).toBe(idType)
+        expect(author.type).toEqual([idType, 'null'])
         const tags = schema('PostsCreate').properties?.tags as SchemaObject
-        expect(tags.type).toBe('array')
+        expect(tags.type).toEqual(['array', 'null'])
         expect((tags.items as SchemaObject).type).toBe(idType)
+      })
+
+      it('writes polymorphic relationships as `{ relationTo, value }` in create bodies', () => {
+        const related = schema('PostsCreate').properties?.related as SchemaObject
+        expect(related.type).toEqual(['array', 'null'])
+        const branches = (related.items as SchemaObject).oneOf as SchemaObject[]
+        expect(branches.map((b) => b.properties?.relationTo)).toEqual([{ const: 'posts' }, { const: 'tags' }])
+        for (const branch of branches) {
+          expect(branch.required).toEqual(['value', 'relationTo'])
+          expect(branch.properties?.value).toEqual({ type: idType })
+        }
       })
 
       it('writes an upload field as an id in create bodies', () => {
         const featured = schema('PostsCreate').properties?.featuredImage as SchemaObject
-        expect(featured.type).toBe(idType)
+        expect(featured.type).toEqual([idType, 'null'])
+      })
+
+      it('writes relationships nested in groups, named tabs, arrays and blocks as ids', () => {
+        const create = schema('PostsCreate').properties ?? {}
+        const hero = (create.hero as SchemaObject).properties ?? {}
+        expect(hero.image).toEqual({ type: [idType, 'null'] })
+        const link = ((hero.links as SchemaObject).items as SchemaObject).properties?.doc as SchemaObject
+        expect((link.oneOf as SchemaObject[]).map((b) => b.properties?.value)).toEqual([
+          { type: idType },
+          { type: idType },
+        ])
+        expect((create.og as SchemaObject).properties?.image).toEqual({ type: [idType, 'null'] })
+
+        const row = ((create.sections as SchemaObject).items as SchemaObject).properties ?? {}
+        expect(row.tags).toEqual({ type: ['array', 'null'], items: { type: idType } })
+        const blocks = ((row.content as SchemaObject).items as SchemaObject).oneOf as SchemaObject[]
+        expect(blocks[0]?.properties?.media).toEqual({ type: idType })
+
+        const layout = ((create.layout as SchemaObject).items as SchemaObject).oneOf as SchemaObject[]
+        const gallery = layout.find((b) => (b.properties?.blockType as SchemaObject | undefined)?.const === 'gallery')
+        expect(gallery?.properties?.images).toEqual({ type: ['array', 'null'], items: { type: idType } })
+        expect(schema('PostsUpdate').properties?.hero).toEqual(create.hero)
+      })
+
+      it('keeps the populated document in nested read shapes', () => {
+        const read = schema('Posts').properties ?? {}
+        const hero = (read.hero as SchemaObject).properties ?? {}
+        expect((hero.image as SchemaObject).oneOf?.[1]).toEqual({ $ref: '#/components/schemas/Media' })
+        const related = ((read.related as SchemaObject).items as SchemaObject).oneOf as SchemaObject[]
+        const value = related[0]?.properties?.value as SchemaObject
+        expect(value.oneOf?.[1]).toEqual({ $ref: '#/components/schemas/Posts' })
+        const row = ((read.sections as SchemaObject).items as SchemaObject).properties ?? {}
+        const blocks = ((row.content as SchemaObject).items as SchemaObject).oneOf as SchemaObject[]
+        expect(blocks[0]).toEqual({ $ref: '#/components/schemas/BlockMedia' })
+        const media = schema('BlockMedia').properties?.media as SchemaObject
+        expect(media.oneOf?.[1]).toEqual({ $ref: '#/components/schemas/Media' })
       })
     })
 

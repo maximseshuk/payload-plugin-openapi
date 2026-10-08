@@ -9,6 +9,7 @@ import type {
   SanitizedConfig,
   SanitizedGlobalConfig,
 } from 'payload'
+import { flattenAllFields } from 'payload'
 import type { I18n } from '@payloadcms/translations'
 import { describe, expect, it } from 'vitest'
 
@@ -664,6 +665,57 @@ describe('spec/security', () => {
       expect(paths['/api/globals/settings']?.get?.security).toBeUndefined()
       expect(paths['/api/globals/settings']?.post?.security).toEqual(secured)
     })
+  })
+})
+
+describe('spec/entitySchemas', () => {
+  it('writes relationships as ids at any depth and keeps the populated shape on read', async () => {
+    const { buildEntitySchemas } = await import('../src/spec/entitySchemas.js')
+    const fields = [
+      { name: 'cover', type: 'upload', relationTo: 'media' },
+      { name: 'meta', type: 'group', fields: [{ name: 'image', type: 'upload', relationTo: 'media' }] },
+      {
+        name: 'rows',
+        type: 'array',
+        fields: [
+          { name: 'tags', type: 'relationship', relationTo: 'tags', hasMany: true },
+          { name: 'link', type: 'relationship', relationTo: ['media', 'tags'] },
+        ],
+      },
+      {
+        name: 'content',
+        type: 'blocks',
+        blocks: [{ slug: 'quote', fields: [{ name: 'source', type: 'relationship', relationTo: 'tags' }] }],
+      },
+    ] as Field[]
+    const collection = (slug: string, own: Field[] = []) => ({
+      slug,
+      fields: own,
+      flattenedFields: flattenAllFields({ fields: own }),
+    })
+    const entity = collection('posts', fields) as unknown as SanitizedCollectionConfig
+    const config = { collections: [collection('media'), collection('tags')], blocks: [] } as unknown as SanitizedConfig
+    const { read, create, update } = await buildEntitySchemas({ entity, config, ctx })
+
+    const id = { type: 'string' }
+    const optionalId = { type: ['string', 'null'] }
+    const props = create.properties ?? {}
+    expect(props.cover).toEqual(optionalId)
+    expect((props.meta as SchemaObject).properties?.image).toEqual(optionalId)
+    const row = ((props.rows as SchemaObject).items as SchemaObject).properties ?? {}
+    expect(row.tags).toEqual({ type: ['array', 'null'], items: id })
+    const link = (row.link as SchemaObject).oneOf as SchemaObject[]
+    expect(link.map((b) => [b.properties?.relationTo, b.properties?.value])).toEqual([
+      [{ const: 'media' }, id],
+      [{ const: 'tags' }, id],
+    ])
+    const quote = ((props.content as SchemaObject).items as SchemaObject).oneOf?.[0] as SchemaObject
+    expect(quote.properties?.source).toEqual(optionalId)
+    expect(update.properties?.meta).toEqual(props.meta)
+
+    const readMeta = read.properties?.meta as SchemaObject
+    const readImage = readMeta.properties?.image as SchemaObject
+    expect(readImage.oneOf?.[1]).toEqual({ $ref: '#/components/schemas/Media' })
   })
 })
 

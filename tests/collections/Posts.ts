@@ -94,11 +94,37 @@ export const Posts: CollectionConfig = {
             { name: 'metaDescription', type: 'textarea' },
           ],
         },
+        {
+          name: 'og',
+          label: 'Open Graph',
+          fields: [{ name: 'image', type: 'upload', relationTo: 'media' }],
+        },
       ],
     },
     { name: 'featuredImage', type: 'upload', relationTo: 'media' },
     { name: 'author', type: 'relationship', relationTo: 'users' },
     { name: 'tags', type: 'relationship', relationTo: 'tags', hasMany: true },
+    { name: 'related', type: 'relationship', relationTo: ['posts', 'tags'], hasMany: true },
     { name: 'featured', type: 'checkbox', defaultValue: false },
+    {
+      name: 'hero',
+      type: 'group',
+      fields: [
+        { name: 'image', type: 'upload', relationTo: 'media' },
+        {
+          name: 'links',
+          type: 'array',
+          fields: [{ name: 'doc', type: 'relationship', relationTo: ['posts', 'tags'] }],
+        },
+      ],
+    },
+    {
+      name: 'sections',
+      type: 'array',
+      fields: [
+        { type: 'row', fields: [{ name: 'tags', type: 'relationship', relationTo: 'tags', hasMany: true }] },
+        { name: 'content', type: 'blocks', blockReferences: ['mediaBlock', 'callToAction'], blocks: [] },
+      ],
+    },
   ],
 }
