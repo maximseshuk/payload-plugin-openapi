@@ -10,7 +10,7 @@ const nextConfig = {
     }
     return webpackConfig
   },
-  serverExternalPackages: ['mongodb-memory-server'],
+  serverExternalPackages: ['@seshuk/payload-plugin-tooling', 'mongodb-memory-server'],
 }
 
 export default withPayload(nextConfig, { devBundleServerPackages: false })

@@ -3,7 +3,7 @@ import type { CollectionConfig } from 'payload'
 export const Posts: CollectionConfig = {
   slug: 'posts',
   admin: { description: 'Blog posts and articles' },
-  versions: { drafts: { localizeStatus: true }, maxPerDoc: 10 },
+  versions: { drafts: true, maxPerDoc: 10 },
   fields: [
     { name: 'title', type: 'text', required: true, localized: true },
     {
@@ -42,8 +42,7 @@ export const Posts: CollectionConfig = {
     {
       name: 'callouts',
       type: 'blocks',
-      blockReferences: ['callToAction'],
-      blocks: [],
+      blocks: ['callToAction'],
     },
     { name: 'slug', type: 'text', unique: true },
     { name: 'legacyField', type: 'text', custom: { openapi: { deprecated: true } } },
@@ -123,7 +122,7 @@ export const Posts: CollectionConfig = {
       type: 'array',
       fields: [
         { type: 'row', fields: [{ name: 'tags', type: 'relationship', relationTo: 'tags', hasMany: true }] },
-        { name: 'content', type: 'blocks', blockReferences: ['mediaBlock', 'callToAction'], blocks: [] },
+        { name: 'content', type: 'blocks', blocks: ['mediaBlock', 'callToAction'] },
       ],
     },
   ],
