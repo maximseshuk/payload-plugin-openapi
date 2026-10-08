@@ -1635,7 +1635,14 @@ describe('ui/html', () => {
     const { swaggerUi } = await import('@/server/ui/swagger.js')
     const html = await renderHtml(swaggerUi({ configuration: { x: '</script>' } }))
     expect(html).not.toContain('</script>"')
-    expect(html).toContain('\\u003c/script>')
+    expect(html).toContain('\\u003c/script\\u003e')
+  })
+
+  it('escapes `specURL` so it cannot break out of the script', async () => {
+    const { scalar } = await import('@/server/ui/scalar.js')
+    const html = await renderHtml(scalar({ specURL: '/spec.json</script><script>alert(1)</script>' }))
+    expect(html).not.toContain('<script>alert(1)')
+    expect(html).toContain('/spec.json\\u003c/script\\u003e')
   })
 
   it('loads pinned CDN assets with SRI, and a custom `cdnBase` without it', async () => {
