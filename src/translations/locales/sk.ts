@@ -7,6 +7,12 @@ export const sk: PluginDefaultTranslationsObject = {
     paramSortShort: 'Pole, podľa ktorého sa má zoradiť; pre zostupné poradie použite predponu `-`.',
     paramDraft: 'Vrátiť koncepty verzií.',
     paramTrash: 'Zahrnúť dokumenty v koši.',
+    paramAutosave:
+      'Uložiť ako automatické uloženie: aktualizuje poslednú automaticky uloženú verziu namiesto pridania novej.',
+    paramPublishAllLocales: 'Publikovať všetky jazyky, nielen jazyk požiadavky.',
+    paramUnpublishAllLocales: 'Zrušiť publikovanie všetkých jazykov a vrátiť dokument do konceptu.',
+    paramOverrideLock: 'Ignorovať zámok iného používateľa. Predvolene false.',
+    paramSelectedLocales: 'Skopírovať do duplikátu len tieto jazyky. Predvolene: všetky jazyky.',
     paramFlattenLocales:
       'Pri `locale=all` nastavte na false, aby sa lokalizované polia zachovali ako objekty podľa jednotlivých lokalít. Predvolene true.',
     paramLocale:

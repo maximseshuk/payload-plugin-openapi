@@ -319,6 +319,56 @@ describe('generated document', () => {
       expect(posts.properties?.limit).toEqual({ type: 'integer' })
       expect(posts.properties?.where).toBeDefined()
     })
+
+    it('documents the query params that write operations read', () => {
+      const names = (op?: { parameters?: unknown[] }) =>
+        ((op?.parameters ?? []) as ParameterObject[]).map((p) => p.name)
+      const create = names(doc.paths['/api/posts']?.post)
+      expect(create).toEqual(expect.arrayContaining(['depth', 'locale', 'select', 'populate', 'draft']))
+      expect(create).not.toContain('trash')
+      expect(names(doc.paths['/api/posts/{id}']?.patch)).toEqual(expect.arrayContaining(['depth', 'draft', 'trash']))
+      expect(names(doc.paths['/api/posts/{id}']?.delete)).toEqual(expect.arrayContaining(['depth', 'trash']))
+      expect(names(doc.paths['/api/posts/{id}']?.delete)).not.toContain('draft')
+      expect(names(doc.paths['/api/posts']?.patch)).toEqual(
+        expect.arrayContaining(['where', 'limit', 'sort', 'depth', 'draft']),
+      )
+      expect(names(doc.paths['/api/posts']?.delete)).not.toContain('limit')
+      expect(names(doc.paths['/api/posts']?.delete)).not.toContain('sort')
+      expect(names(doc.paths['/api/globals/settings']?.post)).toEqual(expect.arrayContaining(['depth', 'draft']))
+    })
+
+    it('documents the draft, locale and lock params only where Payload reads them', () => {
+      const names = (op?: { parameters?: unknown[] }) =>
+        ((op?.parameters ?? []) as ParameterObject[]).map((p) => p.name)
+      const posts = doc.paths['/api/posts']
+      const post = doc.paths['/api/posts/{id}']
+      expect(names(posts?.post)).toContain('publishAllLocales')
+      expect(names(posts?.post)).not.toContain('unpublishAllLocales')
+      expect(names(posts?.post)).not.toContain('autosave')
+      expect(names(posts?.patch)).toEqual(
+        expect.arrayContaining(['publishAllLocales', 'unpublishAllLocales', 'overrideLock']),
+      )
+      expect(names(post?.patch)).toEqual(
+        expect.arrayContaining(['publishAllLocales', 'unpublishAllLocales', 'overrideLock']),
+      )
+      expect(names(post?.delete)).toContain('overrideLock')
+      expect(names(post?.delete)).not.toContain('publishAllLocales')
+      expect(names(doc.paths['/api/tags/{id}']?.patch)).not.toContain('overrideLock')
+      expect(names(doc.paths['/api/tags/{id}']?.delete)).not.toContain('overrideLock')
+
+      const settings = names(doc.paths['/api/globals/settings']?.post)
+      expect(settings).toContain('autosave')
+      expect(settings).not.toContain('publishAllLocales')
+      expect(settings).not.toContain('overrideLock')
+
+      const duplicate = (doc.paths['/api/posts/{id}/duplicate']?.post?.parameters ?? []) as ParameterObject[]
+      expect(duplicate.find((p) => p.name === 'selectedLocales[]')).toMatchObject({
+        style: 'form',
+        explode: true,
+        schema: { type: 'array', items: { type: 'string', enum: ['en', 'de', 'fr'] } },
+      })
+      expect(names(doc.paths['/api/posts/{id}/duplicate']?.post)).not.toContain('publishAllLocales')
+    })
   })
 
   describe('paths/auth', () => {

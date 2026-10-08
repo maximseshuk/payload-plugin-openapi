@@ -11,7 +11,14 @@ import type { BuildContext } from '../../types.js'
 import { makeT } from '../../translations/index.js'
 import { ERRORS, errorResponses, jsonOk, uploadRequestBody } from '../components.js'
 import { createSchemaName, listSchemaName, refTo, schemaName, updateSchemaName } from '../names.js'
-import { buildListParams, buildParamSchemas, commonReadParams, type ReadParamRefs } from '../params.js'
+import {
+  buildListParams,
+  buildParamSchemas,
+  commonReadParams,
+  type ReadParamRefs,
+  writeParams,
+  type WriteOperation,
+} from '../params.js'
 import type { EntitySecurity } from '../security.js'
 
 export const buildCollectionPaths = ({
@@ -105,17 +112,18 @@ export const buildCollectionPaths = ({
     ...errorResponses(ERRORS.list, t),
   }
 
-  const whereParameter = buildListParams({ base: name, fields: collection.fields, ctx, refs }).find(
-    (p) => p.name === 'where',
-  )
-  const bulkParams = whereParameter ? [whereParameter] : []
+  const listParams = buildListParams({ base: name, fields: collection.fields, ctx, refs })
+  const bulkParams = listParams.filter((p) => p.name === 'where')
+  const bulkUpdateParams = listParams.filter((p) => ['limit', 'sort', 'where'].includes(p.name))
+  const write = (operation: WriteOperation) => writeParams({ base: name, entity: collection, ctx, refs, operation })
+  const deleteParams = write('delete')
 
   const bulkOps = allowBulk
     ? {
         patch: {
           tags: [name],
           operationId: `update${name}`,
-          parameters: bulkParams,
+          parameters: [...bulkUpdateParams, ...write('update')],
           requestBody: requestBody(updateRef, false),
           responses: bulkUpdateResponse,
           security: secUpdate,
@@ -123,7 +131,7 @@ export const buildCollectionPaths = ({
         delete: {
           tags: [name],
           operationId: `delete${name}`,
-          parameters: bulkParams,
+          parameters: [...bulkParams, ...deleteParams],
           responses: bulkDeleteResponse,
           security: secDelete,
         },
@@ -142,6 +150,7 @@ export const buildCollectionPaths = ({
       post: {
         tags: [name],
         operationId: `create${name}`,
+        parameters: write('create'),
         requestBody: requestBody(createRef, fileRequiredOnCreate),
         responses: createResponse,
         security: secCreate,
@@ -169,11 +178,18 @@ export const buildCollectionPaths = ({
       patch: {
         tags: [name],
         operationId: `update${name}ById`,
+        parameters: write('updateByID'),
         requestBody: requestBody(updateRef, false),
         responses: updateResponse,
         security: secUpdate,
       },
-      delete: { tags: [name], operationId: `delete${name}ById`, responses: deleteResponse, security: secDelete },
+      delete: {
+        tags: [name],
+        operationId: `delete${name}ById`,
+        parameters: deleteParams,
+        responses: deleteResponse,
+        security: secDelete,
+      },
     },
   }
 
@@ -183,6 +199,7 @@ export const buildCollectionPaths = ({
       post: {
         tags: [name],
         operationId: `duplicate${name}`,
+        parameters: write('duplicate'),
         responses: { ...jsonOk(t('collectionDuplicated'), mutationSchema), ...errorResponses(ERRORS.create, t) },
         security: secCreate,
       },

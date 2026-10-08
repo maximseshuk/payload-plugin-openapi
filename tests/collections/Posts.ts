@@ -3,7 +3,7 @@ import type { CollectionConfig } from 'payload'
 export const Posts: CollectionConfig = {
   slug: 'posts',
   admin: { description: 'Blog posts and articles' },
-  versions: { drafts: true, maxPerDoc: 10 },
+  versions: { drafts: { localizeStatus: true }, maxPerDoc: 10 },
   fields: [
     { name: 'title', type: 'text', required: true, localized: true },
     {

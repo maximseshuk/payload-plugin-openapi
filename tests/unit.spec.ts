@@ -415,6 +415,15 @@ describe('spec/paths/collections', () => {
     expect(paths['/api/posts/{id}/duplicate']).toBeUndefined()
     expect(paths['/api/posts/{id}']?.get).toBeDefined()
   })
+
+  it('lists `limit` and `sort` on bulk update only', () => {
+    const paths = buildCollectionPaths({ collection: postsColl(), ctx })
+    const names = (op?: { parameters?: unknown[] }) => ((op?.parameters ?? []) as { name: string }[]).map((p) => p.name)
+    expect(names(paths['/api/posts']?.patch)).toEqual(expect.arrayContaining(['limit', 'sort']))
+    expect(names(paths['/api/posts']?.patch)).not.toContain('page')
+    expect(names(paths['/api/posts']?.delete)).not.toContain('limit')
+    expect(names(paths['/api/posts']?.delete)).not.toContain('sort')
+  })
 })
 
 describe('spec/paths/auth', () => {
@@ -631,6 +640,43 @@ describe('spec/params', () => {
     const custom = { ...ctx, i18n: { ...ctx.i18n, t: (() => 'ÜBERSETZT') as unknown as I18n['t'] } }
     const schema = buildSelectSchema({ fields: [{ name: 'title', type: 'text' }] as Field[], ctx: custom })
     expect(schema.description).toBe('ÜBERSETZT')
+  })
+
+  it('adds draft, locale and lock params by entity config and operation', async () => {
+    const { writeParams } = await import('../src/spec/params.js')
+    const refs = { select: true, populate: false, joins: false }
+    const entity = (versions: unknown, lockDocuments?: false) =>
+      ({ slug: 'x', fields: [], versions, lockDocuments }) as unknown as SanitizedCollectionConfig
+    const names = (e: SanitizedCollectionConfig, operation: Parameters<typeof writeParams>[0]['operation']) =>
+      writeParams({ base: 'X', entity: e, ctx, refs, operation }).map((p) => p.name)
+
+    const full = entity({ drafts: { autosave: { interval: 800 }, localizeStatus: true } })
+    expect(names(full, 'create')).toEqual(expect.arrayContaining(['autosave', 'publishAllLocales']))
+    expect(names(full, 'create')).not.toContain('overrideLock')
+    expect(names(full, 'update')).toEqual(
+      expect.arrayContaining(['publishAllLocales', 'unpublishAllLocales', 'overrideLock']),
+    )
+    expect(names(full, 'update')).not.toContain('autosave')
+    expect(names(full, 'updateByID')).toEqual(
+      expect.arrayContaining(['autosave', 'publishAllLocales', 'unpublishAllLocales', 'overrideLock']),
+    )
+    expect(names(full, 'delete')).toContain('overrideLock')
+    expect(names(full, 'duplicate')).toContain('selectedLocales[]')
+    expect(names(full, 'globalUpdate')).not.toContain('overrideLock')
+
+    const plain = entity({ drafts: { autosave: false } }, false)
+    for (const operation of ['create', 'update', 'updateByID', 'delete', 'globalUpdate'] as const) {
+      const list = names(plain, operation)
+      for (const name of ['autosave', 'publishAllLocales', 'unpublishAllLocales', 'overrideLock']) {
+        expect(list).not.toContain(name)
+      }
+    }
+    expect(names(entity(false), 'create')).not.toContain('autosave')
+    expect(
+      writeParams({ base: 'X', entity: plain, ctx: { ...ctx, locales: [] }, refs, operation: 'duplicate' }).map(
+        (p) => p.name,
+      ),
+    ).not.toContain('selectedLocales[]')
   })
 })
 

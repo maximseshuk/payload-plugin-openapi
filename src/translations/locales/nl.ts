@@ -7,6 +7,11 @@ export const nl: PluginDefaultTranslationsObject = {
     paramSortShort: 'Veld om op te sorteren; voorvoeg met `-` voor aflopend.',
     paramDraft: 'Conceptversies retourneren.',
     paramTrash: 'Verwijderde documenten meenemen.',
+    paramAutosave: 'Opslaan als autosave: werkt de laatste autosave-versie bij in plaats van een nieuwe toe te voegen.',
+    paramPublishAllLocales: 'Alle talen publiceren, niet alleen de taal van het verzoek.',
+    paramUnpublishAllLocales: 'De publicatie van alle talen intrekken en het document terugzetten naar concept.',
+    paramOverrideLock: 'Een vergrendeling van een andere gebruiker negeren. Standaard false.',
+    paramSelectedLocales: 'Alleen deze talen naar het duplicaat kopiëren. Standaard: alle talen.',
     paramFlattenLocales:
       'Met `locale=all`, stel in op false om gelokaliseerde velden als objecten per locale te behouden. Standaard true.',
     paramLocale:

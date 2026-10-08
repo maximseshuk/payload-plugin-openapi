@@ -7,6 +7,12 @@ export const sl: PluginDefaultTranslationsObject = {
     paramSortShort: 'Polje za razvrščanje; za padajoči vrstni red ga predpiši s `-`.',
     paramDraft: 'Vrni osnutke različic.',
     paramTrash: 'Vključi dokumente v košu.',
+    paramAutosave:
+      'Shrani kot samodejno shranjevanje: posodobi zadnjo samodejno shranjeno različico, namesto da doda novo.',
+    paramPublishAllLocales: 'Objavi vse jezike, ne le jezika zahteve.',
+    paramUnpublishAllLocales: 'Prekliči objavo vseh jezikov in vrni dokument v osnutek.',
+    paramOverrideLock: 'Prezri zaklep drugega uporabnika. Privzeto false.',
+    paramSelectedLocales: 'V dvojnik kopiraj le te jezike. Privzeto: vsi jeziki.',
     paramFlattenLocales:
       'Pri `locale=all` nastavite na false, da lokalizirana polja ostanejo kot objekti po posameznih jezikih. Privzeto true.',
     paramLocale: 'Jezik, ki naj se vrne, ali `all` za vse jezike. Glejte razdelek Lokalizacija v opisu API-ja.',

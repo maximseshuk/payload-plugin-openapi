@@ -7,6 +7,11 @@ export const bnBd: PluginDefaultTranslationsObject = {
     paramSortShort: 'যে ফিল্ড দিয়ে সাজানো হবে; অবরোহী ক্রমের জন্য `-` উপসর্গ দিন।',
     paramDraft: 'ড্রাফট সংস্করণ ফেরত দিন।',
     paramTrash: 'ট্র্যাশে থাকা ডকুমেন্ট অন্তর্ভুক্ত করুন।',
+    paramAutosave: 'অটোসেভ হিসেবে সংরক্ষণ করুন: নতুন সংস্করণ যোগ না করে সর্বশেষ অটোসেভ সংস্করণ হালনাগাদ করুন।',
+    paramPublishAllLocales: 'শুধু অনুরোধের ভাষা নয়, সব ভাষা প্রকাশ করুন।',
+    paramUnpublishAllLocales: 'সব ভাষার প্রকাশ বাতিল করে ডকুমেন্টকে আবার ড্রাফট করুন।',
+    paramOverrideLock: 'অন্য ব্যবহারকারীর লক উপেক্ষা করুন। ডিফল্ট false।',
+    paramSelectedLocales: 'ডুপ্লিকেটে শুধু এই ভাষাগুলো কপি করুন। ডিফল্ট: সব ভাষা।',
     paramFlattenLocales:
       '`locale=all` এর সাথে, লোকালাইজড ফিল্ডগুলো প্রতি-লোকেল অবজেক্ট হিসেবে রাখতে false সেট করুন। ডিফল্ট true।',
     paramLocale: 'যে লোকেল ফেরত দিতে হবে, অথবা প্রতিটি লোকেলের জন্য `all`। API বিবরণের Localization অংশটি দেখুন।',

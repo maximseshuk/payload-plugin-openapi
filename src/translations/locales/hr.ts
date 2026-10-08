@@ -7,6 +7,12 @@ export const hr: PluginDefaultTranslationsObject = {
     paramSortShort: 'Polje za sortiranje; dodajte prefiks `-` za silazni redoslijed.',
     paramDraft: 'Vrati skicirane verzije.',
     paramTrash: 'Uključi dokumente u smeću.',
+    paramAutosave:
+      'Spremi kao automatsko spremanje: ažurira zadnju automatski spremljenu verziju umjesto dodavanja nove.',
+    paramPublishAllLocales: 'Objavi sve jezike, ne samo jezik zahtjeva.',
+    paramUnpublishAllLocales: 'Poništi objavu svih jezika i vrati dokument u skicu.',
+    paramOverrideLock: 'Zanemari zaključavanje drugog korisnika. Zadano false.',
+    paramSelectedLocales: 'Kopiraj samo ove jezike u duplikat. Zadano: svi jezici.',
     paramFlattenLocales:
       'Uz `locale=all`, postavite na false kako bi lokalizirana polja ostala kao objekti po lokalizaciji. Zadano je true.',
     paramLocale:

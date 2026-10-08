@@ -7,6 +7,12 @@ export const sv: PluginDefaultTranslationsObject = {
     paramSortShort: 'Fält att sortera efter; inled med `-` för fallande ordning.',
     paramDraft: 'Returnera utkastversioner.',
     paramTrash: 'Inkludera papperskorgsdokument.',
+    paramAutosave:
+      'Spara som autosparning: uppdaterar den senaste autosparade versionen i stället för att lägga till en ny.',
+    paramPublishAllLocales: 'Publicera alla språk, inte bara förfrågans språk.',
+    paramUnpublishAllLocales: 'Avpublicera alla språk och gör dokumentet till ett utkast igen.',
+    paramOverrideLock: 'Ignorera ett lås från en annan användare. Standard false.',
+    paramSelectedLocales: 'Kopiera bara dessa språk till dubbletten. Standard: alla språk.',
     paramFlattenLocales:
       'Med `locale=all`, sätt false för att behålla lokaliserade fält som objekt per språk. Standard är true.',
     paramLocale: 'Språk att returnera, eller `all` för alla språk. Se avsnittet Lokalisering i API-beskrivningen.',

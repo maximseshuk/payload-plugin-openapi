@@ -5,7 +5,7 @@ import type { BuildContext } from '../../types.js'
 import { makeT } from '../../translations/index.js'
 import { ERRORS, errorResponses, jsonOk } from '../components.js'
 import { globalSchemaName, refTo, updateSchemaName } from '../names.js'
-import { buildParamSchemas, commonReadParams, type ReadParamRefs } from '../params.js'
+import { buildParamSchemas, commonReadParams, type ReadParamRefs, writeParams } from '../params.js'
 import type { EntitySecurity } from '../security.js'
 
 export const buildGlobalPaths = ({
@@ -44,6 +44,7 @@ export const buildGlobalPaths = ({
       post: {
         tags: [name],
         operationId: `update${name}`,
+        parameters: writeParams({ base: name, entity: global, ctx, refs, operation: 'globalUpdate' }),
         requestBody: { content: { 'application/json': { schema: updateRef } } },
         responses: { ...okDoc, ...errorResponses(ERRORS.globalUpdate, t) },
         security: secUpdate,

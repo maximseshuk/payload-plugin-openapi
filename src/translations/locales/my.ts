@@ -7,6 +7,11 @@ export const my: PluginDefaultTranslationsObject = {
     paramSortShort: 'အစီအစဉ်ခွဲရန် အကွက်; ဆင်းသက်စီရန် `-` ဖြင့် ရှေ့ဆက်ထည့်ပါ။',
     paramDraft: 'မူကြမ်းဗားရှင်းများကို ပြန်ပေးသည်။',
     paramTrash: 'ဖျက်ထားသော စာရွက်စာတမ်းများ ပါဝင်စေသည်။',
+    paramAutosave: 'အလိုအလျောက်သိမ်းဆည်းမှုအဖြစ် သိမ်းပါ။ ဗားရှင်းအသစ်မထည့်ဘဲ နောက်ဆုံး autosave ဗားရှင်းကို အပ်ဒိတ်လုပ်သည်။',
+    paramPublishAllLocales: 'တောင်းဆိုမှု locale သာမက locale အားလုံးကို ထုတ်ဝေသည်။',
+    paramUnpublishAllLocales: 'locale အားလုံး၏ ထုတ်ဝေမှုကို ဖျက်သိမ်းပြီး စာရွက်စာတမ်းကို draft သို့ ပြန်ထားသည်။',
+    paramOverrideLock: 'အခြားအသုံးပြုသူ၏ lock ကို လျစ်လျူရှုသည်။ မူလ false။',
+    paramSelectedLocales: 'ဤ locale များကိုသာ မိတ္တူသို့ ကူးယူသည်။ မူလ- locale အားလုံး။',
     paramFlattenLocales:
       '`locale=all` ဖြင့်အသုံးပြုသောအခါ ဒေသန္တရပြုလုပ်ထားသော အကွက်များကို တစ်ဒေသစီ object အဖြစ် ဆက်ထားရန် false သတ်မှတ်ပါ။ မူရင်းတန်ဖိုးမှာ true ဖြစ်သည်။',
     paramLocale: 'ပြန်ပေးရမည့် ဒေသ၊ သို့မဟုတ် ဒေသအားလုံးအတွက် `all`။ API ဖော်ပြချက်ရှိ Localization အပိုင်းကို ကြည့်ပါ။',

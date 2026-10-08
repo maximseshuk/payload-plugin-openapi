@@ -7,6 +7,12 @@ export const pt: PluginDefaultTranslationsObject = {
     paramSortShort: 'Campo pelo qual ordenar; use o prefixo `-` para ordem decrescente.',
     paramDraft: 'Retornar versões de rascunho.',
     paramTrash: 'Incluir documentos na lixeira.',
+    paramAutosave:
+      'Salvar como salvamento automático: atualiza a última versão salva automaticamente em vez de adicionar uma nova.',
+    paramPublishAllLocales: 'Publicar todos os idiomas, não só o da requisição.',
+    paramUnpublishAllLocales: 'Despublicar todos os idiomas e voltar o documento para rascunho.',
+    paramOverrideLock: 'Ignorar um bloqueio de outro usuário. Padrão false.',
+    paramSelectedLocales: 'Copiar só estes idiomas para a duplicata. Padrão: todos os idiomas.',
     paramFlattenLocales:
       'Com `locale=all`, defina como false para manter os campos localizados como objetos por locale. Padrão true.',
     paramLocale:

@@ -7,6 +7,12 @@ export const az: PluginDefaultTranslationsObject = {
     paramSortShort: 'Sıralanacaq sahə; azalan sıra üçün önünə `-` əlavə edin.',
     paramDraft: 'Qaralama versiyalarını qaytarın.',
     paramTrash: 'Zibilə atılmış sənədləri daxil edin.',
+    paramAutosave:
+      'Avtomatik yadda saxlama kimi saxlayın: yeni versiya əlavə etmək əvəzinə son avtomatik versiyanı yeniləyin.',
+    paramPublishAllLocales: 'Yalnız sorğu dilini deyil, bütün dilləri dərc edin.',
+    paramUnpublishAllLocales: 'Bütün dillərin dərcini ləğv edin və sənədi qaralamaya qaytarın.',
+    paramOverrideLock: 'Başqa istifadəçinin kilidinə məhəl qoymayın. Defolt false.',
+    paramSelectedLocales: 'Dublikata yalnız bu dilləri köçürün. Defolt: bütün dillər.',
     paramFlattenLocales:
       '`locale=all` ilə, lokallaşdırılmış sahələri hər lokal üzrə obyekt kimi saxlamaq üçün false təyin edin. Standart olaraq true.',
     paramLocale: 'Qaytarılacaq lokal, və ya hər lokal üçün `all`. API təsvirindəki Lokallaşdırma bölməsinə baxın.',

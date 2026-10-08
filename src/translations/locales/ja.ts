@@ -7,6 +7,11 @@ export const ja: PluginDefaultTranslationsObject = {
     paramSortShort: '並べ替えの基準となるフィールド。降順にするには `-` を前置します。',
     paramDraft: '下書きバージョンを返します。',
     paramTrash: 'ゴミ箱内のドキュメントを含めます。',
+    paramAutosave: '自動保存として保存します。新しいバージョンを追加せず、最新の自動保存バージョンを更新します。',
+    paramPublishAllLocales: 'リクエストのロケールだけでなく、すべてのロケールを公開します。',
+    paramUnpublishAllLocales: 'すべてのロケールを非公開にし、ドキュメントを下書きに戻します。',
+    paramOverrideLock: '他のユーザーのロックを無視します。デフォルトは false。',
+    paramSelectedLocales: 'これらのロケールだけを複製にコピーします。デフォルト: すべてのロケール。',
     paramFlattenLocales:
       '`locale=all` のとき、false を設定するとローカライズフィールドをロケールごとのオブジェクトとして保持します。デフォルトは true。',
     paramLocale:

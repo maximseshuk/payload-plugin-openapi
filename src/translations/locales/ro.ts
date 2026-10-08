@@ -7,6 +7,12 @@ export const ro: PluginDefaultTranslationsObject = {
     paramSortShort: 'Câmp după care se sortează; prefixați cu `-` pentru ordine descrescătoare.',
     paramDraft: 'Returnează versiunile ciornă.',
     paramTrash: 'Include documentele aflate la coșul de gunoi.',
+    paramAutosave:
+      'Salvează ca salvare automată: actualizează ultima versiune salvată automat în loc să adauge una nouă.',
+    paramPublishAllLocales: 'Publică toate limbile, nu doar limba cererii.',
+    paramUnpublishAllLocales: 'Anulează publicarea tuturor limbilor și readuce documentul la ciornă.',
+    paramOverrideLock: 'Ignoră blocarea deținută de alt utilizator. Implicit false.',
+    paramSelectedLocales: 'Copiază doar aceste limbi în duplicat. Implicit: toate limbile.',
     paramFlattenLocales:
       'Cu `locale=all`, setați false pentru a păstra câmpurile localizate ca obiecte per-locale. Implicit true.',
     paramLocale:

@@ -7,6 +7,12 @@ export const cs: PluginDefaultTranslationsObject = {
     paramSortShort: 'Pole pro řazení; pro sestupné řazení použijte předponu `-`.',
     paramDraft: 'Vrátit koncepty (draft verze).',
     paramTrash: 'Zahrnout dokumenty v koši.',
+    paramAutosave:
+      'Uložit jako automatické uložení: aktualizuje poslední automaticky uloženou verzi místo přidání nové.',
+    paramPublishAllLocales: 'Publikovat všechny jazyky, nejen jazyk požadavku.',
+    paramUnpublishAllLocales: 'Zrušit publikování všech jazyků a vrátit dokument do konceptu.',
+    paramOverrideLock: 'Ignorovat zámek jiného uživatele. Výchozí false.',
+    paramSelectedLocales: 'Zkopírovat do duplikátu jen tyto jazyky. Výchozí: všechny jazyky.',
     paramFlattenLocales:
       'S `locale=all` nastavte false, aby lokalizovaná pole zůstala jako objekty po jednotlivých jazycích. Výchozí hodnota je true.',
     paramLocale: 'Jazyk, který se má vrátit, nebo `all` pro všechny jazyky. Viz sekce Lokalizace v popisu API.',

@@ -7,6 +7,11 @@ export const fa: PluginDefaultTranslationsObject = {
     paramSortShort: 'فیلدی که بر اساس آن مرتب‌سازی شود؛ برای ترتیب نزولی پیشوند `-` بگذارید.',
     paramDraft: 'بازگرداندن نسخه‌های پیش‌نویس.',
     paramTrash: 'شامل اسناد حذف‌شده (در سطل زباله) شود.',
+    paramAutosave: 'ذخیره به‌صورت ذخیرهٔ خودکار: به‌جای افزودن نسخهٔ جدید، آخرین نسخهٔ ذخیرهٔ خودکار به‌روز می‌شود.',
+    paramPublishAllLocales: 'انتشار همهٔ زبان‌ها، نه فقط زبان درخواست.',
+    paramUnpublishAllLocales: 'لغو انتشار همهٔ زبان‌ها و بازگرداندن سند به پیش‌نویس.',
+    paramOverrideLock: 'نادیده گرفتن قفل کاربر دیگر. پیش‌فرض false.',
+    paramSelectedLocales: 'فقط این زبان‌ها در نسخهٔ تکراری کپی شوند. پیش‌فرض: همهٔ زبان‌ها.',
     paramFlattenLocales:
       'با `locale=all`، مقدار false را تنظیم کنید تا فیلدهای محلی‌سازی‌شده به‌صورت اشیای جداگانه برای هر زبان نگه داشته شوند. مقدار پیش‌فرض true است.',
     paramLocale:

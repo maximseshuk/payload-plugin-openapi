@@ -9,6 +9,11 @@ export type PluginDefaultTranslationsObject = {
     paramSortShort: string
     paramDraft: string
     paramTrash: string
+    paramAutosave: string
+    paramPublishAllLocales: string
+    paramUnpublishAllLocales: string
+    paramOverrideLock: string
+    paramSelectedLocales: string
     paramFlattenLocales: string
     paramLocale: string
     paramFallbackLocale: string

@@ -7,6 +7,11 @@ export const hu: PluginDefaultTranslationsObject = {
     paramSortShort: 'Rendezési mező; csökkenő sorrendhez `-` előtaggal.',
     paramDraft: 'Vázlat (draft) verziók visszaadása.',
     paramTrash: 'A kukába helyezett dokumentumok belevétele.',
+    paramAutosave: 'Mentés automatikus mentésként: új verzió helyett a legutóbbi automatikus mentést frissíti.',
+    paramPublishAllLocales: 'Minden nyelv közzététele, nem csak a kérés nyelvéé.',
+    paramUnpublishAllLocales: 'Minden nyelv közzétételének visszavonása és a dokumentum vázlattá alakítása.',
+    paramOverrideLock: 'Másik felhasználó zárolásának figyelmen kívül hagyása. Alapértelmezés false.',
+    paramSelectedLocales: 'Csak ezeket a nyelveket másolja a másolatba. Alapértelmezés: minden nyelv.',
     paramFlattenLocales:
       'A `locale=all` esetén állítsd false értékre, hogy a lokalizált mezők lokálonkénti objektumokként maradjanak meg. Alapértelmezetten true.',
     paramLocale: 'A visszaadandó lokál, vagy `all` az összes lokálhoz. Lásd az API leírásban a Lokalizáció szakaszt.',
