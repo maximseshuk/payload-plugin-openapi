@@ -1,0 +1,91 @@
+---
+title: 'Overview'
+description: 'Configure the plugin with a single openapi() call, plus optional scalar() or swaggerUi() for the docs UI.'
+---
+
+You configure the plugin with a single `openapi(...)` call in your Payload config. The docs UI is separate — add `scalar()` or `swaggerUi()` alongside it (see [Docs UI](/v1/configuration/docs-ui)):
+
+```ts payload.config.ts
+import { openapi, scalar } from '@seshuk/payload-plugin-openapi'
+import { buildConfig } from 'payload'
+
+export default buildConfig({
+  // ...
+  plugins: [
+    openapi({
+      info: {
+        title: 'My API',
+        version: '1.0.0',
+      },
+    }),
+    scalar(),
+  ],
+})
+```
+
+## Plugin options
+
+| Option            | Type                                  | Default           | Description                                                                                                                         |
+| ----------------- | ------------------------------------- | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `info`            | `OpenApiInfo`                         | —                 | The spec `info` block: title, version, description, contact, license. **Required.** See [Info and servers](/v1/configuration/info). |
+| `servers`         | `ServerObject[] \| ({ req }) => …`    | `serverURL`       | Base URLs written to the spec `servers`. See [Servers](/v1/configuration/info#servers).                                             |
+| `trustedHosts`    | `string[]`                            | `[]`              | Hosts whose `Host` header may set `servers`. See [Trusted hosts](/v1/configuration/info#trusted-hosts).                             |
+| `openapiVersion`  | `'3.0' \| '3.1' \| '3.2'`             | `'3.2'`           | Spec version to serve. See [OpenAPI version](/v1/configuration/openapi-version).                                                    |
+| `path`            | `string`                              | `'/openapi.json'` | Path the spec is served from, relative to the API route.                                                                            |
+| `enabled`         | `boolean`                             | `true`            | Set `false` to turn the plugin off. See [Turning the plugin off](#turning-the-plugin-off).                                          |
+| `serve`           | `boolean`                             | `true`            | Set `false` to register only the CLI generator and serve nothing over HTTP. See [Static spec](/v1/guides/static-spec).              |
+| `access`          | `({ req }) => boolean`                | open              | Who may read the spec. See [Limiting who can read the spec](#limiting-who-can-read-the-spec).                                       |
+| `filters`         | `FilterOptions`                       | see page          | Which entities and operations end up in the spec. See [Filters](/v1/configuration/filters).                                         |
+| `interactiveAuth` | `boolean \| { path, collection }`     | `false`           | Username/password login for the docs UI. See [Interactive auth](/v1/configuration/interactive-auth).                                |
+| `nestedTags`      | `boolean`                             | `false`           | Emit an OpenAPI 3.2 nested tag hierarchy. See [OpenAPI version](/v1/configuration/openapi-version#nested-tags).                     |
+| `security`        | `(ctx) => 'public' \| 'secured' \| …` | —                 | Override the auto-detected security marking per operation. See [Security marking](/v1/configuration/security-marking).              |
+| `cache`           | `boolean`                             | `true`            | Cache the built document for the life of the process. See [Caching](/v1/configuration/caching).                                     |
+| `extensions`      | `OpenApiExtension[]`                  | `[]`              | Inject paths, components, tags, or transform the finished document. See [Extensions](/v1/configuration/extensions).                 |
+| `telemetry`       | `boolean \| { url }`                  | `true`            | Anonymous usage telemetry. See [Telemetry](/v1/configuration/telemetry).                                                            |
+
+## Paths are relative to the API route
+
+The plugin registers its endpoints as Payload endpoints, so everything mounts under your Payload API route (`routes.api`, `/api` by default). The `path` you pass to `openapi()` — and the `path` you pass to `scalar()`/`swaggerUi()` — are relative to that route. The defaults resolve to:
+
+- `GET /api/openapi.json` — the generated OpenAPI document
+- `GET /api/docs` — the interactive API reference
+
+## The lazy build model
+
+`openapi()` does not build anything at config time. It stashes the resolved options, registers the CLI generator, and mounts the endpoints. The document itself is built per request (or per CLI run) from the fully **sanitized** Payload config.
+
+That means plugin order does not matter: collections, globals, fields, and endpoints added by any other plugin are visible in the spec, whether that plugin runs before or after `openapi()` in your `plugins` array.
+
+<Note>`info.title` and `info.version` are required. The plugin throws on boot if either is missing.</Note>
+
+## Limiting who can read the spec
+
+The spec and the docs page are open to everyone by default, because most API docs are public. The spec lists every documented collection, field and endpoint. If your API is private, add `access` to `openapi()` and to the docs UI. It gets the request and returns `true` to serve it. Any other result answers `403`.
+
+This recipe shows the docs only to users of your admin collection:
+
+```ts payload.config.ts
+const adminOnly = ({ req }) => req.user?.collection === req.payload.config.admin.user
+
+plugins: [openapi({ info: { title: 'My API', version: '1.0.0' }, access: adminOnly }), scalar({ access: adminOnly })]
+```
+
+The docs page loads the spec from the same site, so the browser sends the admin login cookie with it. To hide the docs only in production, use `access: () => process.env.NODE_ENV !== 'production'`.
+
+## Turning the plugin off
+
+With `enabled: false` the plugin adds no endpoints, no CLI command, no translations and sends no telemetry. It never adds collections or fields, so your database schema is the same either way. It still checks your options, so a removed option still throws.
+
+## Where to go next
+
+- [Info and servers](/v1/configuration/info) — title, version, description, and where the base URL comes from
+- [OpenAPI version](/v1/configuration/openapi-version) — 3.2 by default, downconversion to 3.1/3.0
+- [Filters](/v1/configuration/filters) — choose entities and drop operations
+- [Security marking](/v1/configuration/security-marking) — public vs. secured operations
+- [Interactive auth](/v1/configuration/interactive-auth) — Authorize dialog in the docs UI
+- [Caching](/v1/configuration/caching) — when the document is rebuilt
+- [Extensions](/v1/configuration/extensions) — add paths, components, tags, or transform the document
+- [Docs UI](/v1/configuration/docs-ui) — Scalar and Swagger UI options
+- [Telemetry](/v1/configuration/telemetry) — what the anonymous usage report contains and how to turn it off
+
+For copy-ready configurations, see [Examples](/v1/guides/examples).

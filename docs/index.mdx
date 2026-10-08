@@ -1,56 +1,96 @@
 ---
-title: 'Documentation'
-description: 'Generate an OpenAPI 3.0/3.1/3.2 specification from your Payload CMS config and serve it with Scalar or Swagger UI.'
+title: 'Payload OpenAPI'
+description: 'Generate an OpenAPI 3.0, 3.1 or 3.2 spec from your Payload config and serve Scalar or Swagger UI.'
 mode: 'custom'
 ---
 
-<div className="rp-home">
-  <div className="rp-home-grid" />
-  <div className="rp-hero">
-    <div className="rp-hero-inner">
-      <div className="rp-hero-mark">
-        <div className="rp-hero-glow" />
-        <div className="rp-hero-float">
-          <img src="/hero-mark.svg" alt="Payload OpenAPI" noZoom />
-        </div>
-      </div>
-      <div className="rp-hero-copy">
-        <span className="rp-hero-badge">Payload plugin</span>
-        <h1 className="rp-hero-title">
-          Your Payload API, <span className="rp-hero-grad">documented</span>
-        </h1>
-        <p className="rp-hero-sub">
-          Generate an OpenAPI 3.0, 3.1, or 3.2 specification straight from your Payload config and serve it through
-          Scalar or Swagger UI — always in sync with your collections.
-        </p>
-        <div className="rp-hero-actions">
-          <a className="rp-hero-btn rp-hero-btn-primary" href="/quick-start">
-            Get started
-          </a>
-          <a className="rp-hero-btn rp-hero-btn-ghost" href="/configuration/overview">
-            Read the docs
-          </a>
-        </div>
-        <code
-          className="rp-hero-cmd"
-          role="button"
-          tabIndex={0}
-          title="Click to copy"
-          onClick={(e) => {
-            navigator.clipboard?.writeText('npm install @seshuk/payload-plugin-openapi')
-            const el = e.currentTarget
-            el.setAttribute('data-copied', '')
-            setTimeout(() => el.removeAttribute('data-copied'), 1400)
-          }}
-        >
-          <span className="rp-hero-cmd-text">
-            npm install <span>@seshuk/payload-plugin-openapi</span>
-          </span>
-          <span className="rp-hero-copied" aria-live="polite">
-            Copied to clipboard
-          </span>
-        </code>
-      </div>
+export const InstallRow = () => {
+  const command = 'npm i @seshuk/payload-plugin-openapi'
+  const [copied, setCopied] = useState(false)
+  const timer = useRef()
+  useEffect(() => () => clearTimeout(timer.current), [])
+  const copy = () => {
+    if (!navigator.clipboard) return
+    navigator.clipboard.writeText(command).then(
+      () => {
+        clearTimeout(timer.current)
+        setCopied(true)
+        timer.current = setTimeout(() => setCopied(false), 1500)
+      },
+      () => {},
+    )
+  }
+  return (
+    <button
+      type="button"
+      className="oa-row oa-row-install"
+      onClick={copy}
+      aria-label={copied ? 'Copied' : `Copy: ${command}`}
+    >
+      <code>
+        <span aria-hidden="true">$ </span>
+        {command}
+      </code>
+      <span className="oa-row-icon" aria-hidden="true">
+        {copied ? (
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="m3 8.5 3 3 7-7" />
+          </svg>
+        ) : (
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <rect x="5.5" y="5.5" width="8" height="8" />
+            <path d="M10.5 3V2.5h-8v8H3" />
+          </svg>
+        )}
+      </span>
+    </button>
+  )
+}
+
+<div className="oa-home">
+  <section className="oa-hero">
+    <div className="oa-copy">
+      <h1 className="oa-title">
+        Your {'Payload\u00a0API,'}
+        <br />
+        <span>documented</span>
+      </h1>
+      <p className="oa-sub">
+        Generate an OpenAPI 3.0, 3.1 or 3.2 spec from your Payload config and serve it with Scalar or Swagger UI. It
+        always stays in sync with your collections.
+      </p>
     </div>
-  </div>
+    <div className="oa-actions">
+      <InstallRow />
+      <a className="oa-row" href="/quick-start">
+        Get started
+        <svg
+          className="oa-row-icon"
+          viewBox="0 0 16 16"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          aria-hidden="true"
+        >
+          <path d="M4.5 11.5l7-7M5.5 4.5h6v6" />
+        </svg>
+      </a>
+      <a className="oa-row" href="/configuration/overview">
+        Read docs
+        <svg
+          className="oa-row-icon"
+          viewBox="0 0 16 16"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          aria-hidden="true"
+        >
+          <path d="M4.5 11.5l7-7M5.5 4.5h6v6" />
+        </svg>
+      </a>
+    </div>
+    <div className="oa-mark">
+      <img src="/hero-mark.svg" alt="" noZoom />
+    </div>
+  </section>
 </div>

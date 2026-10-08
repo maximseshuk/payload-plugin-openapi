@@ -1,0 +1,114 @@
+---
+title: 'Telemetry'
+description: 'Anonymous, opt-out usage telemetry: what is collected, what is never sent, and how to turn it off.'
+---
+
+The plugin sends a small, anonymous usage report once per day so the maintainer can see which Payload and plugin versions are in use and which features are worth supporting. It is **opt-out** and **disclosed**: a one-time notice prints to your server logs on first run.
+
+No secrets, IPs, keys, URLs, paths, hostnames, collection names, or anything from your spec ever leave your server.
+
+## What is collected
+
+Every report is a single JSON document with these fields:
+
+| Field             | Example                  | Notes                                                    |
+| ----------------- | ------------------------ | -------------------------------------------------------- |
+| `product`         | `payload-plugin-openapi` | Fixed slug for this plugin.                              |
+| `productVersion`  | `1.0.0`                  | Installed plugin version.                                |
+| `payloadVersion`  | `4.0.0`                  | Installed Payload version.                               |
+| `runtime`         | `node`                   | Always Node for this plugin.                             |
+| `runtimeVersion`  | `24`                     | Node major version only.                                 |
+| `os`              | `linux`                  | `process.platform`, lowercased.                          |
+| `projectId`       | `b3f1a9c2…`              | Anonymous hash — see [below](#how-projectid-is-derived). |
+| `projectIdSource` | `git`                    | Which source produced the hash.                          |
+| `features`        | `{ "serve": true, … }`   | Booleans only — see [below](#feature-flags).             |
+
+### Feature flags
+
+`features` is a flat map of booleans derived from your **resolved** options. It records only whether a capability is on, never any value tied to it:
+
+| Flag                       | Meaning                                                 |
+| -------------------------- | ------------------------------------------------------- |
+| `serve`                    | The spec is served over HTTP (`serve` is not `false`).  |
+| `access`                   | `access` limits who can read the spec.                  |
+| `cache`                    | The built document is cached.                           |
+| `servers`                  | `servers` is set.                                       |
+| `trustedHosts`             | `trustedHosts` lists at least one host.                 |
+| `openapiVersion30`         | The spec is served as OpenAPI 3.0.                      |
+| `openapiVersion31`         | The spec is served as OpenAPI 3.1.                      |
+| `filtersEntities`          | `filters.include` or `filters.exclude` lists an entity. |
+| `filtersExcludeOperations` | `filters.excludeOperations` has a rule or function.     |
+| `filtersIncludeSystem`     | `filters.includeSystem` is on.                          |
+| `interactiveAuth`          | The docs UI login is on.                                |
+| `nestedTags`               | The OpenAPI 3.2 nested tag hierarchy is on.             |
+| `security`                 | A `security` function overrides the marking.            |
+| `extensions`               | At least one extension is set.                          |
+| `extensionTransform`       | An extension has a `transform`.                         |
+| `uiScalar`                 | `scalar()` is in the `plugins` array.                   |
+| `uiSwagger`                | `swaggerUi()` is in the `plugins` array.                |
+
+## How `projectId` is derived
+
+`projectId` is a one-way, irreversible hash:
+
+```
+projectId = sha256( payload.secret + rawSource )
+```
+
+`payload.secret` is used **only as a salt** and is never transmitted — it is high-entropy and private, so the digest cannot be reversed. This mirrors how Payload derives its own telemetry id.
+
+`rawSource` is the first available of, reported as `projectIdSource`:
+
+1. `git` — the repository's `remote.origin.url`
+2. `packageJSON` — your app's `package.json` `name`
+3. `serverURL` — `payload.config.serverURL`
+4. `cwd` — the process working directory
+
+Only the salted hash is sent — never the git URL, package name, or server URL themselves.
+
+## What is never sent
+
+No IP address, no `payload.secret`, no API keys, no `info` values, no server URLs or hosts, no paths, no collection or global names, and nothing from the generated document. `features` carries booleans only.
+
+## Opting out
+
+Telemetry is disabled automatically if **any** of these is true:
+
+- `payload.config.telemetry` is `false` (the host's own Payload opt-out)
+- the plugin's `telemetry` is `false`
+- the `OPENAPI_TELEMETRY_DISABLED` or `DO_NOT_TRACK` environment variable is set to a truthy value
+- a `CI` environment is detected
+- `NODE_ENV` is `test`
+
+With `enabled: false` the plugin sends nothing either.
+
+To opt out explicitly:
+
+```ts payload.config.ts
+openapi({
+  info: { title: 'My API', version: '1.0.0' },
+  telemetry: false,
+})
+```
+
+Or via the environment (respects the cross-tool [Console Do Not Track](https://consoledonottrack.com/) standard):
+
+```bash
+DO_NOT_TRACK=1
+# or, plugin-specific:
+OPENAPI_TELEMETRY_DISABLED=1
+```
+
+## Sending to your own collector
+
+Pass an object with a `url` to point reports at a collector you control:
+
+```ts payload.config.ts
+telemetry: {
+  url: 'https://telemetry.example.com/v1/collect'
+}
+```
+
+## Transport
+
+Reports are **fire-and-forget**: they run after your own `onInit`, never block boot, never throw, and are capped at a 2-second timeout — a telemetry failure can never affect your application. At most one report is sent per project per UTC day (best-effort, via a timestamp in the OS temp directory).

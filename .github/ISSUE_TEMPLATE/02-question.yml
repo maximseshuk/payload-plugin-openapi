@@ -8,7 +8,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        **Before asking:** Please check the [documentation](https://github.com/maximseshuk/payload-plugin-openapi#readme) and [existing issues](https://github.com/maximseshuk/payload-plugin-openapi/issues).
+        **Before asking:** Please check the [documentation](https://payload-plugin-openapi.seshuk.im) and [existing issues](https://github.com/maximseshuk/payload-plugin-openapi/issues).
 
   - type: textarea
     id: question
@@ -25,14 +25,14 @@ body:
       required: true
 
   - type: textarea
-    id: current-config
+    id: current-options
     attributes:
-      label: Current Configuration (if relevant)
-      description: Share your plugin setup
+      label: Current Options (if relevant)
+      description: Share your plugin setup (**remove API keys and sensitive data**)
       placeholder: |
         ```typescript
         openapi({
-          metadata: {
+          info: {
             title: 'My API',
             version: '1.0.0',
           },

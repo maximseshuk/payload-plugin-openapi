@@ -12,7 +12,7 @@ body:
       options:
         - label: I have searched existing issues to ensure this bug hasn't been reported already
           required: true
-        - label: I have read the [documentation](https://github.com/maximseshuk/payload-plugin-openapi#readme)
+        - label: I have read the [documentation](https://payload-plugin-openapi.seshuk.im)
           required: true
 
   - type: textarea
@@ -31,14 +31,14 @@ body:
       required: true
 
   - type: textarea
-    id: config
+    id: options
     attributes:
-      label: Plugin Configuration
-      description: Share your plugin setup
+      label: Plugin Options
+      description: Share your plugin setup (**remove API keys and sensitive data**)
       placeholder: |
         ```typescript
         openapi({
-          metadata: {
+          info: {
             title: 'My API',
             version: '1.0.0',
           },
@@ -56,10 +56,11 @@ body:
         Paste output from `pnpm payload info` or list your versions.
         Please use specific version numbers instead of "latest" to help us debug faster.
       placeholder: |
-        @seshuk/payload-plugin-openapi: 0.1.0
-        payload: 3.53.0
-        next: 15.4.4
-        node: 20.9.0
+        @seshuk/payload-plugin-openapi: 1.0.0
+        payload: 4.0.0
+        next: 16.4.0
+        node: 24.15.0
+        database adapter: @payloadcms/db-sqlite 4.0.0
       render: shell
     validations:
       required: true

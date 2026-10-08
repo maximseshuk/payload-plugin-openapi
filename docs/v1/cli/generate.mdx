@@ -1,0 +1,107 @@
+---
+title: 'Generate command'
+sidebarTitle: 'openapi:generate'
+description: 'Write the OpenAPI document to a file with the openapi:generate CLI command — no HTTP request required.'
+---
+
+The plugin registers a Payload CLI command named `openapi:generate`. It builds the same document the runtime endpoint serves and writes it to disk — no HTTP request, no running server needed.
+
+```bash
+payload openapi:generate
+```
+
+Writing the spec to a file is useful when you want to:
+
+- **Commit the spec** to the repo, so API changes show up in code review.
+- **Diff schemas in CI** and fail the build on unintended API changes.
+- **Feed a client-code generator** (openapi-typescript, Orval, and friends).
+- **Host a static spec** with no runtime endpoint at all — see [Serve a pre-generated spec](/v1/guides/static-spec).
+
+<Note>
+  The command reads the plugin's resolved options from your Payload config, so `openapi()` must be in your `plugins`
+  array — even with [`serve: false`](/v1/guides/static-spec).
+</Note>
+
+## Flags
+
+| Flag       | Description                                                                                                           |
+| ---------- | --------------------------------------------------------------------------------------------------------------------- |
+| `--lang`   | Locale for translated descriptions, or `all` to write one file per supported language. Defaults to the i18n fallback. |
+| `--out`    | Output path for a single-language run. Default `openapi.json`.                                                        |
+| `--server` | Base URL written to the spec's `servers`. Defaults to the `servers` option, then `serverURL`.                         |
+
+Flags accept both `--flag value` and `--flag=value`.
+
+### `--lang`
+
+Picks the locale used for translated titles and descriptions. Defaults to your project's `i18n.fallbackLanguage`.
+
+```bash
+payload openapi:generate --lang ru
+```
+
+Pass `all` to write one file per language in your `i18n.supportedLanguages`, named `openapi.<lang>.json`:
+
+```bash
+payload openapi:generate --lang all
+# → openapi.en.json, openapi.ru.json, …
+```
+
+<Note>When `--lang all` writes multiple files, the `openapi.<lang>.json` naming applies and `--out` is ignored.</Note>
+
+See [Internationalization](/v1/guides/i18n) for how language resolution works.
+
+### `--out`
+
+Output path for a single-language run:
+
+```bash
+payload openapi:generate --lang ru --out ./spec/openapi.ru.json
+```
+
+### `--server`
+
+Base URL written to the spec's `servers` array:
+
+```bash
+payload openapi:generate --server https://api.example.com
+```
+
+A file on disk has no request, so the command does not use `trustedHosts` or a `servers` function. Without `--server` it uses the `servers` option when it is an array, then `serverURL` from your Payload config. With none of them, `servers` is empty. See [Servers](/v1/configuration/info#servers).
+
+<Note>
+  The generated spec reflects public-access marking only — it never runs per-user access checks. This matches the HTTP
+  endpoint exactly. See [Security marking](/v1/configuration/security-marking).
+</Note>
+
+## CI example
+
+Commit the spec, regenerate it in CI, and fail the job when the committed file drifts from the config:
+
+```yaml .github/workflows/openapi.yml
+name: OpenAPI spec check
+
+on: [pull_request]
+
+jobs:
+  spec-diff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx payload openapi:generate --server https://api.example.com --out openapi.json
+      - name: Fail on spec drift
+        run: git diff --exit-code openapi.json
+```
+
+The diff in the failed job output is a readable summary of what changed in your API.
+
+## See also
+
+- [Serve a pre-generated spec](/v1/guides/static-spec) — `serve: false`, static hosting, and pointing the docs UI at a file
+- [Internationalization](/v1/guides/i18n) — locales, `?lang=`, and multi-language generation
+- [Programmatic use](/v1/guides/programmatic-use) — build the document in your own code instead

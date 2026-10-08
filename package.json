@@ -1,7 +1,7 @@
 {
   "name": "@seshuk/payload-plugin-openapi",
-  "version": "0.2.2",
-  "description": "OpenAPI 3.0/3.1/3.2 spec generator for Payload CMS, with Scalar/Swagger UI.",
+  "version": "1.0.0-beta.1",
+  "description": "OpenAPI 3.0/3.1/3.2 spec generator for Payload, with Scalar/Swagger UI.",
   "keywords": [
     "api-docs",
     "cms",
@@ -23,77 +23,93 @@
     "type": "git",
     "url": "git+https://github.com/maximseshuk/payload-plugin-openapi.git"
   },
-  "funding": "https://ko-fi.com/V7V61UCT39",
+  "funding": {
+    "type": "ko-fi",
+    "url": "https://ko-fi.com/seshuk"
+  },
   "files": [
     "dist"
   ],
   "type": "module",
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    ".": {
-      "import": "./src/index.ts",
-      "types": "./src/index.ts",
-      "default": "./src/index.ts"
-    },
-    "./*": "./*"
+    ".": "./dist/index.js"
   },
   "publishConfig": {
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "exports": {
       ".": {
-        "import": "./dist/index.js",
         "types": "./dist/index.d.ts",
+        "import": "./dist/index.js",
         "default": "./dist/index.js"
       }
-    }
+    },
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
-    "build": "rslib build",
-    "build:watch": "rslib build --watch",
-    "dev": "cross-env PAYLOAD_CONFIG_PATH=./tests/payload.config.ts next dev tests --turbo",
-    "dev:safe": "rm -rf .next && cross-env PAYLOAD_CONFIG_PATH=./tests/payload.config.ts next dev tests --turbo --port 3001",
+    "build": "tsdown",
+    "build:watch": "tsdown --watch",
+    "dev": "cross-env PAYLOAD_CONFIG_PATH=./tests/payload.config.ts DATABASE_URL=file:./tests/payload.db next dev tests",
     "dev:generate-importmap": "cd tests && cross-env PAYLOAD_CONFIG_PATH=./payload.config.ts payload generate:importmap",
+    "dev:safe": "rm -rf tests/.next && cross-env PAYLOAD_CONFIG_PATH=./tests/payload.config.ts DATABASE_URL=file:./tests/payload.db next dev tests --port 3001",
     "docs:check-links": "pnpm --dir docs check-links",
     "docs:dev": "pnpm --dir docs dev",
     "docs:validate": "pnpm --dir docs validate",
-    "lint": "oxlint src tests",
-    "lint:fix": "oxlint src tests --fix",
-    "format": "oxfmt .",
-    "format:check": "oxfmt --check .",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "typecheck": "tsc --noEmit",
-    "release:patch": "pnpm version patch -m \"chore(release): v%s\"",
-    "release:minor": "pnpm version minor -m \"chore(release): v%s\"",
-    "release:major": "pnpm version major -m \"chore(release): v%s\""
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "test": "vitest run -c tests/vitest.config.ts",
+    "test:coverage": "vitest run -c tests/vitest.config.ts --coverage",
+    "test:int": "vitest run -c tests/vitest.config.ts --project int",
+    "test:unit": "vitest run -c tests/vitest.config.ts --project unit",
+    "test:watch": "vitest -c tests/vitest.config.ts",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@scalar/openapi-types": "^0.9.1"
   },
   "devDependencies": {
-    "@payloadcms/db-sqlite": "^3.85.1",
-    "@payloadcms/next": "^3.85.1",
-    "@payloadcms/translations": "^3.85.1",
-    "@rslib/core": "^0.22.1",
+    "@payloadcms/db-sqlite": "4.0.0-canary.38",
+    "@payloadcms/next": "4.0.0-canary.38",
+    "@payloadcms/translations": "4.0.0-canary.38",
+    "@payloadcms/ui": "4.0.0-canary.38",
     "@seriousme/openapi-schema-validator": "^2.9.0",
+    "@seshuk/payload-plugin-tooling": "0.2.3",
+    "@types/node": "catalog:",
+    "@vitest/coverage-v8": "^5.0.3",
     "cross-env": "^10.1.0",
-    "next": "^16.2.9",
-    "oxfmt": "^0.54.0",
-    "oxlint": "^1.69.0",
-    "payload": "^3.85.1",
-    "react": "^19.2.7",
-    "react-dom": "^19.2.7",
-    "typescript": "^6.0.3",
-    "vite-tsconfig-paths": "7.0.0-alpha.1",
-    "vitest": "^4.1.8"
+    "next": "16.4.0",
+    "oxfmt": "^0.71.0",
+    "oxlint": "^1.86.0",
+    "payload": "4.0.0-canary.38",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "tsdown": "^0.23.0",
+    "typescript": "catalog:",
+    "vitest": "^5.0.3"
   },
   "peerDependencies": {
-    "@payloadcms/translations": "^3.53.0",
-    "payload": "^3.53.0"
+    "@payloadcms/translations": "4.0.0-canary.38",
+    "payload": "4.0.0-canary.38"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "^12.0.0",
+      "onFail": "warn"
+    },
+    "runtime": {
+      "name": "node",
+      "version": ">=24.15.0",
+      "onFail": "warn"
+    }
   },
   "engines": {
-    "node": ">=20.9.0"
+    "node": ">=24.15.0"
   }
 }

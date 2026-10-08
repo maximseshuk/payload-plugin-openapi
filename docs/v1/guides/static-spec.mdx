@@ -1,0 +1,91 @@
+---
+title: 'Serve a pre-generated spec'
+description: 'Generate the OpenAPI document to a static file with serve: false and host it yourself — no runtime endpoint, no per-request work.'
+---
+
+By default the plugin both registers the [`openapi:generate` CLI](/v1/cli/generate) **and** serves the spec at `/api/openapi.json`. If you only want the file — generated at build time, hosted like any other static asset — turn the runtime endpoint off with `serve: false`.
+
+<Tip>
+  Even with the default runtime endpoint, you are not re-generating on every request. With `cache: true` (the default)
+  the document is built once on first hit and reused for the life of the process — only `servers` is set per request.
+  See [Caching](/v1/configuration/caching). `serve: false` is for when you want **no** runtime endpoint at all, not
+  merely to avoid rebuild cost.
+</Tip>
+
+## Turn off the runtime endpoint
+
+```ts payload.config.ts
+import { openapi } from '@seshuk/payload-plugin-openapi'
+import { buildConfig } from 'payload'
+
+export default buildConfig({
+  plugins: [
+    openapi({
+      info: { title: 'My API', version: '1.0.0' },
+      serve: false, // register the CLI generator only; nothing is served over HTTP
+    }),
+  ],
+})
+```
+
+With `serve: false` the plugin mounts neither the spec endpoint nor the [interactive-auth](/v1/configuration/interactive-auth) endpoint.
+
+<Warning>
+  The plugin still must stay in your `plugins` array. That call is what registers the `openapi:generate` CLI command and
+  stashes the resolved options it reads — remove it and the CLI stops working too.
+</Warning>
+
+## Generate into your static assets
+
+Write the file wherever your app serves static files — `public/` in a Next.js project:
+
+```bash
+payload openapi:generate --server https://api.example.com --out ./public/openapi.json
+```
+
+`--server` sets the base URL in the file. Without it, the command uses the `servers` option or `serverURL` (see [the CLI reference](/v1/cli/generate)).
+
+Now `public/openapi.json` is served at `/openapi.json` like any other static file — through Next.js, a CDN, nginx, or committed to the repo. There is no per-request work and no way to hit a stale or unauthenticated spec at runtime.
+
+## Point the docs UI at the file
+
+The docs UI plugins load the spec from a URL, and that URL does not have to be the plugin's own endpoint. Point `specURL` at your static file and the UI renders it directly:
+
+```ts payload.config.ts
+import { openapi, scalar } from '@seshuk/payload-plugin-openapi'
+
+plugins: [
+  openapi({ info: { title: 'My API', version: '1.0.0' }, serve: false }),
+  scalar({ specURL: '/openapi.json' }), // loads public/openapi.json
+]
+```
+
+The same works for `swaggerUi()`. See [Docs UI](/v1/configuration/docs-ui) for the renderer options.
+
+## Multiple languages
+
+Generate one file per supported language with `--lang all`:
+
+```bash
+payload openapi:generate --server https://api.example.com --lang all
+# → openapi.en.json, openapi.ru.json, …
+```
+
+Move the files into `public/` and wire a language switcher exactly as in [Internationalization](/v1/guides/i18n) — just point Scalar's `sources` at the static files instead of the runtime endpoint:
+
+```ts payload.config.ts
+scalar({
+  configuration: {
+    sources: [
+      { title: 'English', url: '/openapi.en.json', default: true },
+      { title: 'Русский', url: '/openapi.ru.json' },
+    ],
+  },
+})
+```
+
+## See also
+
+- [Generate command](/v1/cli/generate) — all flags, plus a CI diff example
+- [Docs UI](/v1/configuration/docs-ui) — Scalar and Swagger UI options
+- [Caching](/v1/configuration/caching) — what the default runtime endpoint actually costs

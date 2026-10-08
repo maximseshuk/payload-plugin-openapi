@@ -1,0 +1,99 @@
+---
+title: 'Info and servers'
+description: 'The info object fills the spec info block. servers and trustedHosts set the base URL clients call.'
+---
+
+`info` fills the `info` block of the generated document. It is the only required plugin option.
+
+```ts payload.config.ts
+openapi({
+  info: {
+    title: 'My API',
+    version: '1.0.0',
+    summary: 'Content API for the example app.',
+    description: { en: 'Public API for the example app.', de: 'Öffentliche API der Beispiel-App.' },
+    termsOfService: 'https://example.com/terms',
+    contact: { name: 'API team', email: 'api@example.com' },
+    license: { name: 'MIT', identifier: 'MIT' },
+  },
+})
+```
+
+`info` is an OpenAPI [Info Object](https://spec.openapis.org/oas/v3.2.0#info-object). The plugin copies every field into the spec.
+
+| Field            | Type                                     | Default | Description                                        |
+| ---------------- | ---------------------------------------- | ------- | -------------------------------------------------- |
+| `title`          | `string`                                 | —       | API title. Also the docs page title. **Required.** |
+| `version`        | `string`                                 | —       | Your API's version. **Required.**                  |
+| `summary`        | `string`                                 | —       | A short summary. OpenAPI 3.0 output drops it.      |
+| `description`    | `string \| Record<string, string> \| fn` | —       | Description. It can be localized, see below.       |
+| `termsOfService` | `string`                                 | —       | URL of the terms of service.                       |
+| `contact`        | `{ name?, url?, email? }`                | —       | Contact for the API.                               |
+| `license`        | `{ name, identifier?, url? }`            | —       | License. OpenAPI 3.0 output drops `identifier`.    |
+| `x-*`            | `unknown`                                | —       | Any extension field.                               |
+
+<Warning>`info.title` and `info.version` are required. The plugin throws on boot if either is missing.</Warning>
+
+## Localized description
+
+`info.description` works like a Payload label. Give a string, an object keyed by language, or a function that gets `{ t, i18n }`. The plugin resolves it against the [docs language](/v1/guides/i18n):
+
+```ts payload.config.ts
+openapi({
+  info: {
+    title: 'My API',
+    version: '1.0.0',
+    description: ({ i18n }) => (i18n.language === 'de' ? 'Öffentliche API.' : 'Public API.'),
+  },
+})
+```
+
+## Servers
+
+The `servers` field of the spec tells clients and the "Try it" button which base URL to call. The plugin picks it in this order:
+
+1. `servers` as a function. The plugin calls it on every spec request with `{ req }`.
+2. `servers` as an array.
+3. The request `Host` header, but only when it is in `trustedHosts`.
+4. `serverURL` from your Payload config.
+5. Nothing. The spec has an empty `servers` list, and clients use the URL they loaded the spec from.
+
+```ts payload.config.ts
+openapi({
+  info: { title: 'My API', version: '1.0.0' },
+  servers: [
+    { url: 'https://api.example.com', description: 'Production' },
+    { url: 'https://staging.example.com', description: 'Staging' },
+  ],
+})
+```
+
+A function can choose the servers per request:
+
+```ts payload.config.ts
+openapi({
+  info: { title: 'My API', version: '1.0.0' },
+  servers: ({ req }) => [
+    { url: req.headers.get('x-tenant') === 'eu' ? 'https://eu.example.com' : 'https://example.com' },
+  ],
+})
+```
+
+The document is still cached. Only `servers` is set per request.
+
+### Trusted hosts
+
+The `Host` header comes from the client, so the plugin does not trust it by default. If it did, anyone could send a fake `Host` and get a spec that points "Try it" at their own server. To serve one spec under several host names, list them in `trustedHosts`:
+
+```ts payload.config.ts
+openapi({
+  info: { title: 'My API', version: '1.0.0' },
+  trustedHosts: ['api.example.com', 'api.example.org', 'localhost:3000'],
+})
+```
+
+A request whose `Host` is in the list gets that host as its server, with `https`, or `http` for `localhost` and `127.*`. Any other host falls back to `serverURL`. The match ignores case and includes the port. `trustedHosts` has no effect when `servers` is set.
+
+### Static files
+
+A file on disk has no request. The CLI uses the `--server` flag, then `servers` as an array, then `serverURL`. See [Generate](/v1/cli/generate).

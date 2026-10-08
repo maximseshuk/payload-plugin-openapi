@@ -1,0 +1,26 @@
+---
+title: 'Caching'
+description: 'The built document is cached for the life of the process; disable the cache in development to see config edits without a restart.'
+---
+
+`cache` is `true` by default: the plugin builds the document once and reuses it for every request until the process restarts.
+
+## Why this is safe
+
+The Payload config is static after boot — collections, globals, fields, and endpoints cannot change while the server runs. So the document is identical on every request, with one exception: `servers`, which is set on every request, cached or not. See [Servers](/v1/configuration/info#servers).
+
+## Disable it in development
+
+In development your config changes often. Turn the cache off so edits show up without a restart:
+
+```ts payload.config.ts
+openapi({
+  info: { title: 'My API', version: '1.0.0' },
+  cache: process.env.NODE_ENV === 'production',
+})
+```
+
+<Tip>
+  If you never want a live spec endpoint at all, `cache` is not the option you're looking for — set `serve: false` and
+  generate the file with the CLI instead. See [Static spec](/v1/guides/static-spec).
+</Tip>

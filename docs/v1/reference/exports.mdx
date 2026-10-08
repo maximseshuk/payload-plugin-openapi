@@ -1,0 +1,72 @@
+---
+title: 'Exports'
+description: 'The full public API surface of @seshuk/payload-plugin-openapi — plugins, functions, and types from the single entry point.'
+---
+
+Everything is exported from the single main entry point:
+
+```ts
+import {
+  openapi,
+  scalar,
+  swaggerUi,
+  buildOpenApiDocument,
+  toOpenApi30,
+  toOpenApi31,
+} from '@seshuk/payload-plugin-openapi'
+```
+
+## Values
+
+| Export                 | Kind     | Description                                                                                       |
+| ---------------------- | -------- | ------------------------------------------------------------------------------------------------- |
+| `openapi`              | plugin   | The main plugin — generates and serves the spec, registers the [CLI](/v1/cli/generate)            |
+| `scalar`               | plugin   | Mounts a Scalar API reference UI ([Docs UI](/v1/configuration/docs-ui))                           |
+| `swaggerUi`            | plugin   | Mounts a Swagger UI ([Docs UI](/v1/configuration/docs-ui))                                        |
+| `buildOpenApiDocument` | function | Build the document from a live Payload instance ([Programmatic use](/v1/guides/programmatic-use)) |
+| `toOpenApi30`          | function | Downconvert a 3.2 document to 3.0                                                                 |
+| `toOpenApi31`          | function | Downconvert a 3.2 document to 3.1                                                                 |
+
+## Plugin slugs
+
+The three plugins are built with Payload's `definePlugin`, so each one carries a `slug` and the `options` you passed. Another plugin can find them through the `plugins` map that `definePlugin` hands it, or in `config.plugins`:
+
+| Plugin      | Slug                                        |
+| ----------- | ------------------------------------------- |
+| `openapi`   | `@seshuk/payload-plugin-openapi`            |
+| `scalar`    | `@seshuk/payload-plugin-openapi/scalar`     |
+| `swaggerUi` | `@seshuk/payload-plugin-openapi/swagger-ui` |
+
+## Types
+
+All public types come from the same entry point, so editor autocomplete picks them up on `import type { … } from '@seshuk/payload-plugin-openapi'`.
+
+| Type                     | Description                                                                                                                                           |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `OpenApiPluginOptions`   | The options object accepted by `openapi()`                                                                                                            |
+| `OpenApiInfo`            | The `info` option: an OpenAPI Info Object with a localizable `description` ([Info and servers](/v1/configuration/info))                               |
+| `ServersOption`          | The `servers` option: a server list or a function of `{ req }` ([Servers](/v1/configuration/info#servers))                                            |
+| `LocalizedText`          | A string, a language-keyed object or a `({ t, i18n }) => string` function                                                                             |
+| `OpenApiVersion`         | `'3.0' \| '3.1' \| '3.2'`                                                                                                                             |
+| `FilterOptions`          | The `filters` object — entity include/exclude, endpoint-group toggles, operation rules ([Filters](/v1/configuration/filters))                         |
+| `OperationContext`       | `{ method, path, slug, kind }` passed to `filters.excludeOperations` functions and `security`                                                         |
+| `OperationRule`          | One `filters.excludeOperations` rule — `method`, `slug`, `kind`, `path`                                                                               |
+| `OperationFilter`        | One `filters.excludeOperations` entry: an `OperationRule` or a function                                                                               |
+| `OperationKind`          | `'collection' \| 'global' \| 'custom' \| 'jobs' \| 'system'`                                                                                          |
+| `SecurityOption`         | The `security` function ([Security marking](/v1/configuration/security-marking))                                                                      |
+| `SecurityMarking`        | `'public' \| 'secured'`                                                                                                                               |
+| `AccessOption`           | The `access` function of `openapi()`, `scalar()` and `swaggerUi()`                                                                                    |
+| `EntityOperation`        | `'read' \| 'create' \| 'update' \| 'delete' \| 'validate'`                                                                                            |
+| `EntitySecurityOverride` | Shape of `custom.openapi.security` on an entity — a `SecurityMarking` or a per-operation map ([Security marking](/v1/configuration/security-marking)) |
+| `EntityOpenApiMeta`      | Type of `custom.openapi` on a collection or global. The plugin adds it to Payload's `CollectionCustom` and `GlobalCustom`                             |
+| `FieldOpenApiMeta`       | Type of `custom.openapi` on a field. The plugin adds it to Payload's `FieldCustom`                                                                    |
+| `OpenApiExtension`       | Extra `paths`/`components`/`tags` and a `transform` hook ([Extensions](/v1/configuration/extensions))                                                 |
+| `BuildContext`           | Build-time context — locales, API route, doc languages, active i18n                                                                                   |
+| `ExtensionContext`       | `BuildContext` plus `doc`, `payload` and the resolved `options`, passed to extension `transform` hooks as one object                                  |
+| `BuildOpenApiInput`      | The input object of `buildOpenApiDocument` ([Programmatic use](/v1/guides/programmatic-use))                                                          |
+| `UiPluginOptions`        | Options shared by `scalar()` and `swaggerUi()` — `path`, `specURL`, `cdnBase`, `configuration`, `access`, `enabled`                                   |
+
+<Note>
+  Document types (the return type of `buildOpenApiDocument` and the downconverters) come from
+  `@scalar/openapi-types/3.2` — the plugin's only runtime dependency.
+</Note>

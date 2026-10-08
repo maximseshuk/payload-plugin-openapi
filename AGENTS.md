@@ -1,72 +1,109 @@
-# payload-plugin-openapi Development Guidelines
+# OpenAPI Plugin for Payload
 
-This document outlines coding standards and practices for **@seshuk/payload-plugin-openapi** — a Payload CMS plugin that builds an OpenAPI 3.0/3.1/3.2 document from a sanitized Payload config and serves it through Scalar or Swagger UI.
+Payload 4 plugin. Builds OpenAPI 3.0/3.1/3.2 document from sanitized Payload config. Serves it at `/api/openapi.json`, docs UI via Scalar or Swagger UI. Features: filters, security marking from access functions, `custom.openapi` metadata on fields/endpoints, i18n (44 locales), interactive auth, cache, CLI command `openapi:generate`.
 
-`CLAUDE.md` and `GEMINI.md` are symlinks to this file.
+## Environment
 
-## Core Principles
+- pnpm 12. Node.js 24.15+. Payload 4.
+- Shared dev config from `@seshuk/payload-plugin-tooling` (oxlint, oxfmt, tsconfig, tsdown, test DB, CI/release workflows, changelog).
+- Secrets from env only. Never hardcode keys.
 
-**Lazy, Config-Driven Generation**: The document is never built at config time. `openapi()` only registers the `bin` script, stashes `ResolvedOptions` on `config.custom[PLUGIN_NAME]`, merges i18n bundles, and (unless `serve: false`) mounts the endpoints. The actual document is built per request or per CLI run from the fully _sanitized_ config — so every other plugin's collections, globals, fields, and endpoints are visible regardless of plugin order.
+## Commands
 
-**Always Build 3.2, Downconvert Down**: The builder always produces OpenAPI 3.2. `openapiVersion: '3.1'` and `'3.0'` run a downconversion pass (`src/spec/downconvert.ts`) on the finished document. Never branch the builder on version — add to the downconverter instead.
+```bash
+pnpm typecheck        # tsc --noEmit
+pnpm lint             # oxlint
+pnpm lint:fix
+pnpm format           # oxfmt write; format:check to verify
+pnpm test:unit        # vitest, tests/unit: no DB
+pnpm test:int         # vitest, tests/integration: in-memory DB (TEST_DB=sqlite|postgres|mongodb, default sqlite)
+pnpm build            # tsdown -> dist/
 
-**Native Metadata, No Registry**: Field- and endpoint-level docs ride on Payload's own `custom.openapi` key. The plugin reads that shape; it does not keep a parallel registry. Localizable strings (`description`/`title`/`summary`) may be functions or locale-keyed objects, resolved in `src/spec/entitySchemas.ts`.
+pnpm dev              # dev Payload + Next app (tests/payload.config.ts)
+pnpm docs:dev         # Mintlify docs site (docs/)
+pnpm docs:validate
+```
 
-**Resolve Options Once**: Defaults live in `resolveOptions` (`src/options.ts`), nowhere else. Builders take `ResolvedOptions`, never raw user options.
+Before every commit: `pnpm typecheck && pnpm lint && pnpm format && pnpm test:unit && pnpm test:int`.
 
-**Minimal Surface**: `src/index.ts` is the single public entry point. The runtime dependency footprint is essentially just `@scalar/openapi-types` — keep it that way.
+## Structure
 
-## Toolchain
+`src/index.ts` is the only public entry.
 
-The toolchain is **oxc**: `oxlint` for linting, `oxfmt` for formatting. There is **no eslint or prettier** — don't reach for them. The build is **rslib** (not rsbuild or tsup). The package manager is **pnpm**; don't use npm/yarn or commit a `package-lock.json`/`yarn.lock`.
+```
+src/
+├── index.ts               # openapi() plugin, exports
+├── shared/
+│   ├── constants.ts       # PLUGIN_NAME, paths
+│   ├── types/index.ts     # public types (JSDoc = editor hints), ResolvedOptions, BuildContext
+│   ├── translations/      # makeT + locales/ (44)
+│   └── utils.ts           # deepMerge, isPlainObject, … check here first
+├── server/
+│   ├── options/resolveOptions.ts # every default lives here
+│   ├── endpoints/         # spec.ts (serve doc, ?lang=, cache), interactiveAuth.ts
+│   ├── spec/              # generator: build, buildDocument, entitySchemas, fields, params, components, filters, names, tags, security, downconvert, paths/
+│   └── ui/                # createUiPlugin + scalar/swagger/html
+└── cli/generateSpec.ts    # `payload openapi:generate` (--lang, --out, --server)
+tests/
+├── vitest.config.ts       # projects: unit, int
+├── unit/                  # no DB
+├── integration/           # *.int.spec.ts, dev config + testDatabase()
+├── helpers/               # i18n stub, build context
+└── payload.config.ts, app/, collections/, globals/, blocks/   # runnable dev app
+```
 
-## Key Restrictions
+## Architecture
 
-- Never switch the toolchain (eslint, prettier, tsup, a different package manager) without being asked.
-- Never downgrade the TypeScript `lib`/`target` below ES2023 / Node 20 — `.toSorted()` and friends are intentional.
-- Never branch the builder on `openapiVersion`; downconvert from 3.2 instead.
-- Never scatter option defaults outside `resolveOptions`.
-- Never edit `dist/`, `node_modules/`, or other generated output by hand.
-- Never commit secrets, push directly to `main`, or add the agent as a commit/PR author.
+- `openapi()` builds nothing at config time. Registers CLI command, stashes `ResolvedOptions` on `config.custom[PLUGIN_NAME]`, merges i18n, mounts endpoints (unless `serve: false`).
+- Document built per request or per CLI run from sanitized config. Other plugins' collections/endpoints visible regardless of order.
+- Builder always makes 3.2. `openapiVersion: '3.1' | '3.0'` downconverts finished doc in `server/spec/downconvert.ts`. Never branch builder on version.
+- Field/endpoint docs ride on Payload `custom.openapi`. No own registry. Types augment `CollectionCustom`/`GlobalCustom`/`FieldCustom` in `shared/types`.
+- `servers` set per request in `server/endpoints/spec.ts`: `servers` fn > array > `Host` in `trustedHosts` > `serverURL` > `[]`. Never trust `Host` outside allowlist.
+- Extension `transform` fails closed. No try/catch around it.
+- UI default `cdnBase` pinned + SRI. Bump version = recompute sha384 in `server/ui/scalar.ts`/`swagger.ts`.
 
-## Repository Layout
+## Rules
 
-The shipped source is `src/`. `tests/` is both the vitest suite and a runnable Payload + Next dev app.
+- No code comments. Only JSDoc on plugin options types (`src/shared/types/index.ts`).
+- Defaults only in `resolveOptions`. Builders take `ResolvedOptions`.
+- Removed/renamed v0 keys throw via `assertNoRemovedKeys` (`[<plugin>] <old> was renamed to <new>`). No aliases.
+- `excludeOperations` + `security` run for every path group (collection, global, custom, jobs, system) through `finalize` in `buildDocument`. Secured ops get `PayloadLogin` there when `serve && interactiveAuth`.
+- Runtime deps: `@scalar/openapi-types` only. Ask before adding one.
+- New public option: `shared/types/index.ts` (JSDoc), `server/options/resolveOptions.ts`, `README.md`, docs page, test.
+- Match surrounding naming and idiom. Imports end in `.js`. `@/` (= `src/`) for any import that leaves the folder, `./x.js` only in the same folder, no `../`. Tests import source through `@/` too.
 
-- `src/index.ts` — public exports: `openapi`, `scalar`/`swaggerUi`, `buildOpenApiDocument`, the downconverters, and all types.
-- `src/options.ts` — `resolveOptions`; the home of every default.
-- `src/types.ts` — public types plus `ResolvedOptions`/`BuildContext`.
-- `src/endpoints/` — runtime handlers: `spec.ts` (serves the doc; `?lang=` + cache), `interactiveAuth.ts` (credential→JWT).
-- `src/bin/generateSpec.ts` — the `openapi:generate` CLI (`--lang`, `--out`, `--server`).
-- `src/spec/` — the generator: `build.ts`, `buildDocument.ts`, `entitySchemas.ts`, `fields.ts`, `params.ts`, `components.ts`, `filters.ts`, `names.ts`, `tags.ts`, `downconvert.ts`, and `spec/paths/` (collections, globals, auth, versions, jobs, custom).
-- `src/ui/` — docs renderers: `createUiPlugin.ts` (shared factory), `scalar.ts`/`swagger.ts` (thin), `html.ts`.
-- `src/translations/` — `index.ts` registers locale bundles + `makeT`; `locales/` holds 44 files.
-- `src/utils.ts` — shared helpers (`deepMerge`, `isPlainObject`, …); check here before adding a utility.
+## Testing
 
-## Code Style
+- vitest in `tests/`: `unit/` (builders, options, plugin factory; no DB), `integration/*.int.spec.ts` (full doc against dev config).
+- Test DB from `testDatabase()` (`@seshuk/payload-plugin-tooling/test-database`).
+- Plugin factory testable directly: `openapi(opts)(config)`, assert on `endpoints`/`cli`/`custom`/`i18n`.
 
-Internal imports use the `.js` extension under ESM/NodeNext even though the files are `.ts` — match the surrounding imports. TypeScript runs in strict mode; avoid `any` and prefer precise types from `@scalar/openapi-types` and `payload`. Keep comments load-bearing — explain _why_, not _what_, and match the existing low density. When adding a public option, change all four sites in one PR: `types.ts` (with accurate JSDoc — it's the editor-hint source of truth), `options.ts`, the `README.md`, and a test. Format and lint touched files: `pnpm exec oxfmt <file>` and `pnpm lint`.
+## Docs
 
-## Testing Requirements
+- Mintlify site in `docs/`. User-facing change: update `README.md` and matching docs page.
 
-Tests are vitest in `tests/` — `unit.spec.ts` (builders, options, downconvert, the plugin factory in isolation) and `int.spec.ts` (the full document built against the dev config). Follow TDD for behavior changes: write the failing test first. The plugin factory is directly testable — call `openapi(opts)(config)` and assert on the returned `endpoints`/`bin`/`custom`/`i18n`. Cover success, failure, and the edge that motivated the change; don't assert on log output. Run `pnpm test` before committing anything under `src/`, and **show the output** — never claim "tested" or "all green" without pasted evidence in the same turn.
+## Branches
 
-## Build & Commands
+| Branch | Major | Payload | Node   | Takes                          |
+| ------ | ----- | ------- | ------ | ------------------------------ |
+| `main` | v1    | 4       | 24.15+ | all work; PRs target `main`    |
+| `0.x`  | v0    | 3       | 20+    | critical fixes only, from main |
 
-| Task           | Command                                      |
-| -------------- | -------------------------------------------- |
-| Typecheck      | `pnpm typecheck`                             |
-| Lint / fix     | `pnpm lint` · `pnpm lint:fix`                |
-| Format / check | `pnpm format` · `pnpm format:check`          |
-| Test / watch   | `pnpm test` · `pnpm test:watch`              |
-| One test file  | `pnpm exec vitest run tests/unit.spec.ts`    |
-| Build          | `pnpm build`                                 |
-| Dev app        | `pnpm dev` (boots `tests/payload.config.ts`) |
+## Releases
 
-## Commits and PRs
+- Run `/payload-plugin:release` skill: version bump in `package.json`, `.github/releases/vX.Y.Z.md`, checks, commit `chore(release): vX.Y.Z`, tag. Never pushes.
+- Tag push `vX.Y.Z[-pre.N]` runs tooling release workflow: checks, git-cliff notes, GitHub Release, npm publish (OIDC). Dist-tag: `beta` for `-beta.N`, `latest` for newest major, `latest-N` for older major.
+- New major and its first prerelease need `.github/releases/vX.Y.Z.md`.
+- Tags `v*` never move. Bad release = new version.
 
-Use Conventional Commits (`type: subject`) with the subject focused on user impact, one logical change per commit. The **scope is optional** — there's no commitlint enforcing it. When one helps, use the `src/` folder you touched (`bin`, `endpoints`, `spec`, `translations`, `ui`); `release` is reserved for the `pnpm version` scripts (`chore(release): v%s`). Don't invent scopes beyond those.
+## Commits
 
-**Never add a `Co-Authored-By` trailer or any agent attribution to commits.** Agents assist; they don't author. The commit message is the subject line and (when needed) a body explaining _why_ — nothing else.
+- One-line Conventional Commit (`feat: add nestedTags option`). Optional scope = `src/` area (`cli`, `endpoints`, `spec`, `translations`, `ui`).
+- No co-authored-by or agent trailers.
+- Commit locally. Push only when asked.
 
-Branch off `main` and open a PR rather than pushing to it; force-push only with `--force-with-lease`. Keep `README.md` and JSDoc in sync with any option, command, or behavior change in the same PR. Ask first before adding a runtime dependency, changing a public signature, or doing a repo-wide refactor.
+## Boundaries
+
+Ask first: new runtime dependency, public API change, large refactor, commit/push not requested.
+
+Never: secrets in repo; push, force-push or destructive git without explicit request; edit `dist/` or generated files by hand.

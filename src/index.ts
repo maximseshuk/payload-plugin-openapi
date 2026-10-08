@@ -1,28 +1,34 @@
 import { fileURLToPath } from 'node:url'
-import type { Config, Plugin } from 'payload'
 
-import { PLUGIN_NAME } from './constants.js'
-import { resolveOptions } from './options.js'
-import type { OpenApiPluginOptions } from './types.js'
-import { interactiveAuthHandler } from './endpoints/interactiveAuth.js'
-import { specHandler } from './endpoints/spec.js'
-import { translations } from './translations/index.js'
+import { definePlugin } from 'payload'
 
-const BIN_KEY = 'openapi:generate'
+import { interactiveAuthHandler } from '@/server/endpoints/interactiveAuth.js'
+import { specHandler } from '@/server/endpoints/spec.js'
+import { resolveOptions } from '@/server/options/resolveOptions.js'
+import { readSecurityOverride } from '@/server/spec/security.js'
+import { buildFeatures, reportOpenApiTelemetry } from '@/server/telemetry.js'
+import { PLUGIN_NAME } from '@/shared/constants.js'
+import { translations } from '@/shared/translations/index.js'
+import type { OpenApiPluginOptions } from '@/shared/types/index.js'
 
-const resolveBinScriptPath = (): string => {
+const CLI_COMMAND = 'openapi:generate'
+
+const resolveCommandPath = (): string => {
   const selfUrl = new URL(import.meta.url)
   const ext = selfUrl.pathname.endsWith('.ts') ? '.ts' : '.js'
-  return fileURLToPath(new URL(`./bin/generateSpec${ext}`, selfUrl))
+  return `${fileURLToPath(new URL(`./cli/generateSpec${ext}`, selfUrl))}#generateSpecCommand`
 }
 
-export const openapi =
-  (options: OpenApiPluginOptions): Plugin =>
-  (config: Config): Config => {
+export const openapi = definePlugin<OpenApiPluginOptions>({
+  slug: PLUGIN_NAME,
+  plugin: ({ config, options, plugins }) => {
+    const resolved = resolveOptions(options)
+    for (const entity of [...(config.collections ?? []), ...(config.globals ?? [])]) readSecurityOverride(entity)
     if (options.enabled === false) return config
 
-    const resolved = resolveOptions(options)
-    const authCollection = (config.collections ?? []).find((c) => Boolean(c.auth))?.slug ?? 'users'
+    const authCollection =
+      resolved.interactiveAuth.collection ?? (config.collections ?? []).find((c) => Boolean(c.auth))?.slug ?? 'users'
+    const features = buildFeatures({ plugins, resolved })
 
     config.i18n = config.i18n ?? {}
     config.i18n.translations = config.i18n.translations ?? {}
@@ -43,21 +49,26 @@ export const openapi =
         ...config.custom,
         [PLUGIN_NAME]: resolved,
       },
-      bin: [...(config.bin ?? []), { key: BIN_KEY, scriptPath: resolveBinScriptPath() }],
+      cli:
+        config.cli === false
+          ? config.cli
+          : {
+              ...config.cli,
+              commands: { [CLI_COMMAND]: resolveCommandPath(), ...config.cli?.commands },
+            },
       endpoints: [
         ...(config.endpoints ?? []),
-        // `serve: false` registers the CLI bin only — nothing is mounted over HTTP.
         ...(resolved.serve
           ? [
               {
-                path: resolved.specEndpoint,
+                path: resolved.path,
                 method: 'get' as const,
                 handler: specHandler(resolved),
               },
               ...(resolved.interactiveAuth.enabled
                 ? [
                     {
-                      path: resolved.interactiveAuth.endpoint,
+                      path: resolved.interactiveAuth.path,
                       method: 'post' as const,
                       handler: interactiveAuthHandler(authCollection),
                     },
@@ -66,24 +77,40 @@ export const openapi =
             ]
           : []),
       ],
+      onInit: async (payload) => {
+        await config.onInit?.(payload)
+        void reportOpenApiTelemetry({ features, options, payload })
+      },
     }
-  }
+  },
+})
 
-export { buildOpenApiDocument } from './spec/build.js'
-export type { BuildOpenApiInput } from './spec/build.js'
-export { toOpenApi30, toOpenApi31 } from './spec/downconvert.js'
-export { scalar } from './ui/scalar.js'
-export { swaggerUi } from './ui/swagger.js'
+export { buildOpenApiDocument } from '@/server/spec/build.js'
+export type { BuildOpenApiInput } from '@/server/spec/build.js'
+export { toOpenApi30, toOpenApi31 } from '@/server/spec/downconvert.js'
+export { scalar } from '@/server/ui/scalar.js'
+export { swaggerUi } from '@/server/ui/swagger.js'
 
 export type {
+  AccessOption,
   BuildContext,
+  EntityOpenApiMeta,
   EntityOperation,
   EntitySecurityOverride,
+  ExtensionContext,
+  FieldOpenApiMeta,
   FilterOptions,
+  LocalizedText,
   OpenApiExtension,
-  OpenApiMetadata,
+  OpenApiInfo,
   OpenApiPluginOptions,
   OpenApiVersion,
   OperationContext,
+  OperationFilter,
+  OperationKind,
+  OperationRule,
+  SecurityMarking,
+  SecurityOption,
+  ServersOption,
   UiPluginOptions,
-} from './types.js'
+} from '@/shared/types/index.js'

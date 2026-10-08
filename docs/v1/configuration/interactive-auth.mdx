@@ -1,0 +1,66 @@
+---
+title: 'Interactive auth'
+description: 'Add a token endpoint so Scalar and Swagger UI can show an Authorize dialog with a Payload login.'
+---
+
+By default the docs UI expects you to paste a bearer token. Turn on `interactiveAuth` to add a token endpoint (`/api/openapi-auth`) plus a matching security scheme, so Scalar and Swagger UI show an **Authorize** dialog where users log in with their Payload credentials:
+
+```ts payload.config.ts
+openapi({
+  info: { title: 'My API', version: '1.0.0' },
+  interactiveAuth: true, // token endpoint at /api/openapi-auth
+})
+```
+
+To change the token endpoint path or the auth collection, pass an object. The path is relative to the Payload API route (`routes.api`, `/api` by default):
+
+```ts payload.config.ts
+openapi({
+  info: { title: 'My API', version: '1.0.0' },
+  interactiveAuth: { path: '/login', collection: 'admins' }, // → /api/login, logs in to `admins`
+})
+```
+
+## How the login works
+
+The endpoint logs in against `collection`. Without it, it uses your **first auth-enabled collection**, falling back to `users` if none is found. It accepts the username as either `email` or `username`, matching how your auth collection is configured — the same value is passed as both, and Payload uses whichever login field the collection defines.
+
+## Request and response
+
+The token endpoint accepts a `POST` with form data (`username` and `password` fields) and returns the Payload JWT:
+
+```bash Request
+curl -X POST https://example.com/api/openapi-auth \
+  -F 'username=admin@example.com' \
+  -F 'password=secret'
+```
+
+```json Response (200)
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIs...",
+  "token_type": "JWT",
+  "expires_in": 7200
+}
+```
+
+On a failed login the endpoint returns `400` with:
+
+```json Response (400)
+{ "error": "invalid_grant" }
+```
+
+`expires_in` is the number of seconds until the token expires.
+
+The docs UI wires this up for you — users type credentials into the Authorize dialog, the UI exchanges them at the token endpoint, and the returned JWT is attached to every "try it" request. Every secured operation lists both `PayloadToken` and `PayloadLogin`, so the UI sends the token with either one.
+
+<Warning>
+
+The interactive auth endpoint exchanges credentials for a live JWT. Only enable it on docs real users are meant to authenticate against, and serve them over HTTPS.
+
+</Warning>
+
+<Note>
+
+With `serve: false` the interactive-auth endpoint is not mounted, along with the spec endpoint, and the spec does not list the `PayloadLogin` scheme — see [Static spec](/v1/guides/static-spec).
+
+</Note>

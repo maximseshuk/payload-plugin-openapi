@@ -1,0 +1,52 @@
+---
+title: 'Introduction'
+description: 'Generate OpenAPI 3.0/3.1/3.2 documents from your Payload CMS config and serve them with Scalar or Swagger UI.'
+---
+
+`@seshuk/payload-plugin-openapi` builds an OpenAPI document straight from your Payload CMS config. Add it to your `plugins` array and you get a complete spec — collections, globals, auth, versions, and jobs — plus an interactive API reference, with zero annotation needed.
+
+The document is built lazily from the fully sanitized config, so endpoints and fields added by other plugins show up too, regardless of plugin order.
+
+## Key features
+
+- **Full spec from your config** — collections, globals, auth, versions, and jobs are documented automatically.
+- **Native metadata** — document custom endpoints and refine field schemas with Payload's own `custom.openapi` key. No wrapper, no separate registry.
+- **Interactive docs out of the box** — mount Scalar or Swagger UI, or both.
+- **Localized** — descriptions resolve through your Payload i18n; the UI ships translations for 44 locales.
+- **Precise filtering** — control exactly which entities and operations are exposed.
+- **Security marking** — operations are marked public or secured by probing your access functions, with per-entity and per-operation overrides.
+- **File generation** — write the spec to disk for CI, schema diffs, or client codegen.
+- **One option for the spec version** — OpenAPI 3.0, 3.1, or 3.2 from the same config.
+
+## Requirements
+
+Payload `4.0.0-canary.38`, Next.js 16.4 or later and Node.js 24.15 or later. v1 is in beta under the `beta` npm tag, and Payload 4 is published under `canary`. For Payload 3, use the `0.x` versions.
+
+## Where to go next
+
+<Columns cols={2}>
+  <Card title="Quick start" icon="rocket" href="/v1/quick-start">
+    Install the plugin and get a live spec and docs UI in one config change.
+  </Card>
+  <Card title="Configuration" icon="sliders" href="/v1/configuration/overview">
+    Every plugin option, from metadata to caching and extensions.
+  </Card>
+  <Card title="Docs UI" icon="book-open" href="/v1/configuration/docs-ui">
+    Serve Scalar or Swagger UI, and pass configuration through to either.
+  </Card>
+  <Card title="Filters" icon="filter" href="/v1/configuration/filters">
+    Choose which entities and operations end up in the spec.
+  </Card>
+  <Card title="Security marking" icon="lock" href="/v1/configuration/security-marking">
+    How operations are marked public or secured, and how to override it.
+  </Card>
+  <Card title="Custom endpoints" icon="plug" href="/v1/guides/custom-endpoints">
+    Document your own endpoints with a plain OpenAPI Operation Object.
+  </Card>
+  <Card title="CLI generation" icon="terminal" href="/v1/cli/generate">
+    Write the spec to a file with `payload openapi:generate`.
+  </Card>
+  <Card title="Examples" icon="code" href="/v1/guides/examples">
+    Copy-ready configurations for common setups.
+  </Card>
+</Columns>

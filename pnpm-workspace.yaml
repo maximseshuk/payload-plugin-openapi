@@ -1,10 +1,28 @@
+nodeVersion: 24.15.0
+pmOnFail: download
 packages:
-  - .
   - docs
+
+catalog:
+  '@types/node': ^26.1.2
+  react: 19.3.0
+  react-dom: 19.3.0
+  typescript: 7.0.2
+
 allowBuilds:
   '@scarf/scarf': false
   core-js: false
   esbuild: true
   keytar: false
+  oxc-resolver: true
   puppeteer: false
   sharp: true
+minimumReleaseAgeExclude:
+  - '@seshuk/payload-plugin-tooling'
+  - '@payloadcms/db-sqlite@4.0.0-canary.38'
+  - '@payloadcms/drizzle@4.0.0-canary.38'
+  - '@payloadcms/graphql@4.0.0-canary.38'
+  - '@payloadcms/next@4.0.0-canary.38'
+  - '@payloadcms/translations@4.0.0-canary.38'
+  - '@payloadcms/ui@4.0.0-canary.38'
+  - payload@4.0.0-canary.38
