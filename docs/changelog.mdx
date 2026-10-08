@@ -5,6 +5,20 @@ description: 'Release history for the OpenAPI plugin for Payload CMS.'
 
 Notable changes per release. For the full commit-level history, see the [GitHub releases](https://github.com/maximseshuk/payload-plugin-openapi/releases).
 
+<Update label="v0.2.1" description="October 8, 2026">
+
+**Fixes**
+
+- `POST /api/<slug>/unlock` is documented for every auth collection, as Payload mounts it.
+- Login, forgot-password and unlock bodies follow `loginWithUsername`: `email` by default, `username` when email login is off, `email` or `username` with `allowEmailLogin`.
+- OpenAPI 3.0 output is valid with an empty `required` list and with fields that allow several types, such as `json` fields. 3.0 and 3.1 output no longer keep the 3.2 tag fields `summary`, `kind` and `parent`.
+- The internal `payload-kv` and `payload-query-presets` collections are hidden unless `includeSystem` is on.
+- Create, update, delete and duplicate list the query params Payload reads for them, and the global update too. Bulk update also lists `limit` and `sort`. Write operations list `autosave`, `publishAllLocales`, `unpublishAllLocales`, `overrideLock` and `selectedLocales[]` where Payload reads them.
+- Collection create is documented with status `201`. The global update response is `{ message, result }` and a restored global version is `{ doc, message }`.
+- Relationships and uploads inside groups, named tabs, arrays and blocks are written as IDs in create and update bodies. A polymorphic relationship is written as `{ relationTo, value }`, and an optional relationship accepts `null`.
+
+</Update>
+
 <Update label="v0.2.0" description="July 13, 2026">
 
 **New features**
