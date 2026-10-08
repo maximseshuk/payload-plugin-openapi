@@ -431,6 +431,36 @@ describe('generated document', () => {
       expect(doc.paths['/api/globals/settings/versions/{id}']?.post).toBeDefined()
       expect(schema('GlobalSettingsVersion')).toBeDefined()
     })
+
+    it('describes a restored global as `{ doc, message }` and a restored document as the document plus `message`', () => {
+      const body = (path: string) => {
+        const ok = doc.paths[path]?.post?.responses?.['200'] as ResponseObject
+        return ok.content?.['application/json']?.schema as SchemaObject
+      }
+      expect(body('/api/globals/settings/versions/{id}').properties).toEqual({
+        message: { type: 'string' },
+        doc: { $ref: '#/components/schemas/GlobalSettings' },
+      })
+      expect(body('/api/posts/versions/{id}').allOf?.[0]).toEqual({ $ref: '#/components/schemas/Posts' })
+    })
+  })
+
+  describe('responses', () => {
+    it('describes create as 201 and the global update as `{ message, result }`', () => {
+      const create = doc.paths['/api/posts']?.post?.responses ?? {}
+      expect(create['200']).toBeUndefined()
+      const created = (create['201'] as ResponseObject).content?.['application/json']?.schema as SchemaObject
+      expect(created.properties?.doc).toEqual({ $ref: '#/components/schemas/Posts' })
+
+      const update = doc.paths['/api/globals/settings']?.post?.responses?.['200'] as ResponseObject
+      const updated = update.content?.['application/json']?.schema as SchemaObject
+      expect(updated.properties).toEqual({
+        message: { type: 'string' },
+        result: { $ref: '#/components/schemas/GlobalSettings' },
+      })
+      const read = doc.paths['/api/globals/settings']?.get?.responses?.['200'] as ResponseObject
+      expect(read.content?.['application/json']?.schema).toEqual({ $ref: '#/components/schemas/GlobalSettings' })
+    })
   })
 
   describe('paths/jobs', () => {

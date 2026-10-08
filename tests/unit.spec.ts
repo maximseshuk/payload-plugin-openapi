@@ -424,6 +424,39 @@ describe('spec/paths/collections', () => {
     expect(names(paths['/api/posts']?.delete)).not.toContain('limit')
     expect(names(paths['/api/posts']?.delete)).not.toContain('sort')
   })
+
+  it('describes the responses as Payload sends them', async () => {
+    const { buildGlobalPaths } = await import('../src/spec/paths/globals.js')
+    const { buildVersionPaths } = await import('../src/spec/paths/versions.js')
+    const body = (op?: { responses?: Record<string, unknown> }, code = '200') => {
+      const response = op?.responses?.[code] as { content: Record<string, { schema: SchemaObject }> } | undefined
+      return response?.content['application/json']?.schema
+    }
+    const doc = { $ref: '#/components/schemas/Posts' }
+
+    const create = buildCollectionPaths({ collection: postsColl(), ctx })['/api/posts']?.post
+    expect(create?.responses?.['200']).toBeUndefined()
+    expect(body(create, '201')?.properties).toEqual({ message: { type: 'string' }, doc })
+
+    const site = buildGlobalPaths({
+      global: { slug: 'site', fields: [] } as unknown as SanitizedGlobalConfig,
+      ctx,
+    })['/api/globals/site']
+    expect(body(site?.get)).toEqual({ $ref: '#/components/schemas/GlobalSite' })
+    expect(body(site?.post)?.properties).toEqual({
+      message: { type: 'string' },
+      result: { $ref: '#/components/schemas/GlobalSite' },
+    })
+
+    const entity = { slug: 'posts', fields: [], versions: {} } as unknown as SanitizedCollectionConfig
+    const restore = (isGlobal?: boolean) =>
+      body(
+        buildVersionPaths({ entity, pathBase: '/x', ctx, nestedTags: false, global: isGlobal })['/x/versions/{id}']
+          ?.post,
+      )
+    expect(restore()?.allOf?.[0]).toEqual(doc)
+    expect(restore(true)?.properties).toEqual({ message: { type: 'string' }, doc })
+  })
 })
 
 describe('spec/paths/auth', () => {

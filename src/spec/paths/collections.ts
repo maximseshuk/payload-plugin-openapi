@@ -9,7 +9,7 @@ import type {
 
 import type { BuildContext } from '../../types.js'
 import { makeT } from '../../translations/index.js'
-import { ERRORS, errorResponses, jsonOk, uploadRequestBody } from '../components.js'
+import { ERRORS, errorResponses, jsonOk, jsonResponse, uploadRequestBody } from '../components.js'
 import { createSchemaName, listSchemaName, refTo, schemaName, updateSchemaName } from '../names.js'
 import {
   buildListParams,
@@ -73,7 +73,7 @@ export const buildCollectionPaths = ({
     ...errorResponses(ERRORS.read, t),
   }
   const createResponse: ResponsesObject = {
-    ...jsonOk(t('collectionCreated'), mutationSchema),
+    '201': jsonResponse(t('collectionCreated'), mutationSchema),
     ...errorResponses(ERRORS.create, t),
   }
   const updateResponse: ResponsesObject = {
