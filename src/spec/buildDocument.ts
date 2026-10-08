@@ -205,6 +205,7 @@ export const buildDocument = async (input: BuildInput): Promise<Document> => {
             ctx,
             schemaBase: gbase,
             nestedTags: options.nestedTags,
+            global: true,
           }),
         )
       }

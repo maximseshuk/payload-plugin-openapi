@@ -1,7 +1,7 @@
 import type { Field } from 'payload'
 import type { ParameterObject, ReferenceObject, SchemaObject } from '@scalar/openapi-types/3.2'
 
-import type { BuildContext } from '../types.js'
+import type { BuildContext, Entity } from '../types.js'
 import { makeT } from '../translations/index.js'
 import { exposableFields } from './fields.js'
 import { joinsSchemaName, populateSchemaName, querySchemaName, refTo, selectSchemaName } from './names.js'
@@ -225,6 +225,66 @@ export const commonReadParams = ({
 
   return params
 }
+
+export type WriteOperation = 'create' | 'update' | 'updateByID' | 'delete' | 'duplicate' | 'globalUpdate'
+
+const SHARED = ['depth', 'locale', 'fallback-locale', 'select', 'populate']
+const ALL_LOCALES = ['publishAllLocales', 'unpublishAllLocales']
+
+const WRITE_PARAMS: Record<WriteOperation, Set<string>> = {
+  create: new Set([...SHARED, 'draft', 'autosave', 'publishAllLocales']),
+  update: new Set([...SHARED, 'draft', 'trash', 'overrideLock', ...ALL_LOCALES]),
+  updateByID: new Set([...SHARED, 'draft', 'trash', 'autosave', 'overrideLock', ...ALL_LOCALES]),
+  delete: new Set([...SHARED, 'trash', 'overrideLock']),
+  duplicate: new Set([...SHARED, 'draft', 'selectedLocales[]']),
+  globalUpdate: new Set([...SHARED, 'draft', 'autosave', ...ALL_LOCALES]),
+}
+
+const entityWriteParams = (entity: Entity, ctx: BuildContext): ParameterObject[] => {
+  const t = makeT(ctx.i18n)
+  const flag = (name: string, key: Parameters<typeof t>[0]): ParameterObject => ({
+    name,
+    in: 'query',
+    description: t(key),
+    schema: { type: 'boolean' },
+  })
+  const drafts = entity.versions ? entity.versions.drafts : false
+  const params: ParameterObject[] = []
+  if (drafts && drafts.autosave) params.push(flag('autosave', 'paramAutosave'))
+  if (drafts && drafts.localizeStatus) {
+    params.push(flag('publishAllLocales', 'paramPublishAllLocales'))
+    params.push(flag('unpublishAllLocales', 'paramUnpublishAllLocales'))
+  }
+  if (entity.lockDocuments !== false) params.push(flag('overrideLock', 'paramOverrideLock'))
+  if (ctx.locales.length > 0) {
+    params.push({
+      name: 'selectedLocales[]',
+      in: 'query',
+      description: t('paramSelectedLocales'),
+      style: 'form',
+      explode: true,
+      schema: { type: 'array', items: { type: 'string', enum: ctx.locales } },
+    })
+  }
+  return params
+}
+
+export const writeParams = ({
+  base,
+  entity,
+  ctx,
+  refs,
+  operation,
+}: {
+  base: string
+  entity: Entity
+  ctx: BuildContext
+  refs: ReadParamRefs
+  operation: WriteOperation
+}): ParameterObject[] =>
+  [...commonReadParams({ base, ctx, refs }), ...entityWriteParams(entity, ctx)].filter((p) =>
+    WRITE_PARAMS[operation].has(p.name),
+  )
 
 export const whereParam = (base: string): ParameterObject => objectParam('where', refTo(querySchemaName(base)))
 

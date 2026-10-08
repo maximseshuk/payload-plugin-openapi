@@ -7,6 +7,12 @@ export const lv: PluginDefaultTranslationsObject = {
     paramSortShort: 'Lauks, pēc kura kārtot; pievienojiet priedēkli `-` dilstošai secībai.',
     paramDraft: 'Atgriezt melnrakstu versijas.',
     paramTrash: 'Iekļaut atkritnē pārvietotos dokumentus.',
+    paramAutosave:
+      'Saglabāt kā automātisko saglabāšanu: atjaunina pēdējo automātiski saglabāto versiju, nevis pievieno jaunu.',
+    paramPublishAllLocales: 'Publicēt visas valodas, ne tikai pieprasījuma valodu.',
+    paramUnpublishAllLocales: 'Atcelt visu valodu publicēšanu un atgriezt dokumentu melnrakstā.',
+    paramOverrideLock: 'Ignorēt cita lietotāja bloķējumu. Noklusējums false.',
+    paramSelectedLocales: 'Kopēt dublikātā tikai šīs valodas. Noklusējums: visas valodas.',
     paramFlattenLocales:
       'Ja izmantots `locale=all`, iestatiet false, lai lokalizētos laukus saglabātu kā atsevišķu lokāļu objektus. Noklusējums ir true.',
     paramLocale: 'Atgriežamā lokāle vai `all`, lai iegūtu visas lokāles. Skatiet sadaļu Lokalizācija API aprakstā.',

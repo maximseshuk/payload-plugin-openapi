@@ -7,6 +7,12 @@ export const id: PluginDefaultTranslationsObject = {
     paramSortShort: 'Field untuk pengurutan; awali dengan `-` untuk urutan menurun.',
     paramDraft: 'Mengembalikan versi draf.',
     paramTrash: 'Sertakan dokumen yang telah dibuang.',
+    paramAutosave:
+      'Simpan sebagai simpan otomatis: memperbarui versi simpan otomatis terakhir alih-alih menambah versi baru.',
+    paramPublishAllLocales: 'Terbitkan semua bahasa, bukan hanya bahasa permintaan.',
+    paramUnpublishAllLocales: 'Batalkan penerbitan semua bahasa dan kembalikan dokumen ke draf.',
+    paramOverrideLock: 'Abaikan kunci milik pengguna lain. Bawaan false.',
+    paramSelectedLocales: 'Salin hanya bahasa ini ke duplikat. Bawaan: semua bahasa.',
     paramFlattenLocales:
       'Dengan `locale=all`, atur false untuk mempertahankan field terlokalisasi sebagai objek per-lokal. Default true.',
     paramLocale:

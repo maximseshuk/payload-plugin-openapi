@@ -105,12 +105,14 @@ export const buildVersionPaths = ({
   ctx,
   schemaBase,
   nestedTags,
+  global = false,
 }: {
   entity: Entity
   pathBase: string
   ctx: BuildContext
   schemaBase?: string
   nestedTags: boolean
+  global?: boolean
 }): PathsObject => {
   if (!entity.versions) return {}
 
@@ -130,9 +132,10 @@ export const buildVersionPaths = ({
     schema: { type: ctx.defaultIDType === 'number' ? 'integer' : 'string' },
   }
 
-  const restoreResponse: SchemaObject = {
-    allOf: [{ $ref: refTo(name) }, { type: 'object', properties: { message: { type: 'string' } } }],
-  }
+  const message: SchemaObject = { type: 'string' }
+  const restoreResponse: SchemaObject = global
+    ? { type: 'object', properties: { message, doc: { $ref: refTo(name) } } }
+    : { allOf: [{ $ref: refTo(name) }, { type: 'object', properties: { message } }] }
 
   return {
     [`${pathBase}/versions`]: {

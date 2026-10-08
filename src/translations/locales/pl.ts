@@ -8,6 +8,11 @@ export const pl: PluginDefaultTranslationsObject = {
     paramSortShort: 'Pole, według którego następuje sortowanie; poprzedź znakiem `-`, aby sortować malejąco.',
     paramDraft: 'Zwróć wersje robocze.',
     paramTrash: 'Uwzględnij dokumenty w koszu.',
+    paramAutosave: 'Zapisz jako autozapis: aktualizuje ostatnią wersję autozapisu zamiast dodawać nową.',
+    paramPublishAllLocales: 'Opublikuj wszystkie języki, nie tylko język żądania.',
+    paramUnpublishAllLocales: 'Cofnij publikację wszystkich języków i przywróć dokument do wersji roboczej.',
+    paramOverrideLock: 'Zignoruj blokadę innego użytkownika. Domyślnie false.',
+    paramSelectedLocales: 'Skopiuj do duplikatu tylko te języki. Domyślnie: wszystkie języki.',
     paramFlattenLocales:
       'Przy `locale=all` ustaw false, aby zachować pola zlokalizowane jako obiekty z podziałem na języki. Domyślnie true.',
     paramLocale: 'Język do zwrócenia lub `all`, aby zwrócić wszystkie języki. Zobacz sekcję Lokalizacja w opisie API.',

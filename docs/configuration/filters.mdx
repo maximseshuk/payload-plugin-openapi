@@ -19,6 +19,8 @@ description: 'Control what ends up in the spec: which entities are documented, w
 | `excludeOperations` | `OperationRule[]`  | `[]`    | Per-operation removal rules                                                     |
 | `excludeWhen`       | `(ctx) => boolean` | —       | Escape hatch: return `true` to drop an operation                                |
 
+`includeSystem` covers these collections: `payload-jobs`, `payload-kv`, `payload-locked-documents`, `payload-migrations`, `payload-preferences`, `payload-query-presets` and `payload-folders`.
+
 ## Choosing entities with `include` and `exclude`
 
 These two lists pick which collections and globals are documented. Each entry is an `EntityMatcher` — one of three shapes:

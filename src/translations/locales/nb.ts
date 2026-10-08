@@ -7,6 +7,11 @@ export const nb: PluginDefaultTranslationsObject = {
     paramSortShort: 'Felt å sortere etter; sett `-` foran for synkende rekkefølge.',
     paramDraft: 'Returner utkastversjoner.',
     paramTrash: 'Inkluder dokumenter i papirkurven.',
+    paramAutosave: 'Lagre som autolagring: oppdaterer den siste autolagrede versjonen i stedet for å legge til en ny.',
+    paramPublishAllLocales: 'Publiser alle språk, ikke bare språket i forespørselen.',
+    paramUnpublishAllLocales: 'Avpubliser alle språk og sett dokumentet tilbake til utkast.',
+    paramOverrideLock: 'Ignorer en lås fra en annen bruker. Standard false.',
+    paramSelectedLocales: 'Kopier bare disse språkene til duplikatet. Standard: alle språk.',
     paramFlattenLocales:
       'Med `locale=all`, sett til false for å beholde lokaliserte felt som objekter per locale. Standard er true.',
     paramLocale:

@@ -7,6 +7,11 @@ export const vi: PluginDefaultTranslationsObject = {
     paramSortShort: 'Trường để sắp xếp; thêm tiền tố `-` để sắp xếp giảm dần.',
     paramDraft: 'Trả về các phiên bản nháp.',
     paramTrash: 'Bao gồm các tài liệu đã đưa vào thùng rác.',
+    paramAutosave: 'Lưu dưới dạng tự động lưu: cập nhật phiên bản tự động lưu gần nhất thay vì thêm phiên bản mới.',
+    paramPublishAllLocales: 'Xuất bản mọi ngôn ngữ, không chỉ ngôn ngữ của yêu cầu.',
+    paramUnpublishAllLocales: 'Hủy xuất bản mọi ngôn ngữ và đưa tài liệu về bản nháp.',
+    paramOverrideLock: 'Bỏ qua khóa của người dùng khác. Mặc định false.',
+    paramSelectedLocales: 'Chỉ sao chép các ngôn ngữ này sang bản sao. Mặc định: mọi ngôn ngữ.',
     paramFlattenLocales:
       'Với `locale=all`, đặt false để giữ các trường đa ngôn ngữ dưới dạng đối tượng theo từng ngôn ngữ. Mặc định là true.',
     paramLocale: 'Ngôn ngữ cần trả về, hoặc `all` để lấy mọi ngôn ngữ. Xem phần Đa ngôn ngữ trong phần mô tả API.',

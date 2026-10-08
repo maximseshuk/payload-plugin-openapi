@@ -7,6 +7,11 @@ export const da: PluginDefaultTranslationsObject = {
     paramSortShort: 'Felt at sortere efter; sæt `-` foran for faldende rækkefølge.',
     paramDraft: 'Returnér kladdeversioner.',
     paramTrash: 'Inkludér slettede dokumenter.',
+    paramAutosave: 'Gem som autogem: opdaterer den seneste autogemte version i stedet for at tilføje en ny.',
+    paramPublishAllLocales: 'Udgiv alle sprog, ikke kun forespørgslens sprog.',
+    paramUnpublishAllLocales: 'Afpublicér alle sprog og sæt dokumentet tilbage til kladde.',
+    paramOverrideLock: 'Ignorér en lås fra en anden bruger. Standard false.',
+    paramSelectedLocales: 'Kopiér kun disse sprog til dubletten. Standard: alle sprog.',
     paramFlattenLocales:
       'Med `locale=all` skal du sætte false for at bevare lokaliserede felter som objekter pr. sprog. Standard er true.',
     paramLocale: 'Sprog der skal returneres, eller `all` for alle sprog. Se afsnittet Lokalisering i API-beskrivelsen.',

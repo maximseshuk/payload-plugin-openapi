@@ -22,6 +22,7 @@ const buildConfigAsync = async () => {
   return buildConfig({
     secret: process.env.PAYLOAD_SECRET || 'dev-secret',
     typescript: { autoGenerate: false },
+    experimental: { localizeStatus: true },
     admin: { user: 'users', importMap: { baseDir: path.resolve(dirname) } },
     i18n: {
       supportedLanguages: { en, de, fr },

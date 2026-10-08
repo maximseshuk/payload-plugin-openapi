@@ -7,6 +7,11 @@ export const tr: PluginDefaultTranslationsObject = {
     paramSortShort: 'Sıralanacak alan; azalan sıralama için başına `-` ekleyin.',
     paramDraft: 'Taslak sürümleri döndür.',
     paramTrash: 'Çöp kutusundaki dokümanları dahil et.',
+    paramAutosave: 'Otomatik kayıt olarak kaydet: yeni sürüm eklemek yerine son otomatik kayıt sürümünü günceller.',
+    paramPublishAllLocales: 'Yalnızca isteğin dilini değil, tüm dilleri yayımla.',
+    paramUnpublishAllLocales: 'Tüm dillerin yayınını kaldır ve dokümanı taslağa geri al.',
+    paramOverrideLock: 'Başka bir kullanıcının kilidini yok say. Varsayılan false.',
+    paramSelectedLocales: 'Kopyaya yalnızca bu dilleri aktar. Varsayılan: tüm diller.',
     paramFlattenLocales:
       '`locale=all` ile, yerelleştirilmiş alanları yerel başına nesneler olarak tutmak için false yapın. Varsayılan true.',
     paramLocale:

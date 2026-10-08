@@ -7,6 +7,12 @@ export const lt: PluginDefaultTranslationsObject = {
     paramSortShort: 'Laukas, pagal kurį rūšiuoti; mažėjančiai tvarkai naudokite priešdėlį `-`.',
     paramDraft: 'Grąžinti juodraščių versijas.',
     paramTrash: 'Įtraukti į šiukšliadėžę perkeltus dokumentus.',
+    paramAutosave:
+      'Išsaugoti kaip automatinį išsaugojimą: atnaujina paskutinę automatiškai išsaugotą versiją, užuot pridėjus naują.',
+    paramPublishAllLocales: 'Paskelbti visas kalbas, ne tik užklausos kalbą.',
+    paramUnpublishAllLocales: 'Atšaukti visų kalbų paskelbimą ir grąžinti dokumentą į juodraštį.',
+    paramOverrideLock: 'Nepaisyti kito naudotojo užrakto. Numatytoji reikšmė false.',
+    paramSelectedLocales: 'Į kopiją kopijuoti tik šias kalbas. Numatytoji reikšmė: visos kalbos.',
     paramFlattenLocales:
       'Su `locale=all` nustatykite false, kad lokalizuoti laukai liktų kaip atskirų lokalių objektai. Numatytoji reikšmė true.',
     paramLocale: 'Lokalė, kurią grąžinti, arba `all` visoms lokalėms. Žr. lokalizacijos skyrių API aprašyme.',

@@ -7,6 +7,11 @@ export const ar: PluginDefaultTranslationsObject = {
     paramSortShort: 'الحقل المراد الترتيب حسبه؛ ضع البادئة `-` للترتيب التنازلي.',
     paramDraft: 'إرجاع نسخ المسودة.',
     paramTrash: 'تضمين المستندات المحذوفة.',
+    paramAutosave: 'الحفظ كحفظ تلقائي: تحديث آخر نسخة محفوظة تلقائيًا بدلًا من إضافة نسخة جديدة.',
+    paramPublishAllLocales: 'نشر كل اللغات، وليس لغة الطلب فقط.',
+    paramUnpublishAllLocales: 'إلغاء نشر كل اللغات وإعادة المستند إلى مسودة.',
+    paramOverrideLock: 'تجاهل القفل الذي يملكه مستخدم آخر. الافتراضي false.',
+    paramSelectedLocales: 'نسخ هذه اللغات فقط إلى النسخة المكررة. الافتراضي: كل اللغات.',
     paramFlattenLocales:
       'مع `locale=all`، اضبط على false للإبقاء على الحقول المترجمة ككائنات لكل لغة. القيمة الافتراضية true.',
     paramLocale: 'اللغة المراد إرجاعها، أو `all` لكل اللغات. راجع قسم الترجمة في وصف الـ API.',

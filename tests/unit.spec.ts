@@ -9,6 +9,7 @@ import type {
   SanitizedConfig,
   SanitizedGlobalConfig,
 } from 'payload'
+import { flattenAllFields } from 'payload'
 import type { I18n } from '@payloadcms/translations'
 import { describe, expect, it } from 'vitest'
 
@@ -30,8 +31,9 @@ import {
 import type { Translate } from '../src/translations/types.js'
 import { buildCustomEndpointPaths } from '../src/spec/paths/custom.js'
 import { buildCollectionPaths } from '../src/spec/paths/collections.js'
+import { buildAuthPaths } from '../src/spec/paths/auth.js'
 import { applySecurityWhen, evaluateAccess, resolveEntitySecurity } from '../src/spec/security.js'
-import type { Document, PathsObject, SchemaObject } from '@scalar/openapi-types/3.2'
+import type { Document, PathsObject, RequestBodyObject, SchemaObject } from '@scalar/openapi-types/3.2'
 import type { OpenApiExtension, ResolvedFilters } from '../src/types.js'
 import { baseInput, ctx, i18nStub, t } from './helpers.js'
 
@@ -125,6 +127,12 @@ describe('spec/filters', () => {
       expect(shouldIncludeCollection(hiddenFromAnon, f())).toBe(false)
       expect(shouldIncludeCollection(visibleToAnon, f())).toBe(true)
       expect(shouldIncludeCollection(hiddenFromAnon, f({ includeHidden: true }))).toBe(true)
+    })
+
+    it('hides the `payload-kv` and `payload-query-presets` collections unless `includeSystem` is set', () => {
+      expect(shouldIncludeCollection(coll('payload-kv'), f())).toBe(false)
+      expect(shouldIncludeCollection(coll('payload-query-presets'), f())).toBe(false)
+      expect(shouldIncludeCollection(coll('payload-kv'), f({ includeSystem: true }))).toBe(true)
     })
 
     it('keeps a collection whose `admin.hidden` function throws', () => {
@@ -408,6 +416,95 @@ describe('spec/paths/collections', () => {
     expect(paths['/api/posts/{id}/duplicate']).toBeUndefined()
     expect(paths['/api/posts/{id}']?.get).toBeDefined()
   })
+
+  it('lists `limit` and `sort` on bulk update only', () => {
+    const paths = buildCollectionPaths({ collection: postsColl(), ctx })
+    const names = (op?: { parameters?: unknown[] }) => ((op?.parameters ?? []) as { name: string }[]).map((p) => p.name)
+    expect(names(paths['/api/posts']?.patch)).toEqual(expect.arrayContaining(['limit', 'sort']))
+    expect(names(paths['/api/posts']?.patch)).not.toContain('page')
+    expect(names(paths['/api/posts']?.delete)).not.toContain('limit')
+    expect(names(paths['/api/posts']?.delete)).not.toContain('sort')
+  })
+
+  it('describes the responses as Payload sends them', async () => {
+    const { buildGlobalPaths } = await import('../src/spec/paths/globals.js')
+    const { buildVersionPaths } = await import('../src/spec/paths/versions.js')
+    const body = (op?: { responses?: Record<string, unknown> }, code = '200') => {
+      const response = op?.responses?.[code] as { content: Record<string, { schema: SchemaObject }> } | undefined
+      return response?.content['application/json']?.schema
+    }
+    const doc = { $ref: '#/components/schemas/Posts' }
+
+    const create = buildCollectionPaths({ collection: postsColl(), ctx })['/api/posts']?.post
+    expect(create?.responses?.['200']).toBeUndefined()
+    expect(body(create, '201')?.properties).toEqual({ message: { type: 'string' }, doc })
+
+    const site = buildGlobalPaths({
+      global: { slug: 'site', fields: [] } as unknown as SanitizedGlobalConfig,
+      ctx,
+    })['/api/globals/site']
+    expect(body(site?.get)).toEqual({ $ref: '#/components/schemas/GlobalSite' })
+    expect(body(site?.post)?.properties).toEqual({
+      message: { type: 'string' },
+      result: { $ref: '#/components/schemas/GlobalSite' },
+    })
+
+    const entity = { slug: 'posts', fields: [], versions: {} } as unknown as SanitizedCollectionConfig
+    const restore = (isGlobal?: boolean) =>
+      body(
+        buildVersionPaths({ entity, pathBase: '/x', ctx, nestedTags: false, global: isGlobal })['/x/versions/{id}']
+          ?.post,
+      )
+    expect(restore()?.allOf?.[0]).toEqual(doc)
+    expect(restore(true)?.properties).toEqual({ message: { type: 'string' }, doc })
+  })
+})
+
+describe('spec/paths/auth', () => {
+  const users = (auth: Record<string, unknown>): SanitizedCollectionConfig =>
+    ({ slug: 'users', fields: [], auth }) as unknown as SanitizedCollectionConfig
+
+  const build = (auth: Record<string, unknown>): PathsObject =>
+    buildAuthPaths({ collection: users(auth), ctx, includeAdmin: true, nestedTags: true })
+
+  const body = (paths: PathsObject, route: string): SchemaObject => {
+    const requestBody = paths[`/api/users/${route}`]?.post?.requestBody as RequestBodyObject
+    return requestBody.content['application/json'].schema as SchemaObject
+  }
+
+  it('asks for `email` in login, forgot-password and unlock bodies by default', () => {
+    const paths = build({})
+    for (const route of ['login', 'forgot-password', 'unlock']) {
+      expect(Object.keys(body(paths, route).properties ?? {})).not.toContain('username')
+      expect(body(paths, route).required).toContain('email')
+    }
+    expect(body(paths, 'login').required).toEqual(['email', 'password'])
+  })
+
+  it('asks for `username` only when `loginWithUsername` does not allow email login', () => {
+    for (const loginWithUsername of [true, { allowEmailLogin: false, requireEmail: true }]) {
+      const paths = build({ loginWithUsername })
+      for (const route of ['login', 'forgot-password', 'unlock']) {
+        expect(Object.keys(body(paths, route).properties ?? {})).not.toContain('email')
+        expect(body(paths, route).required).toContain('username')
+      }
+    }
+  })
+
+  it('accepts `email` or `username` when `allowEmailLogin` is on', () => {
+    const paths = build({ loginWithUsername: { allowEmailLogin: true, requireEmail: false } })
+    for (const route of ['login', 'forgot-password', 'unlock']) {
+      const schema = body(paths, route)
+      expect(Object.keys(schema.properties ?? {})).toEqual(expect.arrayContaining(['email', 'username']))
+      expect(schema.anyOf).toEqual([{ required: ['email'] }, { required: ['username'] }])
+    }
+    expect(body(paths, 'login').required).toEqual(['password'])
+    expect(body(paths, 'unlock').required).toBeUndefined()
+  })
+
+  it('documents unlock for every auth collection, without `maxLoginAttempts`', () => {
+    expect(build({})['/api/users/unlock']?.post).toBeDefined()
+  })
 })
 
 describe('spec/security', () => {
@@ -571,12 +668,100 @@ describe('spec/security', () => {
   })
 })
 
+describe('spec/entitySchemas', () => {
+  it('writes relationships as ids at any depth and keeps the populated shape on read', async () => {
+    const { buildEntitySchemas } = await import('../src/spec/entitySchemas.js')
+    const fields = [
+      { name: 'cover', type: 'upload', relationTo: 'media' },
+      { name: 'meta', type: 'group', fields: [{ name: 'image', type: 'upload', relationTo: 'media' }] },
+      {
+        name: 'rows',
+        type: 'array',
+        fields: [
+          { name: 'tags', type: 'relationship', relationTo: 'tags', hasMany: true },
+          { name: 'link', type: 'relationship', relationTo: ['media', 'tags'] },
+        ],
+      },
+      {
+        name: 'content',
+        type: 'blocks',
+        blocks: [{ slug: 'quote', fields: [{ name: 'source', type: 'relationship', relationTo: 'tags' }] }],
+      },
+    ] as Field[]
+    const collection = (slug: string, own: Field[] = []) => ({
+      slug,
+      fields: own,
+      flattenedFields: flattenAllFields({ fields: own }),
+    })
+    const entity = collection('posts', fields) as unknown as SanitizedCollectionConfig
+    const config = { collections: [collection('media'), collection('tags')], blocks: [] } as unknown as SanitizedConfig
+    const { read, create, update } = await buildEntitySchemas({ entity, config, ctx })
+
+    const id = { type: 'string' }
+    const optionalId = { type: ['string', 'null'] }
+    const props = create.properties ?? {}
+    expect(props.cover).toEqual(optionalId)
+    expect((props.meta as SchemaObject).properties?.image).toEqual(optionalId)
+    const row = ((props.rows as SchemaObject).items as SchemaObject).properties ?? {}
+    expect(row.tags).toEqual({ type: ['array', 'null'], items: id })
+    const link = (row.link as SchemaObject).oneOf as SchemaObject[]
+    expect(link.map((b) => [b.properties?.relationTo, b.properties?.value])).toEqual([
+      [{ const: 'media' }, id],
+      [{ const: 'tags' }, id],
+    ])
+    const quote = ((props.content as SchemaObject).items as SchemaObject).oneOf?.[0] as SchemaObject
+    expect(quote.properties?.source).toEqual(optionalId)
+    expect(update.properties?.meta).toEqual(props.meta)
+
+    const readMeta = read.properties?.meta as SchemaObject
+    const readImage = readMeta.properties?.image as SchemaObject
+    expect(readImage.oneOf?.[1]).toEqual({ $ref: '#/components/schemas/Media' })
+  })
+})
+
 describe('spec/params', () => {
   it('uses `ctx.t` for descriptions so a custom translation flows through', async () => {
     const { buildSelectSchema } = await import('../src/spec/params.js')
     const custom = { ...ctx, i18n: { ...ctx.i18n, t: (() => 'ÜBERSETZT') as unknown as I18n['t'] } }
     const schema = buildSelectSchema({ fields: [{ name: 'title', type: 'text' }] as Field[], ctx: custom })
     expect(schema.description).toBe('ÜBERSETZT')
+  })
+
+  it('adds draft, locale and lock params by entity config and operation', async () => {
+    const { writeParams } = await import('../src/spec/params.js')
+    const refs = { select: true, populate: false, joins: false }
+    const entity = (versions: unknown, lockDocuments?: false) =>
+      ({ slug: 'x', fields: [], versions, lockDocuments }) as unknown as SanitizedCollectionConfig
+    const names = (e: SanitizedCollectionConfig, operation: Parameters<typeof writeParams>[0]['operation']) =>
+      writeParams({ base: 'X', entity: e, ctx, refs, operation }).map((p) => p.name)
+
+    const full = entity({ drafts: { autosave: { interval: 800 }, localizeStatus: true } })
+    expect(names(full, 'create')).toEqual(expect.arrayContaining(['autosave', 'publishAllLocales']))
+    expect(names(full, 'create')).not.toContain('overrideLock')
+    expect(names(full, 'update')).toEqual(
+      expect.arrayContaining(['publishAllLocales', 'unpublishAllLocales', 'overrideLock']),
+    )
+    expect(names(full, 'update')).not.toContain('autosave')
+    expect(names(full, 'updateByID')).toEqual(
+      expect.arrayContaining(['autosave', 'publishAllLocales', 'unpublishAllLocales', 'overrideLock']),
+    )
+    expect(names(full, 'delete')).toContain('overrideLock')
+    expect(names(full, 'duplicate')).toContain('selectedLocales[]')
+    expect(names(full, 'globalUpdate')).not.toContain('overrideLock')
+
+    const plain = entity({ drafts: { autosave: false } }, false)
+    for (const operation of ['create', 'update', 'updateByID', 'delete', 'globalUpdate'] as const) {
+      const list = names(plain, operation)
+      for (const name of ['autosave', 'publishAllLocales', 'unpublishAllLocales', 'overrideLock']) {
+        expect(list).not.toContain(name)
+      }
+    }
+    expect(names(entity(false), 'create')).not.toContain('autosave')
+    expect(
+      writeParams({ base: 'X', entity: plain, ctx: { ...ctx, locales: [] }, refs, operation: 'duplicate' }).map(
+        (p) => p.name,
+      ),
+    ).not.toContain('selectedLocales[]')
   })
 })
 
@@ -676,6 +861,50 @@ describe('spec/downconvert', () => {
     })
   })
 
+  describe('toOpenApi30 required', () => {
+    it('drops an empty `required` array and keeps a filled one', async () => {
+      const { toOpenApi30 } = await import('../src/spec/downconvert.js')
+      const doc: Document = {
+        openapi: '3.2.0',
+        info: { title: 'T', version: '1' },
+        paths: {},
+        components: {
+          schemas: {
+            A: { type: 'object', properties: { x: { type: 'string' } }, required: [] },
+            B: { type: 'object', properties: { x: { type: 'string' } }, required: ['x'] },
+          },
+        },
+      }
+      const out = toOpenApi30(doc)
+      expect(out.components!.schemas!.A).not.toHaveProperty('required')
+      expect((out.components!.schemas!.B as SchemaObject).required).toEqual(['x'])
+    })
+
+    it('turns several types into `anyOf` and keeps `null` in each branch', async () => {
+      const { toOpenApi30 } = await import('../src/spec/downconvert.js')
+      const doc: Document = {
+        openapi: '3.2.0',
+        info: { title: 'T', version: '1' },
+        paths: {},
+        components: {
+          schemas: {
+            J: { type: ['object', 'integer', 'number', 'null'] },
+            K: { type: ['string', 'null'] },
+          },
+        },
+      }
+      const out = toOpenApi30(doc)
+      expect(out.components!.schemas!.J).toEqual({
+        anyOf: [
+          { type: 'object', nullable: true },
+          { type: 'integer', nullable: true },
+          { type: 'number', nullable: true },
+        ],
+      })
+      expect(out.components!.schemas!.K).toEqual({ type: 'string', nullable: true })
+    })
+  })
+
   describe('toOpenApi31', () => {
     it('rewrites the `openapi` version field to 3.1.2', async () => {
       const { toOpenApi31 } = await import('../src/spec/downconvert.js')
@@ -691,14 +920,14 @@ describe('spec/downconvert', () => {
       expect(toOpenApi31(doc)).not.toBe(doc)
     })
 
-    it('strips the 3.2-only `kind` and `parent` fields from tags', async () => {
+    it('strips the 3.2-only `kind`, `parent` and `summary` fields from tags', async () => {
       const { toOpenApi31 } = await import('../src/spec/downconvert.js')
       const doc: Document = {
         openapi: '3.2.0',
         info: { title: 'T', version: '1' },
         paths: {},
         tags: [
-          { name: 'Collections', kind: 'nav' },
+          { name: 'Collections', kind: 'nav', summary: 'Collections' },
           { name: 'Posts', parent: 'Collections', description: 'Blog posts' },
         ],
       }

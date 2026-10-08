@@ -7,6 +7,12 @@ export const rsLatin: PluginDefaultTranslationsObject = {
     paramSortShort: 'Polje po kojem se sortira; dodajte prefiks `-` za opadajući redosled.',
     paramDraft: 'Vrati verzije nacrta.',
     paramTrash: 'Uključi obrisane dokumente.',
+    paramAutosave:
+      'Sačuvaj kao automatsko čuvanje: ažurira poslednju automatski sačuvanu verziju umesto dodavanja nove.',
+    paramPublishAllLocales: 'Objavi sve jezike, ne samo jezik zahteva.',
+    paramUnpublishAllLocales: 'Poništi objavu svih jezika i vrati dokument u nacrt.',
+    paramOverrideLock: 'Zanemari zaključavanje drugog korisnika. Podrazumevano false.',
+    paramSelectedLocales: 'Kopiraj samo ove jezike u duplikat. Podrazumevano: svi jezici.',
     paramFlattenLocales:
       'Uz `locale=all`, postavite na false da biste lokalizovana polja zadržali kao objekte po lokalitetu. Podrazumevano true.',
     paramLocale:

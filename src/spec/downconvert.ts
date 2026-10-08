@@ -33,9 +33,17 @@ const downconvertTo30 = (node: unknown): unknown => {
 
   if (Array.isArray(out.type)) {
     const types = out.type as string[]
-    if (types.includes(NULL)) out.nullable = true
+    const nullable = types.includes(NULL)
     const rest = types.filter((t) => t !== NULL)
-    out.type = rest.length === 1 ? rest[0] : rest
+    if (rest.length === 1) {
+      out.type = rest[0]
+      if (nullable) out.nullable = true
+    } else if (rest.length > 1) {
+      delete out.type
+      const union = rest.map((type) => (nullable ? { type, nullable: true } : { type }))
+      if (out.anyOf) out.allOf = [...((out.allOf as unknown[]) ?? []), { anyOf: union }]
+      else out.anyOf = union
+    }
   }
 
   if ('const' in out) {
@@ -50,19 +58,21 @@ const downconvertTo30 = (node: unknown): unknown => {
     delete out.examples
   }
 
+  if (Array.isArray(out.required) && out.required.length === 0) delete out.required
+
   for (const keyword of UNSUPPORTED_KEYWORDS) delete out[keyword]
 
   return out
 }
 
-export const toOpenApi30 = (doc: Document): Document => {
-  const converted = downconvertTo30(doc) as Document
-  converted.openapi = '3.0.4'
-  return converted
-}
-
 export const toOpenApi31 = (doc: Document): Document => ({
   ...doc,
   openapi: '3.1.2',
-  tags: doc.tags?.map(({ kind: _kind, parent: _parent, ...rest }: TagObject) => rest),
+  tags: doc.tags?.map(({ kind: _kind, parent: _parent, summary: _summary, ...rest }: TagObject) => rest),
 })
+
+export const toOpenApi30 = (doc: Document): Document => {
+  const converted = downconvertTo30(toOpenApi31(doc)) as Document
+  converted.openapi = '3.0.4'
+  return converted
+}

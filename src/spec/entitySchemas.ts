@@ -7,7 +7,7 @@ import type { BuildContext, Entity, IDType } from '../types.js'
 import { deepMerge, isPlainObject } from '../utils.js'
 import { makeT } from '../translations/index.js'
 import { AUTH_FIELDS, flattenFields } from './fields.js'
-import { rewriteRefs } from './names.js'
+import { refTo, rewriteRefs, schemaName } from './names.js'
 
 const READ_HIDDEN_FIELDS = new Set<string>([...AUTH_FIELDS, 'collection'])
 
@@ -24,12 +24,16 @@ const toComponentSchema = ({
   config,
   source,
   idType,
+  write = false,
 }: {
   config: SanitizedConfig
   source: Entity | Block
   idType: IDType
+  write?: boolean
 }): SchemaObject => {
-  const jsonSchema = entityToJSONSchema(config, source as never, new Map(), idType)
+  const jsonSchema = entityToJSONSchema(config, source as never, new Map(), idType, undefined, undefined, {
+    forceInlineBlocks: write,
+  })
   const blockSlugs = new Set((config.blocks ?? []).map((b) => b.slug))
   const schema = rewriteRefs(jsonSchema as never, blockSlugs) as unknown as SchemaObject
   delete schema.title
@@ -162,16 +166,41 @@ const removeProps = (schema: SchemaObject, names: Iterable<string>): void => {
   }
 }
 
+const toIdType = (type: unknown): unknown =>
+  Array.isArray(type) ? type.map(toIdType) : type === 'number' ? 'integer' : type
+
+const writeRelationshipsAsIds = (node: unknown, refs: Set<string>): void => {
+  if (Array.isArray(node)) {
+    for (const item of node) writeRelationshipsAsIds(item, refs)
+    return
+  }
+  if (!isPlainObject(node)) return
+  const oneOf = node.oneOf
+  if (Array.isArray(oneOf) && oneOf.length === 2 && isRef(oneOf[1]) && refs.has(oneOf[1].$ref)) {
+    delete node.oneOf
+    node.type = toIdType((oneOf[0] as SchemaObject).type)
+    return
+  }
+  for (const value of Object.values(node)) writeRelationshipsAsIds(value, refs)
+}
+
 const buildBaseSchema = ({
   entity,
   config,
   ctx,
+  write = false,
 }: {
   entity: Entity
   config: SanitizedConfig
   ctx: BuildContext
+  write?: boolean
 }): SchemaObject => {
-  const schema = toComponentSchema({ config, source: stripInterfaceName(entity), idType: ctx.defaultIDType })
+  const idType = ctx.defaultIDType
+  const schema = toComponentSchema({ config, source: stripInterfaceName(entity), idType, write })
+  if (write) {
+    const refs = new Set((config.collections ?? []).map((c) => refTo(schemaName(c.slug))))
+    writeRelationshipsAsIds(schema, refs)
+  }
   const isAuth = 'auth' in entity && Boolean(entity.auth)
   if (isAuth) removeProps(schema, READ_HIDDEN_FIELDS)
   applyFieldOverrides({ schema, fields: entity.fields, ctx })
@@ -184,25 +213,6 @@ const cloneSchema = (schema: SchemaObject): SchemaObject => ({
   properties: { ...schema.properties },
   required: Array.isArray(schema.required) ? [...schema.required] : schema.required,
 })
-
-const flattenRelationships = ({
-  schema,
-  fields,
-  idType,
-}: {
-  schema: SchemaObject
-  fields: Field[]
-  idType: IDType
-}): void => {
-  if (!schema.properties) return
-  const idSchema: SchemaObject = { type: idType === 'number' ? 'integer' : 'string' }
-  for (const field of flattenFields(fields)) {
-    if (field.type !== 'relationship' && field.type !== 'upload') continue
-    const name = 'name' in field ? field.name : undefined
-    if (!name || !(name in schema.properties)) continue
-    schema.properties[name] = 'hasMany' in field && field.hasMany ? { type: 'array', items: idSchema } : idSchema
-  }
-}
 
 export interface EntitySchemas {
   read: SchemaObject
@@ -220,24 +230,22 @@ export const buildEntitySchemas = async ({
   ctx: BuildContext
 }): Promise<EntitySchemas> => {
   const read = buildBaseSchema({ entity, config, ctx })
+  const write = buildBaseSchema({ entity, config, ctx, write: true })
   const isAuth = 'auth' in entity && Boolean(entity.auth)
-  const idType = ctx.defaultIDType
 
-  const create = cloneSchema(read)
+  const create = cloneSchema(write)
   if (Array.isArray(create.required)) {
     const optional = new Set(SERVER_FIELDS)
     create.required = create.required.filter((r: string) => !optional.has(r))
   }
-  flattenRelationships({ schema: create, fields: entity.fields, idType })
   if (isAuth && create.properties) {
     create.properties.password = { type: 'string' }
     create.required = [...new Set([...(create.required ?? []), 'password'])]
   }
 
-  const update = cloneSchema(read)
+  const update = cloneSchema(write)
   delete update.required
   if (update.properties) delete update.properties.id
-  flattenRelationships({ schema: update, fields: entity.fields, idType })
   if (isAuth && update.properties) {
     update.properties.password = { type: 'string' }
   }

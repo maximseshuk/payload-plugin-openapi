@@ -7,6 +7,12 @@ export const ca: PluginDefaultTranslationsObject = {
     paramSortShort: 'Camp pel qual ordenar; afegiu el prefix `-` per a ordre descendent.',
     paramDraft: "Retorna les versions d'esborrany.",
     paramTrash: 'Inclou els documents enviats a la paperera.',
+    paramAutosave:
+      "Desa com a desat automàtic: actualitza l'última versió desada automàticament en lloc d'afegir-ne una de nova.",
+    paramPublishAllLocales: 'Publica tots els idiomes, no només el de la petició.',
+    paramUnpublishAllLocales: 'Despublica tots els idiomes i torna el document a esborrany.',
+    paramOverrideLock: "Ignora un bloqueig d'un altre usuari. Per defecte false.",
+    paramSelectedLocales: 'Copia només aquests idiomes al duplicat. Per defecte: tots els idiomes.',
     paramFlattenLocales:
       'Amb `locale=all`, establiu-ho a false per mantenir els camps localitzats com a objectes per localització. Per defecte és true.',
     paramLocale:

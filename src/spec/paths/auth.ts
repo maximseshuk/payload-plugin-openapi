@@ -13,25 +13,28 @@ import { ERRORS, type ErrorCode, errorResponses, jsonBody, jsonResponse, message
 import { refTo, schemaName } from '../names.js'
 import { authTagName } from '../tags.js'
 
-const identifierProps = (
+const identifierBody = (
   auth: SanitizedCollectionConfig['auth'],
-): {
-  properties: Record<string, SchemaObject>
-  required: string[]
-} => {
-  const loginWithUsername = Boolean(auth?.loginWithUsername)
-  const usernameOnly = typeof auth?.loginWithUsername === 'object' && auth.loginWithUsername.requireEmail === false
+  extra: Record<string, SchemaObject> = {},
+): SchemaObject => {
+  const email: SchemaObject = { type: 'string', format: 'email' }
+  const username: SchemaObject = { type: 'string' }
+  const extraRequired = Object.keys(extra)
+  const loginWithUsername = auth?.loginWithUsername
+  const base = { type: 'object', additionalProperties: false } as const
 
-  if (loginWithUsername && usernameOnly) {
-    return { properties: { username: { type: 'string' } }, required: ['username'] }
+  if (!loginWithUsername) {
+    return { ...base, properties: { email, ...extra }, required: ['email', ...extraRequired] }
   }
-  if (loginWithUsername) {
+  if (typeof loginWithUsername === 'object' && loginWithUsername.allowEmailLogin) {
     return {
-      properties: { email: { type: 'string', format: 'email' }, username: { type: 'string' } },
-      required: [],
+      ...base,
+      properties: { email, username, ...extra },
+      ...(extraRequired.length > 0 ? { required: extraRequired } : {}),
+      anyOf: [{ required: ['email'] }, { required: ['username'] }],
     }
   }
-  return { properties: { email: { type: 'string', format: 'email' } }, required: ['email'] }
+  return { ...base, properties: { username, ...extra }, required: ['username', ...extraRequired] }
 }
 
 export const buildAuthPaths = ({
@@ -52,7 +55,6 @@ export const buildAuthPaths = ({
   const name = schemaName(collection.slug)
   const base = `${ctx.apiRoute}/${collection.slug}`
   const tag = [nestedTags ? authTagName(name) : name]
-  const ident = identifierProps(auth)
   const userRef: ReferenceObject = { $ref: refTo(name) }
 
   const op = (
@@ -69,12 +71,7 @@ export const buildAuthPaths = ({
   const paths: PathsObject = {
     [`${base}/login`]: {
       post: op(`login${name}`, ERRORS.login, {
-        requestBody: jsonBody({
-          type: 'object',
-          additionalProperties: false,
-          properties: { ...ident.properties, password: { type: 'string' } },
-          required: [...ident.required, 'password'],
-        }),
+        requestBody: jsonBody(identifierBody(auth, { password: { type: 'string' } })),
         responses: {
           '200': jsonResponse(t('authLogin'), {
             type: 'object',
@@ -123,12 +120,7 @@ export const buildAuthPaths = ({
     },
     [`${base}/forgot-password`]: {
       post: op(`forgotPassword${name}`, ERRORS.authAction, {
-        requestBody: jsonBody({
-          type: 'object',
-          additionalProperties: false,
-          properties: { email: { type: 'string', format: 'email' } },
-          required: ['email'],
-        }),
+        requestBody: jsonBody(identifierBody(auth)),
         responses: messageResponse(t('authForgotPassword')),
       }),
     },
@@ -193,18 +185,11 @@ export const buildAuthPaths = ({
     }
   }
 
-  if (auth.maxLoginAttempts && auth.maxLoginAttempts > 0) {
-    paths[`${base}/unlock`] = {
-      post: op(`unlock${name}`, ERRORS.authAction, {
-        requestBody: jsonBody({
-          type: 'object',
-          additionalProperties: false,
-          properties: { email: { type: 'string', format: 'email' } },
-          required: ['email'],
-        }),
-        responses: messageResponse(t('authUnlock')),
-      }),
-    }
+  paths[`${base}/unlock`] = {
+    post: op(`unlock${name}`, ERRORS.authAction, {
+      requestBody: jsonBody(identifierBody(auth)),
+      responses: messageResponse(t('authUnlock')),
+    }),
   }
 
   if (auth.verify) {

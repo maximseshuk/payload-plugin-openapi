@@ -12,6 +12,7 @@ import type {
 import { beforeAll, describe, expect, it } from 'vitest'
 
 import { buildDocument } from '../src/spec/buildDocument.js'
+import { toOpenApi30, toOpenApi31 } from '../src/spec/downconvert.js'
 import { specHandler } from '../src/endpoints/spec.js'
 import { resolveOptions } from '../src/options.js'
 import type { BuildContext, FilterOptions } from '../src/types.js'
@@ -60,9 +61,13 @@ const schema = (name: string) => doc.components?.schemas?.[name] as SchemaObject
 
 describe('generated document', () => {
   describe('document validity', () => {
-    it('validates as a well-formed OpenAPI document', async () => {
+    it.each([
+      ['3.2', (d: typeof doc) => d],
+      ['3.1', toOpenApi31],
+      ['3.0', toOpenApi30],
+    ])('validates as a well-formed OpenAPI %s document', async (_version, convert) => {
       const { Validator } = await import('@seriousme/openapi-schema-validator')
-      const result = await new Validator().validate(structuredClone(doc))
+      const result = await new Validator().validate(convert(structuredClone(doc)))
       expect(result.valid).toBe(true)
     })
 
@@ -159,15 +164,62 @@ describe('generated document', () => {
 
       it('writes relationships as ids in create bodies', () => {
         const author = schema('PostsCreate').properties?.author as SchemaObject
-        expect(author.type).toBe(idType)
+        expect(author.type).toEqual([idType, 'null'])
         const tags = schema('PostsCreate').properties?.tags as SchemaObject
-        expect(tags.type).toBe('array')
+        expect(tags.type).toEqual(['array', 'null'])
         expect((tags.items as SchemaObject).type).toBe(idType)
+      })
+
+      it('writes polymorphic relationships as `{ relationTo, value }` in create bodies', () => {
+        const related = schema('PostsCreate').properties?.related as SchemaObject
+        expect(related.type).toEqual(['array', 'null'])
+        const branches = (related.items as SchemaObject).oneOf as SchemaObject[]
+        expect(branches.map((b) => b.properties?.relationTo)).toEqual([{ const: 'posts' }, { const: 'tags' }])
+        for (const branch of branches) {
+          expect(branch.required).toEqual(['value', 'relationTo'])
+          expect(branch.properties?.value).toEqual({ type: idType })
+        }
       })
 
       it('writes an upload field as an id in create bodies', () => {
         const featured = schema('PostsCreate').properties?.featuredImage as SchemaObject
-        expect(featured.type).toBe(idType)
+        expect(featured.type).toEqual([idType, 'null'])
+      })
+
+      it('writes relationships nested in groups, named tabs, arrays and blocks as ids', () => {
+        const create = schema('PostsCreate').properties ?? {}
+        const hero = (create.hero as SchemaObject).properties ?? {}
+        expect(hero.image).toEqual({ type: [idType, 'null'] })
+        const link = ((hero.links as SchemaObject).items as SchemaObject).properties?.doc as SchemaObject
+        expect((link.oneOf as SchemaObject[]).map((b) => b.properties?.value)).toEqual([
+          { type: idType },
+          { type: idType },
+        ])
+        expect((create.og as SchemaObject).properties?.image).toEqual({ type: [idType, 'null'] })
+
+        const row = ((create.sections as SchemaObject).items as SchemaObject).properties ?? {}
+        expect(row.tags).toEqual({ type: ['array', 'null'], items: { type: idType } })
+        const blocks = ((row.content as SchemaObject).items as SchemaObject).oneOf as SchemaObject[]
+        expect(blocks[0]?.properties?.media).toEqual({ type: idType })
+
+        const layout = ((create.layout as SchemaObject).items as SchemaObject).oneOf as SchemaObject[]
+        const gallery = layout.find((b) => (b.properties?.blockType as SchemaObject | undefined)?.const === 'gallery')
+        expect(gallery?.properties?.images).toEqual({ type: ['array', 'null'], items: { type: idType } })
+        expect(schema('PostsUpdate').properties?.hero).toEqual(create.hero)
+      })
+
+      it('keeps the populated document in nested read shapes', () => {
+        const read = schema('Posts').properties ?? {}
+        const hero = (read.hero as SchemaObject).properties ?? {}
+        expect((hero.image as SchemaObject).oneOf?.[1]).toEqual({ $ref: '#/components/schemas/Media' })
+        const related = ((read.related as SchemaObject).items as SchemaObject).oneOf as SchemaObject[]
+        const value = related[0]?.properties?.value as SchemaObject
+        expect(value.oneOf?.[1]).toEqual({ $ref: '#/components/schemas/Posts' })
+        const row = ((read.sections as SchemaObject).items as SchemaObject).properties ?? {}
+        const blocks = ((row.content as SchemaObject).items as SchemaObject).oneOf as SchemaObject[]
+        expect(blocks[0]).toEqual({ $ref: '#/components/schemas/BlockMedia' })
+        const media = schema('BlockMedia').properties?.media as SchemaObject
+        expect(media.oneOf?.[1]).toEqual({ $ref: '#/components/schemas/Media' })
       })
     })
 
@@ -314,6 +366,56 @@ describe('generated document', () => {
       expect(posts.properties?.limit).toEqual({ type: 'integer' })
       expect(posts.properties?.where).toBeDefined()
     })
+
+    it('documents the query params that write operations read', () => {
+      const names = (op?: { parameters?: unknown[] }) =>
+        ((op?.parameters ?? []) as ParameterObject[]).map((p) => p.name)
+      const create = names(doc.paths['/api/posts']?.post)
+      expect(create).toEqual(expect.arrayContaining(['depth', 'locale', 'select', 'populate', 'draft']))
+      expect(create).not.toContain('trash')
+      expect(names(doc.paths['/api/posts/{id}']?.patch)).toEqual(expect.arrayContaining(['depth', 'draft', 'trash']))
+      expect(names(doc.paths['/api/posts/{id}']?.delete)).toEqual(expect.arrayContaining(['depth', 'trash']))
+      expect(names(doc.paths['/api/posts/{id}']?.delete)).not.toContain('draft')
+      expect(names(doc.paths['/api/posts']?.patch)).toEqual(
+        expect.arrayContaining(['where', 'limit', 'sort', 'depth', 'draft']),
+      )
+      expect(names(doc.paths['/api/posts']?.delete)).not.toContain('limit')
+      expect(names(doc.paths['/api/posts']?.delete)).not.toContain('sort')
+      expect(names(doc.paths['/api/globals/settings']?.post)).toEqual(expect.arrayContaining(['depth', 'draft']))
+    })
+
+    it('documents the draft, locale and lock params only where Payload reads them', () => {
+      const names = (op?: { parameters?: unknown[] }) =>
+        ((op?.parameters ?? []) as ParameterObject[]).map((p) => p.name)
+      const posts = doc.paths['/api/posts']
+      const post = doc.paths['/api/posts/{id}']
+      expect(names(posts?.post)).toContain('publishAllLocales')
+      expect(names(posts?.post)).not.toContain('unpublishAllLocales')
+      expect(names(posts?.post)).not.toContain('autosave')
+      expect(names(posts?.patch)).toEqual(
+        expect.arrayContaining(['publishAllLocales', 'unpublishAllLocales', 'overrideLock']),
+      )
+      expect(names(post?.patch)).toEqual(
+        expect.arrayContaining(['publishAllLocales', 'unpublishAllLocales', 'overrideLock']),
+      )
+      expect(names(post?.delete)).toContain('overrideLock')
+      expect(names(post?.delete)).not.toContain('publishAllLocales')
+      expect(names(doc.paths['/api/tags/{id}']?.patch)).not.toContain('overrideLock')
+      expect(names(doc.paths['/api/tags/{id}']?.delete)).not.toContain('overrideLock')
+
+      const settings = names(doc.paths['/api/globals/settings']?.post)
+      expect(settings).toContain('autosave')
+      expect(settings).not.toContain('publishAllLocales')
+      expect(settings).not.toContain('overrideLock')
+
+      const duplicate = (doc.paths['/api/posts/{id}/duplicate']?.post?.parameters ?? []) as ParameterObject[]
+      expect(duplicate.find((p) => p.name === 'selectedLocales[]')).toMatchObject({
+        style: 'form',
+        explode: true,
+        schema: { type: 'array', items: { type: 'string', enum: ['en', 'de', 'fr'] } },
+      })
+      expect(names(doc.paths['/api/posts/{id}/duplicate']?.post)).not.toContain('publishAllLocales')
+    })
   })
 
   describe('paths/auth', () => {
@@ -375,6 +477,36 @@ describe('generated document', () => {
       expect(doc.paths['/api/globals/settings/versions/{id}']?.get).toBeDefined()
       expect(doc.paths['/api/globals/settings/versions/{id}']?.post).toBeDefined()
       expect(schema('GlobalSettingsVersion')).toBeDefined()
+    })
+
+    it('describes a restored global as `{ doc, message }` and a restored document as the document plus `message`', () => {
+      const body = (path: string) => {
+        const ok = doc.paths[path]?.post?.responses?.['200'] as ResponseObject
+        return ok.content?.['application/json']?.schema as SchemaObject
+      }
+      expect(body('/api/globals/settings/versions/{id}').properties).toEqual({
+        message: { type: 'string' },
+        doc: { $ref: '#/components/schemas/GlobalSettings' },
+      })
+      expect(body('/api/posts/versions/{id}').allOf?.[0]).toEqual({ $ref: '#/components/schemas/Posts' })
+    })
+  })
+
+  describe('responses', () => {
+    it('describes create as 201 and the global update as `{ message, result }`', () => {
+      const create = doc.paths['/api/posts']?.post?.responses ?? {}
+      expect(create['200']).toBeUndefined()
+      const created = (create['201'] as ResponseObject).content?.['application/json']?.schema as SchemaObject
+      expect(created.properties?.doc).toEqual({ $ref: '#/components/schemas/Posts' })
+
+      const update = doc.paths['/api/globals/settings']?.post?.responses?.['200'] as ResponseObject
+      const updated = update.content?.['application/json']?.schema as SchemaObject
+      expect(updated.properties).toEqual({
+        message: { type: 'string' },
+        result: { $ref: '#/components/schemas/GlobalSettings' },
+      })
+      const read = doc.paths['/api/globals/settings']?.get?.responses?.['200'] as ResponseObject
+      expect(read.content?.['application/json']?.schema).toEqual({ $ref: '#/components/schemas/GlobalSettings' })
     })
   })
 

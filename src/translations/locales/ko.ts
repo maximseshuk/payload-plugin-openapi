@@ -7,6 +7,11 @@ export const ko: PluginDefaultTranslationsObject = {
     paramSortShort: '정렬 기준 필드입니다. 내림차순은 `-`를 접두사로 붙입니다.',
     paramDraft: '초안 버전을 반환합니다.',
     paramTrash: '휴지통의 문서를 포함합니다.',
+    paramAutosave: '자동 저장으로 저장합니다. 새 버전을 추가하지 않고 최신 자동 저장 버전을 업데이트합니다.',
+    paramPublishAllLocales: '요청 로케일뿐 아니라 모든 로케일을 게시합니다.',
+    paramUnpublishAllLocales: '모든 로케일의 게시를 취소하고 문서를 초안으로 되돌립니다.',
+    paramOverrideLock: '다른 사용자의 잠금을 무시합니다. 기본값 false.',
+    paramSelectedLocales: '이 로케일만 복제본에 복사합니다. 기본값: 모든 로케일.',
     paramFlattenLocales:
       '`locale=all`을 사용할 때, false로 설정하면 현지화된 필드를 로케일별 객체로 유지합니다. 기본값은 true입니다.',
     paramLocale:

@@ -7,6 +7,12 @@ export const et: PluginDefaultTranslationsObject = {
     paramSortShort: 'Väli, mille järgi sorteerida; kahanevaks järjestamiseks lisa ette `-`.',
     paramDraft: 'Tagasta mustandversioonid.',
     paramTrash: 'Kaasa prügikasti liigutatud dokumendid.',
+    paramAutosave:
+      'Salvesta automaatsalvestusena: uuendab viimast automaatselt salvestatud versiooni uue lisamise asemel.',
+    paramPublishAllLocales: 'Avalda kõik keeled, mitte ainult päringu keel.',
+    paramUnpublishAllLocales: 'Tühista kõigi keelte avaldamine ja muuda dokument tagasi mustandiks.',
+    paramOverrideLock: 'Eira teise kasutaja lukku. Vaikimisi false.',
+    paramSelectedLocales: 'Kopeeri duplikaati ainult need keeled. Vaikimisi: kõik keeled.',
     paramFlattenLocales:
       'Väärtusega `locale=all` määra false, et hoida lokaliseeritud välju lokaadipõhiste objektidena. Vaikimisi true.',
     paramLocale: 'Tagastatav lokaat või `all` kõigi lokaatide jaoks. Vaata API kirjelduses jaotist Lokaliseerimine.',

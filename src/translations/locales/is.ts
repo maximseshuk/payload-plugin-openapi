@@ -7,6 +7,11 @@ export const is: PluginDefaultTranslationsObject = {
     paramSortShort: 'Reitur til að raða eftir; settu `-` fyrir framan fyrir lækkandi röð.',
     paramDraft: 'Skila drögum.',
     paramTrash: 'Hafa skjöl í ruslafötu með.',
+    paramAutosave: 'Vista sem sjálfvirka vistun: uppfærir síðustu sjálfvirku útgáfuna í stað þess að bæta við nýrri.',
+    paramPublishAllLocales: 'Birta öll tungumál, ekki aðeins tungumál beiðninnar.',
+    paramUnpublishAllLocales: 'Taka öll tungumál úr birtingu og setja skjalið aftur í drög.',
+    paramOverrideLock: 'Hunsa lás annars notanda. Sjálfgefið false.',
+    paramSelectedLocales: 'Afrita aðeins þessi tungumál í afritið. Sjálfgefið: öll tungumál.',
     paramFlattenLocales:
       'Með `locale=all`, settu false til að halda staðfærðum reitum sem hlutum eftir tungumáli. Sjálfgefið true.',
     paramLocale: 'Tungumál til að skila, eða `all` fyrir öll tungumál. Sjá Staðfærsla-kaflann í API-lýsingunni.',

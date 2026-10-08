@@ -5,7 +5,7 @@ import type { BuildContext } from '../../types.js'
 import { makeT } from '../../translations/index.js'
 import { ERRORS, errorResponses, jsonOk } from '../components.js'
 import { globalSchemaName, refTo, updateSchemaName } from '../names.js'
-import { buildParamSchemas, commonReadParams, type ReadParamRefs } from '../params.js'
+import { buildParamSchemas, commonReadParams, type ReadParamRefs, writeParams } from '../params.js'
 import type { EntitySecurity } from '../security.js'
 
 export const buildGlobalPaths = ({
@@ -30,22 +30,27 @@ export const buildGlobalPaths = ({
     joins: Boolean(paramSchemas.joins),
   }
 
-  const okDoc = jsonOk(t('globalDoc'), docRef)
-
   return {
     [`${ctx.apiRoute}/globals/${global.slug}`]: {
       get: {
         tags: [name],
         operationId: `find${name}`,
         parameters: commonReadParams({ base: name, ctx, refs }),
-        responses: { ...okDoc, ...errorResponses(ERRORS.globalRead, t) },
+        responses: { ...jsonOk(t('globalDoc'), docRef), ...errorResponses(ERRORS.globalRead, t) },
         security: secRead,
       },
       post: {
         tags: [name],
         operationId: `update${name}`,
+        parameters: writeParams({ base: name, entity: global, ctx, refs, operation: 'globalUpdate' }),
         requestBody: { content: { 'application/json': { schema: updateRef } } },
-        responses: { ...okDoc, ...errorResponses(ERRORS.globalUpdate, t) },
+        responses: {
+          ...jsonOk(t('globalDoc'), {
+            type: 'object',
+            properties: { message: { type: 'string' }, result: docRef },
+          }),
+          ...errorResponses(ERRORS.globalUpdate, t),
+        },
         security: secUpdate,
       },
     },
