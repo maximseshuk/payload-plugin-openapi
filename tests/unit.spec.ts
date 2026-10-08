@@ -687,6 +687,50 @@ describe('spec/downconvert', () => {
     })
   })
 
+  describe('toOpenApi30 required', () => {
+    it('drops an empty `required` array and keeps a filled one', async () => {
+      const { toOpenApi30 } = await import('../src/spec/downconvert.js')
+      const doc: Document = {
+        openapi: '3.2.0',
+        info: { title: 'T', version: '1' },
+        paths: {},
+        components: {
+          schemas: {
+            A: { type: 'object', properties: { x: { type: 'string' } }, required: [] },
+            B: { type: 'object', properties: { x: { type: 'string' } }, required: ['x'] },
+          },
+        },
+      }
+      const out = toOpenApi30(doc)
+      expect(out.components!.schemas!.A).not.toHaveProperty('required')
+      expect((out.components!.schemas!.B as SchemaObject).required).toEqual(['x'])
+    })
+
+    it('turns several types into `anyOf` and keeps `null` in each branch', async () => {
+      const { toOpenApi30 } = await import('../src/spec/downconvert.js')
+      const doc: Document = {
+        openapi: '3.2.0',
+        info: { title: 'T', version: '1' },
+        paths: {},
+        components: {
+          schemas: {
+            J: { type: ['object', 'integer', 'number', 'null'] },
+            K: { type: ['string', 'null'] },
+          },
+        },
+      }
+      const out = toOpenApi30(doc)
+      expect(out.components!.schemas!.J).toEqual({
+        anyOf: [
+          { type: 'object', nullable: true },
+          { type: 'integer', nullable: true },
+          { type: 'number', nullable: true },
+        ],
+      })
+      expect(out.components!.schemas!.K).toEqual({ type: 'string', nullable: true })
+    })
+  })
+
   describe('toOpenApi31', () => {
     it('rewrites the `openapi` version field to 3.1.2', async () => {
       const { toOpenApi31 } = await import('../src/spec/downconvert.js')
@@ -702,14 +746,14 @@ describe('spec/downconvert', () => {
       expect(toOpenApi31(doc)).not.toBe(doc)
     })
 
-    it('strips the 3.2-only `kind` and `parent` fields from tags', async () => {
+    it('strips the 3.2-only `kind`, `parent` and `summary` fields from tags', async () => {
       const { toOpenApi31 } = await import('../src/spec/downconvert.js')
       const doc: Document = {
         openapi: '3.2.0',
         info: { title: 'T', version: '1' },
         paths: {},
         tags: [
-          { name: 'Collections', kind: 'nav' },
+          { name: 'Collections', kind: 'nav', summary: 'Collections' },
           { name: 'Posts', parent: 'Collections', description: 'Blog posts' },
         ],
       }

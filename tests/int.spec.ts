@@ -12,6 +12,7 @@ import type {
 import { beforeAll, describe, expect, it } from 'vitest'
 
 import { buildDocument } from '../src/spec/buildDocument.js'
+import { toOpenApi30, toOpenApi31 } from '../src/spec/downconvert.js'
 import { specHandler } from '../src/endpoints/spec.js'
 import { resolveOptions } from '../src/options.js'
 import type { BuildContext, FilterOptions } from '../src/types.js'
@@ -60,9 +61,13 @@ const schema = (name: string) => doc.components?.schemas?.[name] as SchemaObject
 
 describe('generated document', () => {
   describe('document validity', () => {
-    it('validates as a well-formed OpenAPI document', async () => {
+    it.each([
+      ['3.2', (d: typeof doc) => d],
+      ['3.1', toOpenApi31],
+      ['3.0', toOpenApi30],
+    ])('validates as a well-formed OpenAPI %s document', async (_version, convert) => {
       const { Validator } = await import('@seriousme/openapi-schema-validator')
-      const result = await new Validator().validate(structuredClone(doc))
+      const result = await new Validator().validate(convert(structuredClone(doc)))
       expect(result.valid).toBe(true)
     })
 
