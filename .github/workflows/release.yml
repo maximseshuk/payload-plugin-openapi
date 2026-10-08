@@ -19,7 +19,7 @@ jobs:
           version: 11.11.0
       - uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version: 24
           cache: pnpm
           registry-url: https://registry.npmjs.org/
 
@@ -43,6 +43,4 @@ jobs:
         with:
           body: ${{ steps.changelog.outputs.content }}
 
-      - run: pnpm publish --access public --provenance --no-git-checks
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: npm publish --access public --provenance --tag latest
