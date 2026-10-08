@@ -11,4 +11,6 @@ dist
 docs/.mint
 node_modules
 tests/.next
+tests/AGENTS.md
+tests/CLAUDE.md
 tests/node_modules

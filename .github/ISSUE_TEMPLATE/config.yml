@@ -1,5 +1,8 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Documentation
-    url: https://github.com/maximseshuk/payload-plugin-openapi#readme
+  - name: 📚 Documentation
+    url: https://payload-plugin-openapi.seshuk.im
     about: Check the documentation for setup and configuration guides
+  - name: 🔄 Upgrade Guide
+    url: https://payload-plugin-openapi.seshuk.im/v1/upgrade-guide
+    about: How to upgrade from 0.x
