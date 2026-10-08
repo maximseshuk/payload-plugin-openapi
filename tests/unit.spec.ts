@@ -32,7 +32,7 @@ import { buildCustomEndpointPaths } from '../src/spec/paths/custom.js'
 import { buildCollectionPaths } from '../src/spec/paths/collections.js'
 import { buildAuthPaths } from '../src/spec/paths/auth.js'
 import { applySecurityWhen, evaluateAccess, resolveEntitySecurity } from '../src/spec/security.js'
-import type { Document, PathsObject, SchemaObject } from '@scalar/openapi-types/3.2'
+import type { Document, PathsObject, RequestBodyObject, SchemaObject } from '@scalar/openapi-types/3.2'
 import type { OpenApiExtension, ResolvedFilters } from '../src/types.js'
 import { baseInput, ctx, i18nStub, t } from './helpers.js'
 
@@ -415,9 +415,46 @@ describe('spec/paths/auth', () => {
   const users = (auth: Record<string, unknown>): SanitizedCollectionConfig =>
     ({ slug: 'users', fields: [], auth }) as unknown as SanitizedCollectionConfig
 
+  const build = (auth: Record<string, unknown>): PathsObject =>
+    buildAuthPaths({ collection: users(auth), ctx, includeAdmin: true, nestedTags: true })
+
+  const body = (paths: PathsObject, route: string): SchemaObject => {
+    const requestBody = paths[`/api/users/${route}`]?.post?.requestBody as RequestBodyObject
+    return requestBody.content['application/json'].schema as SchemaObject
+  }
+
+  it('asks for `email` in login, forgot-password and unlock bodies by default', () => {
+    const paths = build({})
+    for (const route of ['login', 'forgot-password', 'unlock']) {
+      expect(Object.keys(body(paths, route).properties ?? {})).not.toContain('username')
+      expect(body(paths, route).required).toContain('email')
+    }
+    expect(body(paths, 'login').required).toEqual(['email', 'password'])
+  })
+
+  it('asks for `username` only when `loginWithUsername` does not allow email login', () => {
+    for (const loginWithUsername of [true, { allowEmailLogin: false, requireEmail: true }]) {
+      const paths = build({ loginWithUsername })
+      for (const route of ['login', 'forgot-password', 'unlock']) {
+        expect(Object.keys(body(paths, route).properties ?? {})).not.toContain('email')
+        expect(body(paths, route).required).toContain('username')
+      }
+    }
+  })
+
+  it('accepts `email` or `username` when `allowEmailLogin` is on', () => {
+    const paths = build({ loginWithUsername: { allowEmailLogin: true, requireEmail: false } })
+    for (const route of ['login', 'forgot-password', 'unlock']) {
+      const schema = body(paths, route)
+      expect(Object.keys(schema.properties ?? {})).toEqual(expect.arrayContaining(['email', 'username']))
+      expect(schema.anyOf).toEqual([{ required: ['email'] }, { required: ['username'] }])
+    }
+    expect(body(paths, 'login').required).toEqual(['password'])
+    expect(body(paths, 'unlock').required).toBeUndefined()
+  })
+
   it('documents unlock for every auth collection, without `maxLoginAttempts`', () => {
-    const paths = buildAuthPaths({ collection: users({}), ctx, includeAdmin: true, nestedTags: true })
-    expect(paths['/api/users/unlock']?.post).toBeDefined()
+    expect(build({})['/api/users/unlock']?.post).toBeDefined()
   })
 })
 
