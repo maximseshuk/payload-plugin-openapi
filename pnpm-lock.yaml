@@ -182,8 +182,8 @@ importers:
   .:
     dependencies:
       '@scalar/openapi-types':
-        specifier: ^0.9.1
-        version: 0.9.1
+        specifier: ^0.9.7
+        version: 0.9.7
     devDependencies:
       '@payloadcms/db-sqlite':
         specifier: 4.0.0-canary.38
@@ -2509,8 +2509,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@scalar/openapi-types@0.9.1':
-    resolution: {integrity: sha512-gkGhSkxSzADaBiNg+ZAbJuwj+ZUmzP2Pg9CWZ7ZP+0fck2WjPeDDM7aAbouAm0aQQMF9xBjSPXSA9a/qTHYaTw==}
+  '@scalar/openapi-types@0.9.7':
+    resolution: {integrity: sha512-UVSgxRxcTaIbTZGtNRdQJHZC60uyYi29zfDqQVp0lxx07BNczIHbf9jycgI/+W3Uxxod+yUUt7hzxnKllOHE0w==}
     engines: {node: '>=22'}
 
   '@scarf/scarf@1.4.0':
@@ -8990,7 +8990,7 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.60.4':
     optional: true
 
-  '@scalar/openapi-types@0.9.1': {}
+  '@scalar/openapi-types@0.9.7': {}
 
   '@scarf/scarf@1.4.0': {}
 
@@ -12745,7 +12745,7 @@ snapshots:
   postcss-load-config@4.0.2(postcss@8.5.23):
     dependencies:
       lilconfig: 3.1.3
-      yaml: 2.9.1
+      yaml: 2.8.3
     optionalDependencies:
       postcss: 8.5.23
 

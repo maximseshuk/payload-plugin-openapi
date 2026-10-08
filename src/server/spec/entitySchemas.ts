@@ -1,10 +1,9 @@
 import { getTranslation } from '@payloadcms/translations'
-import type { SchemaObject } from '@scalar/openapi-types/3.2'
 import { entityToJSONSchema } from 'payload'
 import type { Block, Field, SanitizedConfig, SchemaVariant } from 'payload'
 
 import { makeT } from '@/shared/translations/index.js'
-import type { BuildContext, Entity, IDType } from '@/shared/types/index.js'
+import type { BuildContext, Entity, IDType, Schema } from '@/shared/types/index.js'
 import { deepMerge, isPlainObject } from '@/shared/utils.js'
 
 import { AUTH_FIELDS, flattenFields } from './fields.js'
@@ -29,7 +28,7 @@ const toComponentSchema = ({
   idType: IDType
   defs?: Map<string, unknown>
   variant?: SchemaVariant
-}): SchemaObject => {
+}): Schema => {
   const jsonSchema = entityToJSONSchema(
     config,
     source as never,
@@ -42,7 +41,7 @@ const toComponentSchema = ({
     variant,
   )
   const blockSlugs = new Set((config.blocks ?? []).map((b) => b.slug))
-  const schema = rewriteRefs(jsonSchema as never, blockSlugs, defs) as unknown as SchemaObject
+  const schema = rewriteRefs(jsonSchema as never, blockSlugs, defs) as unknown as Schema
   delete schema.title
   return schema
 }
@@ -92,15 +91,7 @@ export const resolveLocalizedStrings = (value: unknown, ctx: BuildContext): unkn
   return out
 }
 
-const applyFieldOverrides = ({
-  schema,
-  fields,
-  ctx,
-}: {
-  schema: SchemaObject
-  fields: Field[]
-  ctx: BuildContext
-}): void => {
+const applyFieldOverrides = ({ schema, fields, ctx }: { schema: Schema; fields: Field[]; ctx: BuildContext }): void => {
   if (!schema.properties) return
   for (const field of flattenFields(fields)) {
     const name = 'name' in field ? field.name : undefined
@@ -109,7 +100,7 @@ const applyFieldOverrides = ({
     const current = schema.properties[name]
     if (isPlainObject(current)) {
       const resolved = resolveLocalizedStrings(override, ctx) as Record<string, unknown>
-      schema.properties[name] = deepMerge(current, resolved) as SchemaObject
+      schema.properties[name] = deepMerge(current, resolved) as Schema
     }
   }
 }
@@ -129,7 +120,7 @@ const addBlockDiscriminators = (node: unknown): void => {
   if (!isPlainObject(node)) return
   const oneOf = node.oneOf
   if (Array.isArray(oneOf) && oneOf.length > 0 && oneOf.every(isBlockBranch)) {
-    ;(node as SchemaObject).discriminator = { propertyName: 'blockType' }
+    ;(node as Schema).discriminator = { propertyName: 'blockType' }
   }
   for (const value of Object.values(node)) addBlockDiscriminators(value)
 }
@@ -140,28 +131,20 @@ const fixPolymorphicJoinRequired = (node: unknown): void => {
     return
   }
   if (!isPlainObject(node)) return
-  const { properties, required } = node as SchemaObject
+  const { properties, required } = node as Schema
   if (isPlainObject(properties) && 'relationTo' in properties && Array.isArray(required)) {
-    ;(node as SchemaObject).required = required.map((r: string) => (r === 'collectionSlug' ? 'relationTo' : r))
+    ;(node as Schema).required = required.map((r: string) => (r === 'collectionSlug' ? 'relationTo' : r))
   }
   for (const value of Object.values(node)) fixPolymorphicJoinRequired(value)
 }
 
-const markLocalizedFields = ({
-  schema,
-  fields,
-  ctx,
-}: {
-  schema: SchemaObject
-  fields: Field[]
-  ctx: BuildContext
-}): void => {
+const markLocalizedFields = ({ schema, fields, ctx }: { schema: Schema; fields: Field[]; ctx: BuildContext }): void => {
   if (!schema.properties || ctx.locales.length === 0) return
   for (const field of flattenFields(fields)) {
     if (!('localized' in field) || !field.localized) continue
     const name = 'name' in field ? field.name : undefined
     if (!name || !(name in schema.properties)) continue
-    const single = schema.properties[name] as SchemaObject
+    const single = schema.properties[name] as Schema
     schema.properties[name] = {
       oneOf: [
         single,
@@ -175,7 +158,7 @@ const markLocalizedFields = ({
   }
 }
 
-const removeProps = (schema: SchemaObject, names: Iterable<string>): void => {
+const removeProps = (schema: Schema, names: Iterable<string>): void => {
   if (!schema.properties) return
   for (const name of names) delete schema.properties[name]
   if (Array.isArray(schema.required)) {
@@ -198,16 +181,16 @@ const deniedWrites = (fields: Field[], operation: 'create' | 'update'): string[]
     .filter((field) => 'name' in field && 'access' in field && isConstantDeny(field.access?.[operation]))
     .map((field) => (field as { name: string }).name)
 
-const cloneSchema = (schema: SchemaObject): SchemaObject => ({
+const cloneSchema = (schema: Schema): Schema => ({
   ...schema,
   properties: { ...schema.properties },
   required: Array.isArray(schema.required) ? [...schema.required] : schema.required,
 })
 
 export interface EntitySchemas {
-  read: SchemaObject
-  create: SchemaObject
-  update: SchemaObject
+  read: Schema
+  create: Schema
+  update: Schema
 }
 
 export const buildEntitySchemas = async ({
@@ -254,9 +237,9 @@ export const buildEntitySchemas = async ({
   return { read, create, update }
 }
 
-export const buildBlockSchema = (block: Block, config: SanitizedConfig): SchemaObject => {
+export const buildBlockSchema = (block: Block, config: SanitizedConfig): Schema => {
   const schema = toComponentSchema({ config, source: stripInterfaceName(block), idType: 'text' })
-  const blockType: SchemaObject = { type: 'string', enum: [block.slug] }
+  const blockType: Schema = { type: 'string', enum: [block.slug] }
   const properties = { ...schema.properties, blockType }
   const required = [...new Set(['blockType', ...(schema.required ?? [])])]
   return { ...schema, type: 'object', properties, required }

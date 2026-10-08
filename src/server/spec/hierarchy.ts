@@ -26,11 +26,16 @@ export const applyHierarchy = ({
     [hierarchy.titlePathFieldName]: t('schemaHierarchyTitlePath'),
   }
 
-  const read = schemas[base]?.properties
+  const propertiesOf = (name: string) => {
+    const schema = schemas[name]
+    return typeof schema === 'object' ? schema.properties : undefined
+  }
+  const read = propertiesOf(base)
   for (const [name, description] of Object.entries(pathFields)) {
-    if (read?.[name]) read[name] = { ...read[name], readOnly: true, description }
+    const current = read?.[name]
+    if (read && typeof current === 'object') read[name] = { ...current, readOnly: true, description }
     for (const other of [createSchemaName(base), updateSchemaName(base), querySchemaName(base)]) {
-      delete schemas[other]?.properties?.[name]
+      delete propertiesOf(other)?.[name]
     }
   }
 

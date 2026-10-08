@@ -255,17 +255,12 @@ export const uploadRequestBody = ({
 export const SECURITY_SCHEME_NAME = 'PayloadToken'
 export const INTERACTIVE_SCHEME_NAME = 'PayloadLogin'
 
-export const interactiveSecurityScheme = ({
-  tokenUrl,
-  t,
-}: {
-  tokenUrl: string
-  t: Translate
-}): SecuritySchemeObject => ({
-  type: 'oauth2',
-  description: t('securityInteractive'),
-  flows: { password: { tokenUrl, scopes: {} } },
-})
+export const interactiveSecurityScheme = ({ tokenUrl, t }: { tokenUrl: string; t: Translate }): SecuritySchemeObject =>
+  ({
+    type: 'oauth2',
+    description: t('securityInteractive'),
+    flows: { password: { tokenUrl, scopes: {} } },
+  }) as SecuritySchemeObject
 
 export const securityScheme = ({ cookiePrefix, t }: { cookiePrefix: string; t: Translate }): SecuritySchemeObject => ({
   type: 'http',

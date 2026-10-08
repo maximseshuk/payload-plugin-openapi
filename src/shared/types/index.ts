@@ -5,6 +5,7 @@ import type {
   InfoObject,
   PathsObject,
   SecurityRequirementObject,
+  SchemaObject,
   ServerObject,
   TagObject,
 } from '@scalar/openapi-types/3.2'
@@ -21,6 +22,8 @@ export type OperationKind = EntityKind | 'custom' | 'jobs' | 'system'
 export type HttpMethod = 'get' | 'post' | 'patch' | 'put' | 'delete'
 
 export type IDType = 'text' | 'number'
+
+export type Schema = Exclude<SchemaObject, boolean>
 
 export type Entity = SanitizedCollectionConfig | SanitizedGlobalConfig
 

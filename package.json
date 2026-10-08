@@ -71,7 +71,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@scalar/openapi-types": "^0.9.1"
+    "@scalar/openapi-types": "^0.9.7"
   },
   "devDependencies": {
     "@payloadcms/db-sqlite": "4.0.0-canary.38",

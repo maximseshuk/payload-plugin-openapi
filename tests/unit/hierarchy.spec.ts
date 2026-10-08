@@ -1,12 +1,13 @@
-import type { ParameterObject, PathsObject, SchemaObject } from '@scalar/openapi-types/3.2'
+import type { ParameterObject, PathsObject } from '@scalar/openapi-types/3.2'
 import type { SanitizedCollectionConfig } from 'payload'
 import { describe, expect, it } from 'vitest'
 
 import { applyHierarchy } from '@/server/spec/hierarchy.js'
+import type { Schema } from '@/shared/types/index.js'
 
 import { ctx } from '../helpers/context.js'
 
-const text: SchemaObject = { type: 'string' }
+const text: Schema = { type: 'string' }
 
 const setup = (hierarchy: SanitizedCollectionConfig['hierarchy']) => {
   const paths: PathsObject = {
@@ -14,7 +15,7 @@ const setup = (hierarchy: SanitizedCollectionConfig['hierarchy']) => {
     '/api/folders/{id}': { get: { parameters: [] }, patch: { parameters: [] } },
   }
   const props = () => ({ name: text, crumbs: text, titles: text })
-  const schemas: Record<string, SchemaObject> = {
+  const schemas: Record<string, Schema> = {
     Folders: { type: 'object', properties: props() },
     FoldersCreate: { type: 'object', properties: props() },
     FoldersUpdate: { type: 'object', properties: props() },
@@ -36,13 +37,13 @@ describe('applyHierarchy', () => {
     } as SanitizedCollectionConfig['hierarchy'])
 
     for (const name of ['crumbs', 'titles']) {
-      expect(schemas.Folders.properties?.[name]).toMatchObject({ type: 'string', readOnly: true })
-      expect(schemas.FoldersCreate.properties?.[name]).toBeUndefined()
-      expect(schemas.FoldersUpdate.properties?.[name]).toBeUndefined()
-      expect(schemas.FoldersQueryOperations.properties?.[name]).toBeUndefined()
-      expect(schemas.FoldersSelect.properties?.[name]).toEqual(text)
+      expect(schemas.Folders!.properties?.[name]).toMatchObject({ type: 'string', readOnly: true })
+      expect(schemas.FoldersCreate!.properties?.[name]).toBeUndefined()
+      expect(schemas.FoldersUpdate!.properties?.[name]).toBeUndefined()
+      expect(schemas.FoldersQueryOperations!.properties?.[name]).toBeUndefined()
+      expect(schemas.FoldersSelect!.properties?.[name]).toEqual(text)
     }
-    expect(schemas.FoldersCreate.properties?.name).toEqual(text)
+    expect(schemas.FoldersCreate!.properties?.name).toEqual(text)
 
     const param = paths['/api/folders']?.get?.parameters?.[0] as ParameterObject
     expect(param).toMatchObject({ name: 'computeHierarchyPaths', in: 'query', schema: { type: 'boolean' } })
@@ -54,8 +55,8 @@ describe('applyHierarchy', () => {
 
   it('leaves a collection without hierarchy untouched', () => {
     const { paths, schemas } = setup(false)
-    expect(schemas.Folders.properties?.crumbs).toEqual(text)
-    expect(schemas.FoldersCreate.properties?.crumbs).toEqual(text)
+    expect(schemas.Folders!.properties?.crumbs).toEqual(text)
+    expect(schemas.FoldersCreate!.properties?.crumbs).toEqual(text)
     expect(names(paths['/api/folders']?.get)).toEqual([])
   })
 })

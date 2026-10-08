@@ -1,12 +1,4 @@
-import type {
-  Document,
-  ParameterObject,
-  ReferenceObject,
-  RequestBodyObject,
-  ResponseObject,
-  SchemaObject,
-  TagObject,
-} from '@scalar/openapi-types/3.2'
+import type { Document, MediaTypeObject, ReferenceObject, TagObject } from '@scalar/openapi-types/3.2'
 import { getPayload } from 'payload'
 import type { Access, SanitizedCollectionConfig } from 'payload'
 import { beforeAll, describe, expect, it } from 'vitest'
@@ -15,14 +7,22 @@ import { specHandler } from '@/server/endpoints/spec.js'
 import { resolveOptions } from '@/server/options/resolveOptions.js'
 import { buildDocument } from '@/server/spec/buildDocument.js'
 import { toOpenApi30, toOpenApi31 } from '@/server/spec/downconvert.js'
-import type { BuildContext, FilterOptions } from '@/shared/types/index.js'
+import type { BuildContext, FilterOptions, Schema } from '@/shared/types/index.js'
 
 import { i18nStub } from '../helpers/context.js'
 import configPromise from '../payload.config.js'
 
-let doc: Document
-let nestedDoc: Document
-let adminDoc: Document
+type Doc = Document & { paths: NonNullable<Document['paths']> }
+type Media = Record<string, MediaTypeObject>
+type Body = { required?: boolean; content: Media }
+type Resp = { description?: string; content?: Media }
+type Param = { name: string; style?: string; content?: Media; schema?: Schema }
+
+const buildDoc = (args: Parameters<typeof buildDocument>[0]) => buildDocument(args) as Promise<Doc>
+
+let doc: Doc
+let nestedDoc: Doc
+let adminDoc: Doc
 let idType: 'string' | 'number'
 
 beforeAll(async () => {
@@ -38,7 +38,7 @@ beforeAll(async () => {
     i18n: i18nStub,
   }
   const collections = Object.values(payload.collections).map((c) => c.config)
-  doc = await buildDocument({
+  doc = await buildDoc({
     options: resolveOptions({ info: { title: 'T', version: '1.0.0' } }),
     servers: [{ url: 'http://localhost' }],
     collections,
@@ -47,7 +47,7 @@ beforeAll(async () => {
     ctx,
     payload,
   })
-  adminDoc = await buildDocument({
+  adminDoc = await buildDoc({
     options: resolveOptions({ info: { title: 'T', version: '1.0.0' }, filters: { includeAdminAuth: true } }),
     servers: [{ url: 'http://localhost' }],
     collections,
@@ -56,7 +56,7 @@ beforeAll(async () => {
     ctx,
     payload,
   })
-  nestedDoc = await buildDocument({
+  nestedDoc = await buildDoc({
     options: resolveOptions({ info: { title: 'T', version: '1.0.0' }, nestedTags: true }),
     servers: [{ url: 'http://localhost' }],
     collections,
@@ -67,7 +67,7 @@ beforeAll(async () => {
   })
 }, 60_000)
 
-const schema = (name: string) => doc.components?.schemas?.[name] as SchemaObject
+const schema = (name: string) => doc.components?.schemas?.[name] as Schema
 
 describe('generated document', () => {
   describe('document validity', () => {
@@ -104,7 +104,7 @@ describe('generated document', () => {
 
     it('adds a localization note to `info.description` when locales are configured', async () => {
       const payload = await getPayload({ config: await configPromise })
-      const localized = await buildDocument({
+      const localized = await buildDoc({
         options: resolveOptions({ info: { title: 'T', version: '1.0.0', description: 'Base.' } }),
         servers: [{ url: 'http://localhost' }],
         collections: [],
@@ -117,7 +117,7 @@ describe('generated document', () => {
       expect(localized.info.description).toContain('locale=all')
       expect(localized.info.description).toContain('`en`')
 
-      const noLocale = await buildDocument({
+      const noLocale = await buildDoc({
         options: resolveOptions({ info: { title: 'T', version: '1.0.0' } }),
         servers: [{ url: 'http://localhost' }],
         collections: [],
@@ -168,7 +168,7 @@ describe('generated document', () => {
     describe('create', () => {
       it('keeps `password` on the auth create schema and marks it required', () => {
         const create = schema('UsersCreate')
-        expect((create.properties?.password as SchemaObject)?.type).toBe('string')
+        expect((create.properties?.password as Schema)?.type).toBe('string')
         expect(create.required ?? []).toContain('password')
       })
 
@@ -180,17 +180,17 @@ describe('generated document', () => {
       })
 
       it('writes relationships as ids in create bodies', () => {
-        const author = schema('PostsCreate').properties?.author as SchemaObject
+        const author = schema('PostsCreate').properties?.author as Schema
         expect(author).toEqual({ type: [idType, 'null'] })
-        const tags = schema('PostsCreate').properties?.tags as SchemaObject
+        const tags = schema('PostsCreate').properties?.tags as Schema
         expect(tags.type).toEqual(['array', 'null'])
-        expect((tags.items as SchemaObject).type).toBe(idType)
+        expect((tags.items as Schema).type).toBe(idType)
       })
 
       it('writes polymorphic relationships as `{ relationTo, value }` in create bodies', () => {
-        const related = schema('PostsCreate').properties?.related as SchemaObject
+        const related = schema('PostsCreate').properties?.related as Schema
         expect(related.type).toEqual(['array', 'null'])
-        const branches = (related.items as SchemaObject).oneOf as SchemaObject[]
+        const branches = (related.items as Schema).oneOf as Schema[]
         expect(branches.map((b) => b.properties?.relationTo)).toEqual([{ const: 'posts' }, { const: 'tags' }])
         for (const branch of branches) {
           expect(branch.required).toEqual(['value', 'relationTo'])
@@ -199,40 +199,37 @@ describe('generated document', () => {
       })
 
       it('writes an upload field as an id in create bodies', () => {
-        const featured = schema('PostsCreate').properties?.featuredImage as SchemaObject
+        const featured = schema('PostsCreate').properties?.featuredImage as Schema
         expect(featured).toEqual({ type: [idType, 'null'] })
       })
 
       it('writes relationships nested in groups, named tabs, arrays and blocks as ids', () => {
         const create = schema('PostsCreate').properties ?? {}
-        const hero = (create.hero as SchemaObject).properties ?? {}
+        const hero = (create.hero as Schema).properties ?? {}
         expect(hero.image).toEqual({ type: [idType, 'null'] })
-        const link = ((hero.links as SchemaObject).items as SchemaObject).properties?.doc as SchemaObject
-        expect((link.oneOf as SchemaObject[]).map((b) => b.properties?.value)).toEqual([
-          { type: idType },
-          { type: idType },
-        ])
-        expect((create.og as SchemaObject).properties?.image).toEqual({ type: [idType, 'null'] })
+        const link = ((hero.links as Schema).items as Schema).properties?.doc as Schema
+        expect((link.oneOf as Schema[]).map((b) => b.properties?.value)).toEqual([{ type: idType }, { type: idType }])
+        expect((create.og as Schema).properties?.image).toEqual({ type: [idType, 'null'] })
 
-        const row = ((create.sections as SchemaObject).items as SchemaObject).properties ?? {}
+        const row = ((create.sections as Schema).items as Schema).properties ?? {}
         expect(row.tags).toEqual({ type: ['array', 'null'], items: { type: idType } })
-        const blocks = ((row.content as SchemaObject).items as SchemaObject).oneOf as SchemaObject[]
+        const blocks = ((row.content as Schema).items as Schema).oneOf as Schema[]
         expect(blocks[0]?.properties?.media).toEqual({ type: idType })
         expect(blocks[1]).toEqual({ $ref: '#/components/schemas/BlockCallToAction' })
 
-        const layout = ((create.layout as SchemaObject).items as SchemaObject).oneOf as SchemaObject[]
-        const gallery = layout.find((b) => (b.properties?.blockType as SchemaObject | undefined)?.const === 'gallery')
+        const layout = ((create.layout as Schema).items as Schema).oneOf as Schema[]
+        const gallery = layout.find((b) => (b.properties?.blockType as Schema | undefined)?.const === 'gallery')
         expect(gallery?.properties?.images).toEqual({ type: ['array', 'null'], items: { type: idType } })
         expect(schema('PostsUpdate').properties?.hero).toEqual(create.hero)
       })
 
       it('keeps the populated document in nested read shapes', () => {
         const read = schema('Posts').properties ?? {}
-        const hero = (read.hero as SchemaObject).properties ?? {}
-        const image = hero.image as SchemaObject
+        const hero = (read.hero as Schema).properties ?? {}
+        const image = hero.image as Schema
         expect(image.oneOf?.[1]).toEqual({ $ref: '#/components/schemas/Media' })
-        const row = ((read.sections as SchemaObject).items as SchemaObject).properties ?? {}
-        const blocks = ((row.content as SchemaObject).items as SchemaObject).oneOf as SchemaObject[]
+        const row = ((read.sections as Schema).items as Schema).properties ?? {}
+        const blocks = ((row.content as Schema).items as Schema).oneOf as Schema[]
         expect(blocks[0]).toEqual({ $ref: '#/components/schemas/BlockMedia' })
       })
 
@@ -265,7 +262,7 @@ describe('generated document', () => {
 
   describe('fields', () => {
     it('applies `field.custom.openapi` to the phone property', () => {
-      const phone = schema('Posts').properties?.phone as SchemaObject
+      const phone = schema('Posts').properties?.phone as Schema
       expect(phone.format).toBe('phone')
       expect(phone.example).toBe('+14155552671')
       expect(phone.pattern).toBeDefined()
@@ -273,24 +270,24 @@ describe('generated document', () => {
     })
 
     it('marks a field deprecated from `custom.openapi.deprecated`', () => {
-      const legacy = schema('Posts').properties?.legacyField as SchemaObject
+      const legacy = schema('Posts').properties?.legacyField as Schema
       expect(legacy.deprecated).toBe(true)
     })
 
     it('sets a `blockType` discriminator on block unions', () => {
-      const callouts = schema('Posts').properties?.callouts as SchemaObject
-      const refItems = callouts.items as SchemaObject
+      const callouts = schema('Posts').properties?.callouts as Schema
+      const refItems = callouts.items as Schema
       expect(refItems.oneOf).toBeDefined()
       expect(refItems.discriminator?.propertyName).toBe('blockType')
 
-      const layout = schema('Posts').properties?.layout as SchemaObject
-      const inlineItems = layout.items as SchemaObject
+      const layout = schema('Posts').properties?.layout as Schema
+      const inlineItems = layout.items as Schema
       expect(inlineItems.oneOf).toBeDefined()
       expect(inlineItems.discriminator?.propertyName).toBe('blockType')
     })
 
     it('does not add a discriminator to the localized `oneOf`', () => {
-      const title = schema('Posts').properties?.title as SchemaObject
+      const title = schema('Posts').properties?.title as Schema
       expect(title.oneOf).toBeDefined()
       expect(title.discriminator).toBeUndefined()
     })
@@ -298,28 +295,28 @@ describe('generated document', () => {
     it('registers a component schema for `blockReferences` blocks with a `blockType` discriminator', () => {
       const cta = schema('BlockCallToAction')
       expect(cta).toBeDefined()
-      const blockType = cta.properties?.blockType as SchemaObject
+      const blockType = cta.properties?.blockType as Schema
       expect(blockType.enum).toEqual(['callToAction'])
       expect(cta.required).toContain('blockType')
     })
 
     it('embeds inline block definitions inside the blocks field schema', () => {
-      const layout = schema('Posts').properties?.layout as SchemaObject
+      const layout = schema('Posts').properties?.layout as Schema
       expect(layout.type).toEqual(['array', 'null'])
       expect(schema('BlockCallToAction')).toBeDefined()
       expect(schema('BlockMedia')).toBeDefined()
     })
 
     it('models a localized field as a single value or a per-locale object (#69)', () => {
-      const title = schema('Posts').properties?.title as SchemaObject
+      const title = schema('Posts').properties?.title as Schema
       expect(title.oneOf).toHaveLength(2)
-      const perLocale = title.oneOf?.[1] as SchemaObject
+      const perLocale = title.oneOf?.[1] as Schema
       expect(perLocale.properties?.en).toBeDefined()
       expect(perLocale.properties?.de).toBeDefined()
     })
 
     it('keeps localized write bodies as single values, with no per-locale object', () => {
-      const createTitle = schema('PostsCreate').properties?.title as SchemaObject
+      const createTitle = schema('PostsCreate').properties?.title as Schema
       expect(createTitle.oneOf).toBeUndefined()
       expect(createTitle.type).toBe('string')
     })
@@ -331,20 +328,22 @@ describe('generated document', () => {
 
   describe('uploads', () => {
     it('offers both a multipart body (with binary file) and a json body (no file) for upload collections', () => {
-      const body = doc.paths?.['/api/media']?.post?.requestBody as RequestBodyObject
-      expect((body.content['application/json'].schema as ReferenceObject).$ref).toBe('#/components/schemas/MediaCreate')
-      const multipart = body.content['multipart/form-data']
+      const body = doc.paths?.['/api/media']?.post?.requestBody as Body
+      expect((body.content['application/json']!.schema as ReferenceObject).$ref).toBe(
+        '#/components/schemas/MediaCreate',
+      )
+      const multipart = body.content['multipart/form-data']!
       expect(multipart).toBeDefined()
-      const mpSchema = multipart.schema as SchemaObject
-      expect(((mpSchema.properties ?? {}).file as SchemaObject).format).toBe('binary')
+      const mpSchema = multipart.schema as Schema
+      expect(((mpSchema.properties ?? {}).file as Schema).format).toBe('binary')
       const payloadPart = mpSchema.properties?._payload as { allOf?: ReferenceObject[] }
       expect(payloadPart.allOf?.[0]?.$ref).toBe('#/components/schemas/MediaCreate')
       expect(mpSchema.required).toContain('file')
     })
 
     it('makes the file optional on upload update, alongside the fields', () => {
-      const body = doc.paths?.['/api/media/{id}']?.patch?.requestBody as RequestBodyObject
-      const mpSchema = body.content['multipart/form-data']?.schema as SchemaObject
+      const body = doc.paths?.['/api/media/{id}']?.patch?.requestBody as Body
+      const mpSchema = body.content['multipart/form-data']?.schema as Schema
       expect(mpSchema.required).toBeUndefined()
       expect(body.required).toBe(false)
     })
@@ -352,9 +351,9 @@ describe('generated document', () => {
     it('documents the file and upload instructions endpoints for upload collections', () => {
       expect(doc.paths['/api/media/file/{filename}']?.get).toBeDefined()
       expect(doc.paths['/api/users/file/{filename}']).toBeUndefined()
-      const body = doc.paths['/api/upload-instructions']?.post?.requestBody as RequestBodyObject
-      const bodySchema = body.content['application/json'].schema as SchemaObject
-      const slug = bodySchema.properties?.collectionSlug as SchemaObject
+      const body = doc.paths['/api/upload-instructions']?.post?.requestBody as Body
+      const bodySchema = body.content['application/json']!.schema as Schema
+      const slug = bodySchema.properties?.collectionSlug as Schema
       expect(slug.enum).toEqual(['media'])
       expect(doc.paths['/api/upload-instructions/{uploadId}']?.put).toBeDefined()
       expect(doc.paths['/api/upload-instructions/{uploadId}']?.delete).toBeDefined()
@@ -368,7 +367,7 @@ describe('generated document', () => {
       expect(q.properties?.title).toBeDefined()
       expect(q.properties?.and).toBeDefined()
       expect(q.properties?.or).toBeDefined()
-      const params = (doc.paths?.['/api/posts']?.get?.parameters ?? []) as ParameterObject[]
+      const params = (doc.paths?.['/api/posts']?.get?.parameters ?? []) as Param[]
       const whereParam = params.find((p) => p.name === 'where')
       expect(whereParam).toBeDefined()
       expect(whereParam?.content?.['application/json']?.schema).toEqual({
@@ -377,7 +376,7 @@ describe('generated document', () => {
     })
 
     it('describes the `where` param with a content schema so the UI shows one row', () => {
-      const params = (doc.paths['/api/posts']?.get?.parameters ?? []) as ParameterObject[]
+      const params = (doc.paths['/api/posts']?.get?.parameters ?? []) as Param[]
       const where = params.find((p) => p.name === 'where')
       expect(where).toBeDefined()
       expect(where?.content?.['application/json']?.schema).toEqual({
@@ -402,14 +401,13 @@ describe('generated document', () => {
     it('builds a `Joins` schema for collections with join fields', () => {
       const joins = schema('UsersJoins')
       expect(joins).toBeDefined()
-      const posts = joins.properties?.posts as SchemaObject
+      const posts = joins.properties?.posts as Schema
       expect(posts.properties?.limit).toEqual({ type: 'integer' })
       expect(posts.properties?.where).toBeDefined()
     })
 
     it('documents the query params that write operations read', () => {
-      const names = (op?: { parameters?: unknown[] }) =>
-        ((op?.parameters ?? []) as ParameterObject[]).map((p) => p.name)
+      const names = (op?: { parameters?: unknown[] }) => ((op?.parameters ?? []) as Param[]).map((p) => p.name)
       const create = names(doc.paths['/api/posts']?.post)
       expect(create).toEqual(expect.arrayContaining(['depth', 'locale', 'select', 'populate', 'draft']))
       expect(create).not.toContain('trash')
@@ -425,8 +423,7 @@ describe('generated document', () => {
     })
 
     it('documents the draft, locale and lock params only where Payload reads them', () => {
-      const names = (op?: { parameters?: unknown[] }) =>
-        ((op?.parameters ?? []) as ParameterObject[]).map((p) => p.name)
+      const names = (op?: { parameters?: unknown[] }) => ((op?.parameters ?? []) as Param[]).map((p) => p.name)
       const posts = doc.paths['/api/posts']
       const post = doc.paths['/api/posts/{id}']
       expect(names(posts?.post)).toContain('publishAllLocales')
@@ -448,7 +445,7 @@ describe('generated document', () => {
       expect(settings).not.toContain('publishAllLocales')
       expect(settings).not.toContain('overrideLock')
 
-      const duplicate = (doc.paths['/api/posts/{id}/duplicate']?.post?.parameters ?? []) as ParameterObject[]
+      const duplicate = (doc.paths['/api/posts/{id}/duplicate']?.post?.parameters ?? []) as Param[]
       expect(duplicate.find((p) => p.name === 'selectedLocales[]')).toMatchObject({
         style: 'form',
         explode: true,
@@ -459,8 +456,7 @@ describe('generated document', () => {
   })
 
   describe('hierarchy', () => {
-    const paramNames = (op?: { parameters?: unknown[] }) =>
-      ((op?.parameters ?? []) as ParameterObject[]).map((p) => p.name)
+    const paramNames = (op?: { parameters?: unknown[] }) => ((op?.parameters ?? []) as Param[]).map((p) => p.name)
 
     it('documents a folders collection with the standard collection endpoints only', () => {
       const folderPaths = Object.keys(doc.paths).filter((p) => p.startsWith('/api/folders'))
@@ -480,16 +476,16 @@ describe('generated document', () => {
     it('adds the parent, scope and join fields to the folder read schema', () => {
       const props = schema('Folders').properties ?? {}
       expect(props._h_folders).toBeDefined()
-      expect((props.hierarchyType as SchemaObject).items).toEqual({ type: 'string', enum: ['media'] })
-      const children = (props.children as SchemaObject).properties?.docs as SchemaObject
-      for (const branch of ((children.items as SchemaObject).oneOf ?? []) as SchemaObject[]) {
+      expect((props.hierarchyType as Schema).items).toEqual({ type: 'string', enum: ['media'] })
+      const children = (props.children as Schema).properties?.docs as Schema
+      for (const branch of ((children.items as Schema).oneOf ?? []) as Schema[]) {
         expect(branch.required).toEqual(['relationTo', 'value'])
       }
     })
 
     it('marks the computed path fields read-only and keeps them out of bodies and `where`', () => {
       for (const name of ['_h_slugPath', '_h_titlePath']) {
-        const field = schema('Folders').properties?.[name] as SchemaObject
+        const field = schema('Folders').properties?.[name] as Schema
         expect(field.readOnly).toBe(true)
         expect(field.description).toContain('computeHierarchyPaths=true')
         expect(schema('FoldersCreate').properties?.[name]).toBeUndefined()
@@ -551,14 +547,14 @@ describe('generated document', () => {
       expect(doc.paths['/api/globals/settings/access']).toBeUndefined()
 
       const props = (op?: { responses?: Record<string, unknown> }) => {
-        const ok = op?.responses?.['200'] as ResponseObject
-        const body = ok.content?.['application/json']?.schema as SchemaObject
+        const ok = op?.responses?.['200'] as Resp
+        const body = ok.content?.['application/json']?.schema as Schema
         return Object.keys(body.properties ?? {})
       }
       const byId = adminDoc.paths['/api/posts/access/{id}']?.post
       expect(byId?.operationId).toBe('accessPostsById')
       expect(byId?.security).toBeUndefined()
-      const requestBody = byId?.requestBody as RequestBodyObject
+      const requestBody = byId?.requestBody as Body
       expect(requestBody.content?.['application/json']?.schema).toEqual({
         $ref: '#/components/schemas/PostsUpdate',
       })
@@ -606,8 +602,8 @@ describe('generated document', () => {
 
     it('describes a restored global as `{ doc, message }` and a restored document as the document plus `message`', () => {
       const body = (path: string) => {
-        const ok = doc.paths[path]?.post?.responses?.['200'] as ResponseObject
-        return ok.content?.['application/json']?.schema as SchemaObject
+        const ok = doc.paths[path]?.post?.responses?.['200'] as Resp
+        return ok.content?.['application/json']?.schema as Schema
       }
       expect(body('/api/globals/settings/versions/{id}').properties).toEqual({
         message: { type: 'string' },
@@ -621,16 +617,16 @@ describe('generated document', () => {
     it('describes create as 201 and the global update as `{ message, result }`', () => {
       const create = doc.paths['/api/posts']?.post?.responses ?? {}
       expect(create['200']).toBeUndefined()
-      const created = (create['201'] as ResponseObject).content?.['application/json']?.schema as SchemaObject
+      const created = (create['201'] as Resp).content?.['application/json']?.schema as Schema
       expect(created.properties?.doc).toEqual({ $ref: '#/components/schemas/Posts' })
 
-      const update = doc.paths['/api/globals/settings']?.post?.responses?.['200'] as ResponseObject
-      const updated = update.content?.['application/json']?.schema as SchemaObject
+      const update = doc.paths['/api/globals/settings']?.post?.responses?.['200'] as Resp
+      const updated = update.content?.['application/json']?.schema as Schema
       expect(updated.properties).toEqual({
         message: { type: 'string' },
         result: { $ref: '#/components/schemas/GlobalSettings' },
       })
-      const read = doc.paths['/api/globals/settings']?.get?.responses?.['200'] as ResponseObject
+      const read = doc.paths['/api/globals/settings']?.get?.responses?.['200'] as Resp
       expect(read.content?.['application/json']?.schema).toEqual({ $ref: '#/components/schemas/GlobalSettings' })
     })
   })
@@ -639,12 +635,12 @@ describe('generated document', () => {
     it('documents the jobs `run` and `handle-schedules` endpoints when jobs are configured (#43)', () => {
       const run = doc.paths['/api/payload-jobs/run']?.get
       expect(run).toBeDefined()
-      const runParams = ((run?.parameters ?? []) as ParameterObject[]).map((p) => p.name)
+      const runParams = ((run?.parameters ?? []) as Param[]).map((p) => p.name)
       expect(runParams).toEqual(expect.arrayContaining(['queue', 'allQueues', 'limit', 'disableScheduling', 'silent']))
       expect(doc.paths['/api/payload-jobs/handle-schedules']?.get).toBeDefined()
-      const queue = ((run?.parameters ?? []) as ParameterObject[]).find((p) => p.name === 'queue')
+      const queue = ((run?.parameters ?? []) as Param[]).find((p) => p.name === 'queue')
       expect(queue).toBeDefined()
-      const queueSchema = queue?.schema as SchemaObject | undefined
+      const queueSchema = queue?.schema as Schema | undefined
       expect(queueSchema?.enum).toEqual(expect.arrayContaining(['default', 'nightly']))
     })
   })
@@ -655,8 +651,8 @@ describe('generated document', () => {
       expect(doc.paths['/api/posts']?.delete).toBeDefined()
       expect(doc.paths['/api/posts/count']?.get).toBeDefined()
       expect(doc.paths['/api/posts/{id}/duplicate']?.post).toBeDefined()
-      const count = doc.paths['/api/posts/count']?.get?.responses['200'] as ResponseObject
-      const countSchema = count.content?.['application/json']?.schema as SchemaObject
+      const count = doc.paths['/api/posts/count']?.get?.responses?.['200'] as Resp
+      const countSchema = count.content?.['application/json']?.schema as Schema
       expect(countSchema.properties?.totalDocs).toEqual({ type: 'integer' })
     })
   })
@@ -718,15 +714,15 @@ describe('generated document', () => {
       expect(doc.info.description).toContain('?lang=<code>')
     })
 
-    const listDesc = (served: Document): string | undefined => {
-      const ok = served.paths['/api/posts']?.get?.responses['200'] as ResponseObject | undefined
+    const listDesc = (served: Doc): string | undefined => {
+      const ok = served.paths['/api/posts']?.get?.responses?.['200'] as Resp | undefined
       return ok?.description
     }
-    const serveSpec = async (url: string): Promise<Document> => {
+    const serveSpec = async (url: string): Promise<Doc> => {
       const payload = await getPayload({ config: await configPromise })
       const handler = specHandler(resolveOptions({ info: { title: 'T', version: '1.0.0' }, cache: false }))
       const res = await handler({ url, payload, headers: new Headers(), i18n: i18nStub } as never)
-      return (await res.json()) as Document
+      return (await res.json()) as Doc
     }
 
     it('serves the spec in the language requested via `?lang=`, overriding the request i18n', async () => {
@@ -746,7 +742,7 @@ describe('generated document', () => {
     it('registers a shared `ErrorResponse` schema', () => {
       const err = schema('ErrorResponse')
       expect(err.required).toContain('errors')
-      const items = ((err.properties ?? {}).errors as SchemaObject).items as SchemaObject
+      const items = ((err.properties ?? {}).errors as Schema).items as Schema
       expect(items.properties?.message).toBeDefined()
     })
 
@@ -761,7 +757,7 @@ describe('generated document', () => {
     })
 
     it('points error responses at the `ErrorResponse` schema', () => {
-      const r404 = doc.paths['/api/posts/{id}']?.get?.responses['404'] as ResponseObject
+      const r404 = doc.paths['/api/posts/{id}']?.get?.responses?.['404'] as Resp
       expect(r404.content?.['application/json']?.schema).toEqual({
         $ref: '#/components/schemas/ErrorResponse',
       })
@@ -770,9 +766,9 @@ describe('generated document', () => {
 })
 
 describe('filters', () => {
-  const build = async (filters: Partial<FilterOptions>): Promise<Document> => {
+  const build = async (filters: Partial<FilterOptions>): Promise<Doc> => {
     const payload = await getPayload({ config: await configPromise })
-    return buildDocument({
+    return buildDoc({
       options: resolveOptions({ info: { title: 'T', version: '1.0.0' }, filters }),
       servers: [{ url: 'http://localhost' }],
       collections: Object.values(payload.collections).map((c) => c.config),
@@ -815,11 +811,11 @@ describe('security marking', () => {
   const buildWithReadAccess = async (
     read: Access,
     options = resolveOptions({ info: { title: 'T', version: '1.0.0' } }),
-  ): Promise<Document> => {
+  ): Promise<Doc> => {
     const payload = await getPayload({ config: await configPromise })
     const base = Object.values(payload.collections).find((c) => c.config.slug === 'tags')!.config
     const collection = { ...base, access: { ...base.access, read } } as SanitizedCollectionConfig
-    return buildDocument({
+    return buildDoc({
       options,
       servers: [{ url: 'http://localhost' }],
       collections: [collection],

@@ -1,5 +1,5 @@
 import type { I18n } from '@payloadcms/translations'
-import type { Document, PathsObject, RequestBodyObject, SchemaObject } from '@scalar/openapi-types/3.2'
+import type { Document, MediaTypeObject, PathsObject, RequestBodyObject } from '@scalar/openapi-types/3.2'
 import { Validator } from '@seriousme/openapi-schema-validator'
 import type {
   CollectionConfig,
@@ -38,7 +38,13 @@ import {
 } from '@/server/spec/tags.js'
 import { PLUGIN_NAME } from '@/shared/constants.js'
 import type { Translate } from '@/shared/translations/types.js'
-import type { EntityOpenApiMeta, FieldOpenApiMeta, OpenApiExtension, ResolvedFilters } from '@/shared/types/index.js'
+import type {
+  EntityOpenApiMeta,
+  FieldOpenApiMeta,
+  OpenApiExtension,
+  ResolvedFilters,
+  Schema,
+} from '@/shared/types/index.js'
 
 import { baseInput, ctx, i18nStub, t } from '../helpers/context.js'
 
@@ -638,9 +644,9 @@ describe('spec/paths/auth', () => {
   const build = (auth: Record<string, unknown>): PathsObject =>
     buildAuthPaths({ collection: users(auth), ctx, includeAdmin: true, nestedTags: true })
 
-  const body = (paths: PathsObject, route: string): SchemaObject => {
+  const body = (paths: PathsObject, route: string): Schema => {
     const requestBody = paths[`/api/users/${route}`]?.post?.requestBody as RequestBodyObject
-    return requestBody.content['application/json'].schema as SchemaObject
+    return (requestBody.content['application/json'] as MediaTypeObject).schema as Schema
   }
 
   it('asks for `email` in login, forgot-password and unlock bodies by default', () => {
@@ -774,7 +780,7 @@ describe('spec/paths/collections', () => {
     const { buildGlobalPaths } = await import('@/server/spec/paths/globals.js')
     const { buildVersionPaths } = await import('@/server/spec/paths/versions.js')
     const body = (op?: { responses?: Record<string, unknown> }, code = '200') => {
-      const response = op?.responses?.[code] as { content: Record<string, { schema: SchemaObject }> } | undefined
+      const response = op?.responses?.[code] as { content: Record<string, { schema: Schema }> } | undefined
       return response?.content['application/json']?.schema
     }
     const doc = { $ref: '#/components/schemas/Posts' }
@@ -806,7 +812,7 @@ describe('spec/paths/collections', () => {
   it('adds the document access endpoints with the operations Payload checks', async () => {
     const { buildGlobalPaths } = await import('@/server/spec/paths/globals.js')
     const operations = (op?: { responses?: Record<string, unknown> }) => {
-      const ok = op?.responses?.['200'] as { content: Record<string, { schema: SchemaObject }> }
+      const ok = op?.responses?.['200'] as { content: Record<string, { schema: Schema }> }
       return Object.keys(ok.content['application/json']?.schema.properties ?? {})
     }
     expect(buildCollectionPaths({ collection: postsColl(), ctx })['/api/posts/access/{id}']).toBeUndefined()
@@ -1190,20 +1196,20 @@ describe('spec/entitySchemas', () => {
     const id = { type: ['string', 'null'] }
     const props = create.properties ?? {}
     expect(props.cover).toEqual(id)
-    expect((props.meta as SchemaObject).properties?.image).toEqual(id)
-    const row = ((props.rows as SchemaObject).items as SchemaObject).properties ?? {}
+    expect((props.meta as Schema).properties?.image).toEqual(id)
+    const row = ((props.rows as Schema).items as Schema).properties ?? {}
     expect(row.tags).toEqual({ type: ['array', 'null'], items: { type: 'string' } })
-    const link = (row.link as SchemaObject).oneOf as SchemaObject[]
+    const link = (row.link as Schema).oneOf as Schema[]
     expect(link.map((b) => [b.properties?.relationTo, b.properties?.value])).toEqual([
       [{ const: 'media' }, { type: 'string' }],
       [{ const: 'tags' }, { type: 'string' }],
     ])
-    const quote = ((props.content as SchemaObject).items as SchemaObject).oneOf?.[0] as SchemaObject
+    const quote = ((props.content as Schema).items as Schema).oneOf?.[0] as Schema
     expect(quote.properties?.source).toEqual(id)
     expect(update.properties?.meta).toEqual(props.meta)
 
-    const readMeta = read.properties?.meta as SchemaObject
-    const readImage = readMeta.properties?.image as SchemaObject
+    const readMeta = read.properties?.meta as Schema
+    const readImage = readMeta.properties?.image as Schema
     expect(readImage.oneOf?.[1]).toEqual({ $ref: '#/components/schemas/Media' })
   })
 
@@ -1247,7 +1253,7 @@ describe('spec/params', () => {
   it('uses `ctx.t` for descriptions so a custom translation flows through', async () => {
     const { buildSelectSchema } = await import('@/server/spec/params.js')
     const custom = { ...ctx, i18n: { ...ctx.i18n, t: (() => 'ÜBERSETZT') as unknown as I18n['t'] } }
-    const schema = buildSelectSchema({ fields: [{ name: 'title', type: 'text' }] as Field[], ctx: custom })
+    const schema = buildSelectSchema({ fields: [{ name: 'title', type: 'text' }] as Field[], ctx: custom }) as Schema
     expect(schema.description).toBe('ÜBERSETZT')
   })
 
@@ -1314,7 +1320,7 @@ describe('spec/downconvert', () => {
       }
       const out = toOpenApi30(doc)
       expect(out.openapi).toBe('3.0.4')
-      const schemaA = out.components!.schemas!.A as { properties: Record<string, SchemaObject & Loose> }
+      const schemaA = out.components!.schemas!.A as { properties: Record<string, Schema & Loose> }
       const props = schemaA.properties
       expect(props.title).toEqual({ type: 'string', nullable: true })
       expect(props.count).toEqual({ type: 'integer' })
@@ -1344,14 +1350,14 @@ describe('spec/downconvert', () => {
       const out = toOpenApi30(doc)
       const a = out.components!.schemas!.A as {
         $schema?: unknown
-        properties: Record<string, SchemaObject & Loose>
+        properties: Record<string, Schema & Loose>
       }
       expect(a.$schema).toBeUndefined()
       expect(a.properties.file).toEqual({ type: 'string', format: 'binary' })
       expect(a.properties.data).toEqual({ type: 'string', format: 'byte' })
-      expect(a.properties.status.example).toBe('active')
-      expect(a.properties.status['x-examples']).toEqual(['active', 'archived'])
-      expect(a.properties.status.contentMediaType).toBeUndefined()
+      expect(a.properties.status!.example).toBe('active')
+      expect(a.properties.status!['x-examples']).toEqual(['active', 'archived'])
+      expect(a.properties.status!.contentMediaType).toBeUndefined()
     })
 
     it('leaves a 3.0 examples map untouched when it is already an object', async () => {
@@ -1399,7 +1405,7 @@ describe('spec/downconvert', () => {
       }
       const out = toOpenApi30(doc)
       expect(out.components!.schemas!.A).not.toHaveProperty('required')
-      expect((out.components!.schemas!.B as SchemaObject).required).toEqual(['x'])
+      expect((out.components!.schemas!.B as Schema).required).toEqual(['x'])
     })
 
     it('turns several types into `anyOf` and keeps `null` in each branch', async () => {
