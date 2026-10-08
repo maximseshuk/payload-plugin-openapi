@@ -15,6 +15,8 @@ const SYSTEM_COLLECTIONS = new Set([
   'payload-preferences',
   'payload-migrations',
   'payload-folders',
+  'payload-kv',
+  'payload-query-presets',
 ])
 
 const HTTP_METHODS: HttpMethod[] = ['get', 'post', 'patch', 'put', 'delete']

@@ -128,6 +128,12 @@ describe('spec/filters', () => {
       expect(shouldIncludeCollection(hiddenFromAnon, f({ includeHidden: true }))).toBe(true)
     })
 
+    it('hides the `payload-kv` and `payload-query-presets` collections unless `includeSystem` is set', () => {
+      expect(shouldIncludeCollection(coll('payload-kv'), f())).toBe(false)
+      expect(shouldIncludeCollection(coll('payload-query-presets'), f())).toBe(false)
+      expect(shouldIncludeCollection(coll('payload-kv'), f({ includeSystem: true }))).toBe(true)
+    })
+
     it('keeps a collection whose `admin.hidden` function throws', () => {
       const thrower = coll('drafts', {
         admin: {
