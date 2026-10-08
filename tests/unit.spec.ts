@@ -1032,7 +1032,14 @@ describe('ui/html', () => {
     const { swaggerUi } = await import('../src/ui/swagger.js')
     const html = await renderHtml(swaggerUi({ configuration: { x: '</script>' } }))
     expect(html).not.toContain('</script>"')
-    expect(html).toContain('\\u003c/script>')
+    expect(html).toContain('\\u003c/script\\u003e')
+  })
+
+  it('escapes `specEndpoint` so it cannot break out of the script', async () => {
+    const { scalar } = await import('../src/ui/scalar.js')
+    const html = await renderHtml(scalar({ specEndpoint: '/spec.json</script><script>alert(1)</script>' }))
+    expect(html).not.toContain('<script>alert(1)')
+    expect(html).toContain('/spec.json\\u003c/script\\u003e')
   })
 
   it('forwards the docs page `?lang=` onto the spec URL it loads', async () => {
