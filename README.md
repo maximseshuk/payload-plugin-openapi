@@ -46,8 +46,8 @@ v1 is in beta under the `beta` npm tag, and Payload 4 is published under `canary
 Add the plugin to your Payload config, plus a docs UI renderer:
 
 ```typescript
-import { buildConfig } from 'payload'
 import { openapi, scalar } from '@seshuk/payload-plugin-openapi'
+import { buildConfig } from 'payload'
 
 export default buildConfig({
   plugins: [
