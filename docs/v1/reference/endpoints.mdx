@@ -1,0 +1,135 @@
+---
+title: 'Endpoints'
+description: 'Every Payload REST endpoint the plugin documents, when it appears, and the filter that controls it.'
+---
+
+The plugin documents the REST endpoints that Payload 4 mounts for your config. An endpoint is in the spec only when Payload serves it. Paths below use the default API route `/api`. `<slug>` is a collection slug and `<global>` is a global slug.
+
+## Collections
+
+| Endpoint                      | Method              | When                                                 | Filter                             |
+| ----------------------------- | ------------------- | ---------------------------------------------------- | ---------------------------------- |
+| `/api/<slug>`                 | GET, POST           | Always                                               | —                                  |
+| `/api/<slug>`                 | PATCH, DELETE       | `disableBulkEdit` is not set                         | —                                  |
+| `/api/<slug>/count`           | GET                 | Always                                               | —                                  |
+| `/api/<slug>/{id}`            | GET, PATCH, DELETE  | Always                                               | —                                  |
+| `/api/<slug>/validate`        | POST                | Always                                               | —                                  |
+| `/api/<slug>/{id}/validate`   | POST                | Always                                               | —                                  |
+| `/api/<slug>/{id}/duplicate`  | POST                | `disableDuplicate` is not set (auth: off by default) | —                                  |
+| `/api/<slug>/file/{filename}` | GET                 | Upload collection                                    | —                                  |
+| `/api/<slug>/versions`        | GET                 | `versions` is not `false`                            | `includeVersions`                  |
+| `/api/<slug>/versions/{id}`   | GET, POST (restore) | `versions` is not `false`                            | `includeVersions`                  |
+| `/api/<slug>/access`          | POST                | Always                                               | `includeAuth` + `includeAdminAuth` |
+| `/api/<slug>/access/{id}`     | POST                | Always                                               | `includeAuth` + `includeAdminAuth` |
+
+## Auth collections
+
+| Endpoint                          | Method | When                            | Filter                             |
+| --------------------------------- | ------ | ------------------------------- | ---------------------------------- |
+| `/api/<slug>/me`                  | GET    | Always                          | `includeAuth`                      |
+| `/api/<slug>/logout`              | POST   | Always                          | `includeAuth`                      |
+| `/api/<slug>/refresh-token`       | POST   | Always                          | `includeAuth`                      |
+| `/api/<slug>/login`               | POST   | Local strategy on               | `includeAuth`                      |
+| `/api/<slug>/forgot-password`     | POST   | Local strategy on               | `includeAuth`                      |
+| `/api/<slug>/reset-password`      | POST   | Local strategy on               | `includeAuth`                      |
+| `/api/<slug>/unlock`              | POST   | Local strategy on               | `includeAuth`                      |
+| `/api/<slug>/verify/{id}`         | POST   | Local strategy on, `verify` set | `includeAuth`                      |
+| `/api/<slug>/{id}/api-key/reveal` | POST   | `useAPIKey: { reveal: true }`   | `includeAuth`                      |
+| `/api/<slug>/init`                | GET    | Always                          | `includeAuth` + `includeAdminAuth` |
+| `/api/<slug>/first-register`      | POST   | Local strategy on               | `includeAuth` + `includeAdminAuth` |
+
+"Local strategy on" means `auth.disableLocalStrategy` is not set. Login, forgot-password and unlock take `email` by default. With `loginWithUsername` they take `username`, or either one when `allowEmailLogin` is on.
+
+## Globals
+
+| Endpoint                              | Method              | When                      | Filter                             |
+| ------------------------------------- | ------------------- | ------------------------- | ---------------------------------- |
+| `/api/globals/<global>`               | GET, POST           | Always                    | —                                  |
+| `/api/globals/<global>/validate`      | POST                | Always                    | —                                  |
+| `/api/globals/<global>/versions`      | GET                 | `versions` is not `false` | `includeVersions`                  |
+| `/api/globals/<global>/versions/{id}` | GET, POST (restore) | `versions` is not `false` | `includeVersions`                  |
+| `/api/globals/<global>/access`        | POST                | Always                    | `includeAuth` + `includeAdminAuth` |
+
+## System
+
+| Endpoint                              | Method      | When                              | Filter                             |
+| ------------------------------------- | ----------- | --------------------------------- | ---------------------------------- |
+| `/api/access`                         | GET         | Always                            | `includeAuth` + `includeAdminAuth` |
+| `/api/upload-instructions`            | POST        | At least one upload collection    | —                                  |
+| `/api/upload-instructions/{uploadId}` | PUT, DELETE | At least one upload collection    | —                                  |
+| `/api/payload-jobs/run`               | GET         | Tasks or workflows are configured | `includeJobs`                      |
+| `/api/payload-jobs/handle-schedules`  | GET         | Tasks or workflows are configured | `includeJobs`                      |
+
+## Request and response bodies
+
+Each collection gets a read schema (`Posts`), a create body (`PostsCreate`) and an update body (`PostsUpdate`). A global gets a read schema (`GlobalSettings`) and an update body (`GlobalSettingsUpdate`).
+
+The read schema shows a relationship or upload as an ID or the populated document. Create and update bodies take only the ID, at any depth: top level, groups, tabs, arrays and blocks. A polymorphic relationship takes `{ relationTo, value }`, and `hasMany` takes an array of them. The bodies follow the input types Payload generates, so they leave out join and virtual fields and `createdAt`/`updatedAt`, and a field with a `defaultValue` is optional. A field whose `access.create` or `access.update` is a function with no parameters that returns `false`, like `() => false`, is left out of that body, because Payload ignores it over REST. This covers the `createdBy` and `updatedBy` fields Payload adds. In an update body every field is optional.
+
+The responses follow what Payload sends. Create returns `201` with `{ doc, message }`. Update, delete and duplicate by ID return `{ doc, message }`, and bulk update and delete return `{ docs, errors, message }`. The global update returns `{ message, result }`. A restored version is the document plus `message` for a collection, and `{ doc, message }` for a global.
+
+## Write params
+
+Create, update, delete and duplicate list the query params Payload reads for them: `depth`, `locale`, `fallback-locale`, `select`, `populate`, `draft` and `trash`. Bulk update and delete also take `where`. Bulk update also takes `limit` and `sort`, which pick how many matching documents it updates and in what order. These params depend on the config:
+
+| Param                 | Operations                                          | When                                                   |
+| --------------------- | --------------------------------------------------- | ------------------------------------------------------ |
+| `autosave`            | Create, update by ID, global update                 | Drafts with `autosave` on                              |
+| `publishAllLocales`   | Create, update, update by ID, global update         | Drafts keep their status per locale (`localizeStatus`) |
+| `unpublishAllLocales` | Update, update by ID, global update                 | Drafts keep their status per locale (`localizeStatus`) |
+| `overrideLock`        | Update and delete, bulk or by ID (collections only) | `lockDocuments` is not `false`                         |
+| `selectedLocales[]`   | Duplicate                                           | Localization is on                                     |
+
+Payload sets `localizeStatus` itself when localization is on and the collection or global has localized fields. Send `selectedLocales[]` once per locale, for example `?selectedLocales[]=en&selectedLocales[]=de`.
+
+## Validate
+
+`POST /api/<slug>/validate` checks data for a new document. The body is required and uses the create body (`PostsCreate`). `POST /api/<slug>/{id}/validate` checks changes to a saved document. Its body is optional and uses the update body (`PostsUpdate`). Payload merges it over the newest draft or the saved document. `POST /api/globals/<global>/validate` does the same for a global. Nothing is saved.
+
+The response is `200` with `{ valid, errors }`, also when a field is not valid. Each error has `message` and `path`, and can have `label`, `locale` and `tableName`. Payload returns `400` for a bad body or locale, `403` without access and `404` when the document does not exist.
+
+The only query param is `locale`, and it is listed only when localization is on. It takes one or more locales or `all`. Send it once per locale, for example `?locale=en&locale=de`. The [security marking](/v1/configuration/security-marking) follows `access.validate`, which is `access.update` unless you set it.
+
+## Document access
+
+`POST /api/<slug>/access/{id}` returns what the current user may do with one document: `create`, `read`, `update`, `delete`, `validate`, plus `readVersions` when the collection has versions and `unlock` when it sets `auth.maxLoginAttempts`. Each one is `true` or `{ permission, where }`. `fields` is `true` or the permissions per field. Without `{id}`, Payload checks the collection, not a saved document. `POST /api/globals/<global>/access` returns `read`, `update`, `validate` and `readVersions` for a global. The body is optional: send document data to check access against it instead of the saved document. Payload leaves out an operation the user may not do.
+
+## Your own endpoints
+
+Your own endpoints with `custom.openapi` are added too. See [Custom endpoints](/v1/guides/custom-endpoints).
+
+To drop a single endpoint, use `excludeOperations` in [Filters](/v1/configuration/filters). It works on every endpoint on this page, your own endpoints included.
+
+## New in Payload 4
+
+- **Upload instructions.** A client can ask Payload where to send the file bytes before it saves the document. Call `POST /api/upload-instructions` with `collectionSlug`, `filename`, `filesize` and `mimeType`. The response tells you where to send the bytes (`type: 'http'`) or which client handler to run (`type: 'dispatch'`). It also returns a `file` object. Send that object as the `file` field of the create or update request. For staged uploads, send the bytes with `PUT /api/upload-instructions/{uploadId}`. Remove them with `DELETE`. You must be logged in and have create or update access.
+- **Versions are on by default.** Collections and globals have versions unless you set `versions: false`. The version endpoints appear in the spec for each of them.
+- **Folders and tags.** See [Folders and tags](#folders-and-tags).
+
+## Folders and tags
+
+In Payload 4, folders and tags are ordinary collections with `folders`, `tags` or `hierarchy` set. There is no `payload-folders` system collection and no extra REST endpoint. The plugin documents a folder or tag collection like any other collection, with the standard [collection endpoints](#collections), and `includeSystem` does not hide it.
+
+The spec also covers the fields that Payload adds:
+
+| Field                                  | On                            | In the spec                                                                        |
+| -------------------------------------- | ----------------------------- | ---------------------------------------------------------------------------------- |
+| `_h_<slug>`                            | The folder or tag collection  | The parent, as a relationship. You can filter on it in `where`.                    |
+| `_h_slugPath`, `_h_titlePath`          | The folder or tag collection  | Read-only. Not in create or update bodies, and not in `where`, which rejects them. |
+| `hierarchyType`                        | With `collectionSpecific`     | The collections a folder may hold, as an enum.                                     |
+| The `joinField`                        | When `joinField` is set       | A join that lists child folders and related documents as `{ relationTo, value }`.  |
+| `createFolderField` / `createTagField` | Collections that use a folder | A relationship to the folder or tag collection.                                    |
+
+Payload fills `_h_slugPath` and `_h_titlePath` only when you ask for them. The `GET /api/<slug>` and `GET /api/<slug>/{id}` operations of a folder or tag collection list a `computeHierarchyPaths` query param for this. Selecting either field with `select` computes them too. Both fields work in `sort`. If you rename them with `slugPathFieldName` or `titlePathFieldName`, the spec uses your names.
+
+## Not documented
+
+These endpoints exist but are not in the spec. They serve the admin panel or are internal.
+
+| Endpoint                         | Reason                                    |
+| -------------------------------- | ----------------------------------------- |
+| `GET /api/<slug>/paste-url/{id}` | Admin panel helper for `pasteURL` uploads |
+| `POST /api/reorder`              | Admin panel drag-and-drop for `orderable` |
+| `GET /api/og`                    | Admin panel Open Graph image (Next.js)    |
+| `POST /api/graphql`              | GraphQL, not REST                         |
+| `/api/payload-preferences/{key}` | Admin panel preferences                   |

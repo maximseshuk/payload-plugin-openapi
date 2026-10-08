@@ -1,0 +1,100 @@
+---
+title: 'Internationalization'
+sidebarTitle: 'i18n'
+description: 'UI translations for 44 locales, per-request language resolution, ?lang= on the spec endpoint, and language switchers in the docs UI.'
+---
+
+The plugin ships UI translations for 44 locales, automatically merged into your Payload i18n configuration under the `@seshuk/payload-plugin-openapi` namespace. Only the languages present in your project's `i18n.supportedLanguages` are merged in — the plugin never adds languages your project doesn't declare.
+
+## How language resolution works
+
+Entity titles and descriptions in the generated spec are resolved through the active request locale, the same way Payload resolves its own labels. The spec endpoint also honors an explicit `?lang=` query param:
+
+```bash
+curl https://example.com/api/openapi.json?lang=ru
+```
+
+returns the document with Russian descriptions. Without `?lang=`, the request language (or the i18n fallback) applies.
+
+## Language switcher in Scalar
+
+Scalar supports multiple spec sources natively. Point `configuration.sources` at the same runtime endpoint with different `?lang=` values — nothing is pre-generated, each language resolves on request:
+
+```ts payload.config.ts
+import { openapi, scalar } from '@seshuk/payload-plugin-openapi'
+
+plugins: [
+  openapi({ info: { title: 'My API', version: '1.0.0' } }),
+  scalar({
+    configuration: {
+      sources: [
+        { title: 'English', url: '/api/openapi.json?lang=en', default: true },
+        { title: 'Русский', url: '/api/openapi.json?lang=ru' },
+      ],
+    },
+  }),
+]
+```
+
+<Note>
+  When `sources` is set, the renderer's own `specURL` is ignored. The first entry is the default unless another entry
+  sets `default: true`.
+</Note>
+
+The same switcher works against static files instead of the runtime endpoint — generate one file per language with [`--lang all`](/v1/cli/generate) and point the `sources` at `/openapi.en.json`, `/openapi.ru.json`, and so on. See [Serve a pre-generated spec](/v1/guides/static-spec).
+
+## Swagger UI: one instance per language
+
+Swagger UI has no built-in switcher. Mount one instance per language, each on its own `path`:
+
+```ts payload.config.ts
+import { openapi, swaggerUi } from '@seshuk/payload-plugin-openapi'
+
+plugins: [
+  openapi({ info: { title: 'My API', version: '1.0.0' } }),
+  swaggerUi({ path: '/docs/en', specURL: '/api/openapi.json?lang=en' }),
+  swaggerUi({ path: '/docs/ru', specURL: '/api/openapi.json?lang=ru' }),
+]
+```
+
+## Localizable field metadata
+
+`description`, `title`, and `summary` in `custom.openapi` metadata are localizable. Give them a function or a locale-keyed object and they resolve against the request language, the same way Payload labels do:
+
+```ts
+import type { Field } from 'payload'
+
+const slug: Field = {
+  name: 'slug',
+  type: 'text',
+  custom: {
+    openapi: {
+      // a function…
+      description: ({ t }) => t('fields:slugHelp'),
+      // …or a locale map:
+      // description: { en: 'URL-safe identifier', ru: 'URL-совместимый идентификатор' },
+    },
+  },
+}
+```
+
+See [Field metadata](/v1/guides/field-metadata) for the full merge behavior.
+
+## Generating translated files
+
+The [`openapi:generate` CLI](/v1/cli/generate) takes `--lang` for a single locale, or `--lang all` to write one file per supported language (`openapi.<lang>.json`):
+
+```bash
+payload openapi:generate --lang all
+```
+
+## Supported locales
+
+`ar`, `az`, `bg`, `bn` (BD/IN), `ca`, `cs`, `da`, `de`, `en`, `es`, `et`, `fa`, `fr`, `he`, `hr`, `hu`, `hy`, `id`, `is`, `it`, `ja`, `ko`, `lt`, `lv`, `my`, `nb`, `nl`, `pl`, `pt`, `ro`, `rs` (Cyrillic/Latin), `ru`, `sk`, `sl`, `sv`, `ta`, `th`, `tr`, `uk`, `vi`, `zh`, `zhTw`
+
+## See also
+
+- [Generate command](/v1/cli/generate) — `--lang` and `--lang all`
+- [Serve a pre-generated spec](/v1/guides/static-spec) — static multi-language files
+- [Field metadata](/v1/guides/field-metadata) — localizable `custom.openapi` strings
+- [Docs UI](/v1/configuration/docs-ui) — Scalar and Swagger UI options

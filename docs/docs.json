@@ -4,9 +4,9 @@
   "name": "OpenAPI Plugin for Payload CMS",
   "description": "OpenAPI 3.0/3.1/3.2 specs generated from your Payload CMS config, with Scalar or Swagger UI",
   "colors": {
-    "primary": "#10b981",
-    "light": "#34d399",
-    "dark": "#059669"
+    "primary": "#0e9f6e",
+    "light": "#26eca9",
+    "dark": "#0a7551"
   },
   "favicon": "/favicon.svg",
   "logo": {
@@ -38,47 +38,103 @@
     "display": "header"
   },
   "navigation": {
-    "tabs": [
+    "versions": [
       {
-        "tab": "Documentation",
-        "groups": [
+        "version": "v0",
+        "default": true,
+        "tabs": [
           {
-            "group": "Documentation",
-            "pages": ["introduction", "quick-start", "changelog"]
-          },
-          {
-            "group": "Configuration",
-            "pages": [
-              "configuration/overview",
-              "configuration/metadata",
-              "configuration/openapi-version",
-              "configuration/filters",
-              "configuration/security-marking",
-              "configuration/interactive-auth",
-              "configuration/caching",
-              "configuration/extensions",
-              "configuration/docs-ui"
+            "tab": "Documentation",
+            "groups": [
+              {
+                "group": "Documentation",
+                "pages": ["introduction", "quick-start", "changelog"]
+              },
+              {
+                "group": "Configuration",
+                "pages": [
+                  "configuration/overview",
+                  "configuration/metadata",
+                  "configuration/openapi-version",
+                  "configuration/filters",
+                  "configuration/security-marking",
+                  "configuration/interactive-auth",
+                  "configuration/caching",
+                  "configuration/extensions",
+                  "configuration/docs-ui"
+                ]
+              },
+              {
+                "group": "CLI",
+                "pages": ["cli/generate"]
+              },
+              {
+                "group": "Guides",
+                "pages": [
+                  "guides/custom-endpoints",
+                  "guides/field-metadata",
+                  "guides/plugin-authors",
+                  "guides/static-spec",
+                  "guides/programmatic-use",
+                  "guides/i18n",
+                  "guides/examples"
+                ]
+              },
+              {
+                "group": "Reference",
+                "pages": ["reference/exports"]
+              }
             ]
-          },
+          }
+        ]
+      },
+      {
+        "version": "v1",
+        "tag": "Beta",
+        "tabs": [
           {
-            "group": "CLI",
-            "pages": ["cli/generate"]
-          },
-          {
-            "group": "Guides",
-            "pages": [
-              "guides/custom-endpoints",
-              "guides/field-metadata",
-              "guides/plugin-authors",
-              "guides/static-spec",
-              "guides/programmatic-use",
-              "guides/i18n",
-              "guides/examples"
+            "tab": "Documentation",
+            "groups": [
+              {
+                "group": "Documentation",
+                "pages": ["v1/introduction", "v1/quick-start", "v1/upgrade-guide", "v1/changelog"]
+              },
+              {
+                "group": "Configuration",
+                "pages": [
+                  "v1/configuration/overview",
+                  "v1/configuration/info",
+                  "v1/configuration/openapi-version",
+                  "v1/configuration/filters",
+                  "v1/configuration/security-marking",
+                  "v1/configuration/interactive-auth",
+                  "v1/configuration/caching",
+                  "v1/configuration/extensions",
+                  "v1/configuration/docs-ui",
+                  "v1/configuration/telemetry"
+                ]
+              },
+              {
+                "group": "CLI",
+                "pages": ["v1/cli/generate"]
+              },
+              {
+                "group": "Guides",
+                "pages": [
+                  "v1/guides/custom-endpoints",
+                  "v1/guides/field-metadata",
+                  "v1/guides/plugin-authors",
+                  "v1/guides/static-spec",
+                  "v1/guides/programmatic-use",
+                  "v1/guides/i18n",
+                  "v1/guides/examples"
+                ]
+              },
+              {
+                "group": "Reference",
+                "pages": ["v1/reference/endpoints", "v1/reference/exports"]
+              }
             ]
-          },
-          {
-            "group": "Reference",
-            "pages": ["reference/exports"]
           }
         ]
       }

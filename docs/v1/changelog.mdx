@@ -1,0 +1,88 @@
+---
+title: 'Changelog'
+description: 'Release history for the OpenAPI plugin for Payload CMS.'
+---
+
+Notable changes per release. For the full commit-level history, see the [GitHub releases](https://github.com/maximseshuk/payload-plugin-openapi/releases).
+
+<Update label="v1.0.0-beta.1" description="October 3, 2026">
+
+**Breaking changes**
+
+- Payload 4.0.0-canary.38, Next.js 16.4+ and Node.js 24.15+ are required. Payload 3 users stay on `0.x`.
+- `openapi:generate` is now a Payload 4 CLI command. The flags are the same.
+- The access endpoint is now `GET /api/access`, not `GET /api/<slug>/access`. This is the path Payload serves. It still needs `includeAdminAuth`.
+- Top-level `config.endpoints` are now documented under the API route (`/api/health`, not `/health`). This is the path Payload serves.
+- Payload 4 turns versions on by default, so version endpoints now appear for every collection and global without `versions: false`.
+- The internal `payload-jobs-stats` global is hidden unless `includeSystem` is on.
+- Renamed options: `metadata` is now `info`, `specEndpoint` is now `path`, `interactiveAuth.endpoint` is now `interactiveAuth.path`, and the docs UI `specEndpoint` is now `specURL`. The plugin throws at boot on an old name. See [Upgrade guide](/v1/upgrade-guide).
+- `custom.openapi.security` on a collection or global takes `'public'` or `'secured'`, not `true` or `false`. The plugin throws at boot on a boolean.
+- `servers` no longer comes from the request `Host` header, because a client can fake it. It comes from `servers`, `serverURL`, or a host listed in [`trustedHosts`](/v1/configuration/info#trusted-hosts).
+- An extension `transform` that throws now fails the spec request instead of being skipped.
+- An extension `transform` gets one object, `({ doc, payload, options, ... })`, not `(doc, ctx)`. The plugin throws at boot on a `transform` with two parameters.
+- `securityWhen` is replaced by `security`. It returns `'public'`, `'secured'`, a security requirement array, or `undefined`, and it gets the `detected` marking.
+- `filters.excludeWhen` is removed. Put the function in `filters.excludeOperations` instead. A function drops an operation only when it returns `true`, and it can be `async`.
+- `excludeOperations` and `security` now also apply to custom, jobs and system endpoints. `OperationContext.kind` can be `'custom'`, `'jobs'` or `'system'`, and `slug` is then not set. A rule without `kind`, such as `{ method: 'delete' }`, now also drops matching custom and system operations.
+
+**New features**
+
+- New [endpoints reference](/v1/reference/endpoints) page.
+- Payload 4 upload instructions: `POST /api/upload-instructions` and `PUT`/`DELETE /api/upload-instructions/{uploadId}`, when you have an upload collection.
+- `GET /api/<slug>/file/{filename}` for upload collections.
+- `POST /api/<slug>/{id}/api-key/reveal` when `useAPIKey: { reveal: true }`.
+- `POST /api/<slug>/access/{id}` (and without `{id}`) and `POST /api/globals/<global>/access` return the current user's permissions for one document. They appear with `includeAdminAuth`, like `GET /api/access`. The response lists `validate` next to `create`, `read`, `update` and `delete`.
+- `POST /api/<slug>/validate`, `POST /api/<slug>/{id}/validate` and `POST /api/globals/<global>/validate` check data without saving it and return `{ valid, errors }`. See [Validate](/v1/reference/endpoints#validate). They are marked from `access.validate`, which follows `update`. `custom.openapi.security` takes a `validate` key, which falls back to `update`.
+- `access` on `openapi()`, `scalar()` and `swaggerUi()` limits who can read the spec and the docs page. See [Limiting who can read the spec](/v1/configuration/overview#limiting-who-can-read-the-spec).
+- `interactiveAuth.collection` picks the auth collection the docs login uses.
+- The docs page title is `info.title`.
+- `info` takes the full OpenAPI Info Object (`summary`, `termsOfService`, `contact`, `license`, `x-*`), and `info.description` can be localized. See [Info and servers](/v1/configuration/info).
+- `servers` sets the spec base URLs, as a list or a function of the request.
+- Extension `transform` hooks can be `async` and get `payload` and the resolved `options`.
+- `custom.openapi` on collections, globals and fields is typed.
+- The docs UI loads pinned Scalar and Swagger UI versions with Subresource Integrity. See [Pinned versions and SRI](/v1/configuration/docs-ui#pinned-versions-and-sri).
+- `openapi()`, `scalar()` and `swaggerUi()` are built with Payload's `definePlugin`, so each one carries a `slug` and its `options`. See [Plugin slugs](/v1/reference/exports#plugin-slugs).
+- [Folders and tags](/v1/reference/endpoints#folders-and-tags) from Payload 4. Folder and tag collections are documented like other collections. Their read operations list the `computeHierarchyPaths` query param, and `_h_slugPath` and `_h_titlePath` are read-only and kept out of bodies and `where`.
+- Anonymous, opt-out usage [telemetry](/v1/configuration/telemetry): plugin, Payload and Node versions and which features are on. Turn it off with `telemetry: false`, `OPENAPI_TELEMETRY_DISABLED=1` or `DO_NOT_TRACK=1`.
+
+**Fixes**
+
+- With `disableLocalStrategy`, `me`, `logout`, `refresh-token` and `init` stay in the spec. Only login, password, registration, unlock and verify endpoints are removed.
+- `POST /api/<slug>/unlock` is documented for every auth collection, as Payload mounts it. Before, it needed `maxLoginAttempts`.
+- Login, forgot-password and unlock bodies now follow `loginWithUsername` as Payload does: `email` by default, `username` when email login is off, and `email` or `username` when `allowEmailLogin` is on. Before, forgot-password and unlock always asked for `email`, and `allowEmailLogin` was ignored.
+- After you log in on the docs page, requests sent from it include your token: every secured operation now lists the `PayloadLogin` scheme too. With `serve: false` the spec no longer lists `PayloadLogin` with a token URL that does not exist.
+- The docs UI loads the spec from the `openapi()` route, including a custom `path`. Before, it always used `/api/openapi.json`.
+- Version reads are marked from `readVersions` and version restore from `update`. The jobs endpoints follow `jobs.access.run`, and the staged upload `PUT` and `DELETE` are secured. Before, all of them were marked public.
+- `expires_in` from the interactive auth endpoint is the token lifetime in seconds, not the expiry timestamp.
+- OpenAPI 3.0 output is now valid when a schema has an empty `required` list (for example upload `variants`) or a field allows several types, such as a `json` field, and 3.0/3.1 output no longer keeps the 3.2 tag fields `summary`, `kind` and `parent`.
+- Create, update, delete and duplicate operations now list the query params Payload reads for them: `depth`, `locale`, `fallback-locale`, `select`, `populate`, `draft` and `trash`. The global update lists them too. Bulk update and delete keep `where`, and bulk update also lists `limit` and `sort`.
+- Write operations also list `autosave`, `publishAllLocales`, `unpublishAllLocales`, `overrideLock` and `selectedLocales[]` where Payload reads them. `autosave` appears when autosave is on, the two locale params when drafts keep their status per locale, `overrideLock` on collection update and delete unless `lockDocuments` is `false`, and `selectedLocales[]` on duplicate when localization is on.
+- A polymorphic relationship (`relationTo` with several collections) is written as `{ relationTo, value }` in create and update bodies. Before, the spec asked for a bare ID, which Payload rejects.
+- Relationships and uploads inside groups, named tabs, arrays and blocks are written as IDs in create and update bodies, like top-level ones. Before, they showed the populated document. The bodies now follow the input types Payload generates: join and virtual fields and `createdAt`/`updatedAt` are left out, a field with a `defaultValue` is optional, and an optional relationship accepts `null`. Fields that can never be written over REST, such as Payload's `createdBy` and `updatedBy`, are left out too.
+- The internal `payload-kv`, `payload-llm-instructions` and `payload-query-presets` collections are hidden unless `includeSystem` is on.
+- A join over several collections lists `relationTo` as required in its items. Before, it listed `collectionSlug`, which the items do not have. This affects every folder and tag join.
+- `includeSystem` no longer covers `payload-folders`. Payload 4 does not create that collection.
+- The global update response is `{ message, result }` and a restored global version is `{ doc, message }`, as Payload sends them. Before, both showed the bare document. Collection create is documented with status `201`, not `200`.
+
+</Update>
+
+<Update label="v0.2.0" description="July 13, 2026">
+
+**New features**
+
+- Per-operation [security marking](/v1/configuration/security-marking) derived from your access functions: each operation is probed as an anonymous request and marked public or secured accordingly.
+- Overrides for the detected marking: `custom.openapi.security` per collection or global, and the `securityWhen` option across the whole document.
+
+</Update>
+
+<Update label="v0.1.0" description="June 14, 2026">
+
+Initial release.
+
+- OpenAPI 3.0/3.1/3.2 document built from the sanitized Payload config — collections, globals, auth, versions, and jobs.
+- [Scalar and Swagger UI](/v1/configuration/docs-ui) renderers.
+- [Custom endpoint](/v1/guides/custom-endpoints) and [field metadata](/v1/guides/field-metadata) via `custom.openapi`.
+- [Filters](/v1/configuration/filters), [interactive auth](/v1/configuration/interactive-auth), [extensions](/v1/configuration/extensions), and [caching](/v1/configuration/caching).
+- [`openapi:generate` CLI](/v1/cli/generate) for writing the spec to a file.
+- UI translations for 44 locales.
+
+</Update>

@@ -1,0 +1,84 @@
+---
+title: 'Security marking'
+description: 'How each operation in the spec is marked public or secured, and how to override the automatic detection.'
+---
+
+Every operation in the generated document is marked either **public** or **secured**. A secured operation references the `PayloadToken` security scheme, so the docs UI shows a padlock and tells the reader a bearer token is required.
+
+The marking is a **static documentation hint**, not a live access check. The plugin never evaluates per-user permissions and never gates any request. It only records, in the spec, which endpoints an anonymous caller can reach — your Payload access control keeps enforcing the real rules at runtime.
+
+## How detection works
+
+By default the plugin probes each entity's Payload access functions as an **anonymous request** (`user: null`). An operation is marked public only if its access function settles on `true`. The probe is deliberately conservative:
+
+- An `async` access function is awaited — `async () => true` is correctly detected as public.
+- A function that returns a `Where` query (partial access), throws, or times out is marked secured.
+- A function that reaches into the database (`req.payload.find(...)`) is marked secured — the probe never runs live queries, so DB-driven access always errs on the side of a padlock.
+
+## Operation groups
+
+Payload access control is defined per operation, so the marking follows the same grouping. One access function decides the marking for every endpoint in its group:
+
+| Access function | Endpoints covered                          |
+| --------------- | ------------------------------------------ |
+| `read`          | list, find by ID, count                    |
+| `create`        | create, duplicate                          |
+| `update`        | update by ID, bulk update, restore version |
+| `delete`        | delete by ID, bulk delete                  |
+| `readVersions`  | list versions, find version by ID          |
+| `validate`      | validate, validate by ID                   |
+
+In Payload 4, `readVersions` follows `read` unless you set it, so version reads get the same marking as reads. In the same way, `validate` follows `update`.
+
+The jobs endpoints follow `jobs.access.run`, which needs a logged-in user by default. The upload instructions endpoints are always secured. Custom endpoints keep the `security` you set in their `custom.openapi`.
+
+## Overriding the detection
+
+When the probe guesses wrong — a `Where`-based rule that is effectively public, or a DB lookup that always allows anonymous reads — override it. Two levels, in precedence order.
+
+### Per entity: `custom.openapi.security`
+
+Set `security` under `custom.openapi` on a collection or global. `'public'` or `'secured'` covers every operation. An object sets each group. The `read` entry also covers `readVersions`. `validate` follows `update` unless you set it. This override wins over the probe:
+
+```ts collections/Posts.ts
+import type { CollectionConfig } from 'payload'
+
+export const Posts: CollectionConfig = {
+  slug: 'posts',
+  custom: {
+    openapi: {
+      // 'public' or 'secured' for all operations, or per operation:
+      security: { read: 'public', create: 'secured', update: 'secured', delete: 'secured' },
+    },
+  },
+  // ...
+}
+```
+
+The type of `custom.openapi` comes with the plugin, so your editor checks it. `true` and `false` were removed in v1. The plugin throws at boot and names the collection. Use `'public'` for `true` and `'secured'` for `false`.
+
+### Document-wide: `security`
+
+The `security` option runs **last**, after `custom.openapi.security` and the probe. It runs for every operation in the spec: collection, global, auth, version, custom, jobs and system operations. It can return:
+
+- `'public'` to mark the operation public;
+- `'secured'` to mark it secured with `PayloadToken`;
+- an array of OpenAPI security requirements, used as is (for example another scheme you added with [extensions](/v1/configuration/extensions));
+- `undefined` to keep the detected marking.
+
+```ts payload.config.ts
+openapi({
+  info: { title: 'My API', version: '1.0.0' },
+  security: ({ slug, method }) => (slug === 'public-feed' && method === 'get' ? 'public' : undefined),
+})
+```
+
+The function receives `{ method, path, slug, kind, detected }` for each operation. `kind` is `'collection'`, `'global'`, `'custom'`, `'jobs'` or `'system'`, and `slug` is set only for collections and globals. `detected` is the marking the plugin found, `'public'` or `'secured'`. The function can be `async`.
+
+When [interactive auth](/v1/configuration/interactive-auth) is on, every secured operation also lists the `PayloadLogin` scheme, so the docs UI sends the token it got from the login dialog.
+
+<Note>
+
+This is public-access marking only — the plugin never runs per-user access checks. The generated spec matches what the HTTP endpoint enforces at runtime; the marking only documents it.
+
+</Note>

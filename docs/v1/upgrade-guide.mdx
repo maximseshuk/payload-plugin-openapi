@@ -1,0 +1,67 @@
+---
+title: 'Upgrade guide'
+description: 'Upgrade the OpenAPI plugin from 0.x to v1: renamed options, entity security values and changed defaults.'
+---
+
+This guide covers upgrading from 0.x to v1. v1 needs Payload `4.0.0-canary.38` and Next.js 16.4 or later.
+
+## 0.x to v1
+
+Some options were renamed in v1. The plugin throws at boot when it finds an old name, and the error names the new one.
+
+| 0.x                                                                 | v1                                              |
+| ------------------------------------------------------------------- | ----------------------------------------------- |
+| `specEndpoint`                                                      | `path`                                          |
+| `securityWhen`                                                      | `security`, returning `'public'` or `'secured'` |
+| `filters.excludeWhen`                                               | a function in `filters.excludeOperations`       |
+| `interactiveAuth.endpoint`                                          | `interactiveAuth.path`                          |
+| `scalar({ specEndpoint })`                                          | `scalar({ specURL })` (same for `swaggerUi`)    |
+| `metadata`                                                          | `info`                                          |
+| `custom.openapi.security: true` / `false` on a collection or global | `'public'` / `'secured'`                        |
+
+```ts Before (0.x)
+openapi({
+  metadata: { title: 'My API', version: '1.0.0' },
+  specEndpoint: '/spec.json',
+  interactiveAuth: { endpoint: '/login' },
+  securityWhen: ({ slug }) => (slug === 'feed' ? true : undefined),
+  filters: { excludeWhen: ({ path }) => path.includes('/internal/') },
+})
+```
+
+```ts After (v1)
+openapi({
+  info: { title: 'My API', version: '1.0.0' },
+  path: '/spec.json',
+  interactiveAuth: { path: '/login' },
+  security: ({ slug }) => (slug === 'feed' ? 'public' : undefined),
+  filters: { excludeOperations: [({ path }) => path.includes('/internal/')] },
+})
+```
+
+Entity security now uses the same words as the `security` option. A `true` or `false` value throws at boot:
+
+```ts Before (0.x)
+custom: { openapi: { security: { read: true, create: false } } }
+```
+
+```ts After (v1)
+custom: { openapi: { security: { read: 'public', create: 'secured' } } }
+```
+
+An extension `transform` now gets one object with `doc` and the build context. A `transform` with two parameters throws at boot. A `transform` that still treats its argument as the document fails the spec request, because it returns the object, not a document. Check every `transform`:
+
+```ts Before (0.x)
+transform: (doc, ctx) => doc
+```
+
+```ts After (v1)
+transform: ({ doc, payload }) => doc
+```
+
+Some defaults changed too:
+
+- The spec no longer takes `servers` from the request `Host` header, because a client can fake it. It uses `serverURL` from your Payload config, or `servers`. To keep the old behavior for known hosts, list them in [`trustedHosts`](/v1/configuration/info#trusted-hosts).
+- An extension `transform` that throws now fails the spec request. Before, the plugin logged the error and served the document without that transform.
+- The docs UI loads a pinned library version with [Subresource Integrity](/v1/configuration/docs-ui#pinned-versions-and-sri).
+- Upload read schemas show `variants` instead of `sizes`, because Payload renamed image sizes to variants. See the [Payload release notes](https://github.com/payloadcms/payload/releases/tag/v4.0.0-canary.38).

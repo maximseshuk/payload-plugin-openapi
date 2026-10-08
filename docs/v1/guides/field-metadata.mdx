@@ -124,7 +124,7 @@ const phone: Field = {
 
 </CodeGroup>
 
-The function receives `{ t, i18n }` for the active request language. A locale map is any object whose keys are your project's locales and whose values are strings. Resolution happens per request: `GET /api/openapi.json?lang=de` returns the German descriptions. See [i18n](/guides/i18n) for how the language is picked.
+The function receives `{ t, i18n }` for the active request language. A locale map is any object whose keys are your project's locales and whose values are strings. Resolution happens per request: `GET /api/openapi.json?lang=de` returns the German descriptions. See [i18n](/v1/guides/i18n) for how the language is picked.
 
 <Note>
   Only `description`, `title`, and `summary` are treated this way. Other keys keep their values as-is, so an object
@@ -141,24 +141,24 @@ export const Posts: CollectionConfig = {
   custom: {
     openapi: {
       // Reads are public; every write shows a padlock.
-      security: { read: true, create: false, update: false, delete: false },
+      security: { read: 'public', create: 'secured', update: 'secured', delete: 'secured' },
     },
   },
   fields: [/* … */],
 }
 ```
 
-Pass a boolean to mark every operation at once, or a partial `{ read, create, update, delete }` map. See [Security marking](/configuration/security-marking) for how this interacts with the access-function probe and `securityWhen`.
+Pass `'public'` or `'secured'` to mark every operation at once, or a partial `{ read, create, update, delete }` map of the same values. See [Security marking](/v1/configuration/security-marking) for how this interacts with the access-function probe and the `security` option.
 
 The title and description shown on an entity's tag in the docs UI come from Payload's own config: the tag description is the collection's or global's `admin.description`, which is also resolved against the request language.
 
 ## Related
 
 <Columns cols={2}>
-  <Card title="Security marking" href="/configuration/security-marking">
+  <Card title="Security marking" href="/v1/configuration/security-marking">
     How operations get their public/secured marking and every way to override it.
   </Card>
-  <Card title="Custom endpoints" href="/guides/custom-endpoints">
+  <Card title="Custom endpoints" href="/v1/guides/custom-endpoints">
     The same `custom.openapi` convention on endpoints, as a full Operation Object.
   </Card>
 </Columns>
