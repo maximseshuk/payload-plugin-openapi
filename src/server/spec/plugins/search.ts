@@ -12,7 +12,10 @@ export const search: OfficialPlugin = {
   build: ({ collections, ctx, options, t }) => {
     const overrides = options?.searchOverrides as { slug?: string } | undefined
     const searchSlug = overrides?.slug || 'search'
-    const indexed = Array.isArray(options?.collections) ? (options.collections as string[]) : []
+    const visible = new Set(collections.map((c) => c.slug))
+    const indexed = Array.isArray(options?.collections)
+      ? (options.collections as string[]).filter((slug) => visible.has(slug))
+      : []
     return collectionGroups(
       collections.filter((c) => c.slug === searchSlug),
       ctx,

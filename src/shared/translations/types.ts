@@ -120,7 +120,7 @@ export type PluginDefaultTranslationsObject = {
     ecommerceMergeCart: string
     ecommerceCartAccess: string
     ecommerceCartResult: string
-    ecommerceCartNotFound: string
+    ecommerceError404: string
     ecommerceQuantity: string
     ecommerceInitiatePayment: string
     ecommerceConfirmOrder: string
@@ -130,16 +130,22 @@ export type PluginDefaultTranslationsObject = {
     stripeWebhook: string
     stripeWebhookBody: string
     stripeWebhookResult: string
-    stripeWebhookInvalid: string
+    stripeWebhookError400: string
     stripeRest: string
     stripeRestResult: string
-    stripeRestError: string
+    stripeRestError404: string
     mcp: string
     mcpDesc: string
     mcpResult: string
     mcpOverrideAccess: string
     mcpGet: string
-    mcpGetResult: string
+    mcpGetError405: string
+    mcpProtocolVersion: string
+    mcpResult202: string
+    mcpError404: string
+    mcpError406: string
+    mcpError413: string
+    mcpError415: string
     seoTitle: string
     seoDescription: string
     seoUrl: string
@@ -159,7 +165,7 @@ export type PluginDefaultTranslationsObject = {
     r2Upload: string
     r2UploadDesc: string
     r2UploadResult: string
-    r2Exists: string
+    r2Error412: string
 
     localizationHeading: string
     localizationNote: string

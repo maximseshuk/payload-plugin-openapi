@@ -127,7 +127,7 @@ Payload fills `_h_slugPath` and `_h_titlePath` only when you ask for them. The `
 
 The spec documents the REST endpoints of these official Payload plugins. You don't need to set anything. The plugin finds an installed plugin by its `slug` in `config.plugins`, and the R2 adapter by its name in `config.storage`. It documents only the endpoints that are mounted, at the path they are mounted on. An endpoint with its own `custom.openapi` is documented from that instead.
 
-Each plugin gets one tag. With `nestedTags`, the tags sit under a `Plugins` group. Rules and functions in `excludeOperations` and `security` see these operations with `kind: 'plugin'` and the package name as `plugin`. An endpoint mounted on a collection has that collection's `slug`, and the plugin documents it only when the collection passes your filters. See [Filters](/v1/configuration/filters#rules).
+Each plugin gets one tag. With `nestedTags`, the tags sit under a `Plugins` group. A plugin tag with the same name as a collection tag, such as `Search`, stays under that collection. Rules and functions in `excludeOperations` and `security` see these operations with `kind: 'plugin'` and the package name as `plugin`. An endpoint mounted on a collection has that collection's `slug`, and the plugin documents it only when the collection passes your filters. See [Filters](/v1/configuration/filters#rules).
 
 ### `@payloadcms/plugin-ecommerce`
 

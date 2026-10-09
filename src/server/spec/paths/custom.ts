@@ -3,7 +3,7 @@ import type { Endpoint, SanitizedCollectionConfig, SanitizedConfig, SanitizedGlo
 
 import type { BuildContext } from '@/shared/types/index.js'
 
-const getOpenapiMeta = (endpoint: Endpoint): OperationObject | undefined => {
+export const getOpenapiMeta = (endpoint: Endpoint): OperationObject | undefined => {
   const meta = endpoint.custom?.openapi
   return meta && typeof meta === 'object' ? (meta as OperationObject) : undefined
 }

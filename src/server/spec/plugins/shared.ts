@@ -2,7 +2,7 @@ import type { OperationObject, PathsObject, ResponsesObject, SchemaObject } from
 import type { Endpoint, SanitizedCollectionConfig, SanitizedConfig } from 'payload'
 
 import { jsonResponse } from '@/server/spec/components.js'
-import { normalizePath } from '@/server/spec/paths/custom.js'
+import { getOpenapiMeta, normalizePath } from '@/server/spec/paths/custom.js'
 import type { Translate } from '@/shared/translations/types.js'
 import type { BuildContext } from '@/shared/types/index.js'
 
@@ -34,7 +34,7 @@ export const mountEndpoints = (
 ): PathsObject => {
   const out: PathsObject = {}
   for (const endpoint of endpoints || []) {
-    if (endpoint.custom?.openapi) continue
+    if (getOpenapiMeta(endpoint)) continue
     const op = operation(endpoint)
     if (!op) continue
     const path = normalizePath(prefix, endpoint.path)

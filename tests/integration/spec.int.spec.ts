@@ -744,8 +744,11 @@ describe('generated document', () => {
       const children = tags.filter((tag) => tag.parent === 'Plugins').map((tag) => tag.name)
       expect(tags.find((tag) => tag.name === 'Plugins')?.kind).toBe('nav')
       expect(children.toSorted()).toEqual(
-        ['Ecommerce', 'Import/Export', 'MCP', 'Multi-tenant', 'SEO', 'Search', 'Storage R2', 'Stripe'].toSorted(),
+        ['Ecommerce', 'Import/Export', 'MCP', 'Multi-tenant', 'SEO', 'Storage R2', 'Stripe'].toSorted(),
       )
+      const names = tags.map((tag) => tag.name)
+      expect(names).toHaveLength(new Set(names).size)
+      expect(tags.find((tag) => tag.name === 'Search')?.parent).toBe('Collections')
     })
   })
 

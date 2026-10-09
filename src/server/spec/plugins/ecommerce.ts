@@ -1,6 +1,6 @@
 import type { OperationObject, ParameterObject, SchemaObject } from '@scalar/openapi-types/3.2'
 
-import { jsonBody, jsonResponse } from '@/server/spec/components.js'
+import { ERROR_SCHEMA_NAME, errorResponses, jsonBody, jsonResponse } from '@/server/spec/components.js'
 import { refTo, schemaName } from '@/server/spec/names.js'
 import { securedRequirement } from '@/server/spec/security.js'
 import type { MessageKey } from '@/shared/translations/types.js'
@@ -105,10 +105,16 @@ export const ecommerce: OfficialPlugin = {
               required: ['cart', 'message', 'success'],
             }),
             ...messageErrors(merge ? ['400', '401'] : ['400'], t, failure),
-            '404': jsonResponse(t('ecommerceCartNotFound'), {
-              type: 'object',
-              properties: { cart: { type: ['object', 'null'] }, ...failure.properties },
-              required: ['cart', 'message', 'success'],
+            ...errorResponses(['403'], t),
+            '404': jsonResponse(t('ecommerceError404'), {
+              oneOf: [
+                {
+                  type: 'object',
+                  properties: { cart: { type: ['object', 'null'] }, ...failure.properties },
+                  required: ['cart', 'message', 'success'],
+                },
+                { $ref: refTo(ERROR_SCHEMA_NAME) },
+              ],
             }),
           },
           ...(merge ? { security: securedRequirement() } : {}),

@@ -134,7 +134,7 @@ export const pt: PluginDefaultTranslationsObject = {
     ecommerceCartAccess:
       'Permitido para o dono do carrinho, ou para um carrinho de convidado com o seu `secret` no corpo.',
     ecommerceCartResult: 'O carrinho atualizado',
-    ecommerceCartNotFound: 'Carrinho não encontrado ou inacessível',
+    ecommerceError404: 'Carrinho não encontrado ou inacessível',
     ecommerceQuantity: 'Nova quantidade, ou `{ "$inc": n }` para alterá-la em n.',
     ecommerceInitiatePayment: 'Iniciar um pagamento com `{{method}}`',
     ecommerceConfirmOrder: 'Confirmar o pagamento com `{{method}}` e criar o pedido',
@@ -146,17 +146,23 @@ export const pt: PluginDefaultTranslationsObject = {
     stripeWebhookBody:
       'O evento bruto do Stripe, assinado no cabeçalho `Stripe-Signature`. Chamado pelo Stripe, não por clientes da API.',
     stripeWebhookResult: 'Evento recebido',
-    stripeWebhookInvalid: 'A verificação da assinatura falhou',
+    stripeWebhookError400: 'A verificação da assinatura falhou',
     stripeRest: 'Chamar um método permitido da API do Stripe',
     stripeRestResult: 'O resultado da API do Stripe',
-    stripeRestError: 'A API do Stripe retornou um erro',
+    stripeRestError404: 'A API do Stripe retornou um erro',
     mcp: 'Enviar uma mensagem MCP JSON-RPC',
     mcpDesc:
-      'Model Context Protocol sobre Streamable HTTP, com respostas JSON. Requisições anônimas funcionam; as ferramentas listadas dependem das permissões do usuário.',
+      'Model Context Protocol sobre Streamable HTTP, com respostas JSON. Requisições anônimas funcionam; as ferramentas listadas dependem das permissões do usuário. Clientes com uma versão do protocolo de 2025 devem enviar `Accept: application/json, text/event-stream`.',
     mcpResult: 'Resposta JSON-RPC',
     mcpOverrideAccess: 'Ignorar as verificações de acesso. Somente para desenvolvimento.',
     mcpGet: 'Não suportado: o servidor não abre nenhum fluxo de eventos',
-    mcpGetResult: 'Método não permitido, use POST',
+    mcpGetError405: 'Método não permitido, use POST',
+    mcpProtocolVersion: 'Versão negociada do protocolo MCP, p. ex. `2025-06-18`.',
+    mcpResult202: 'Aceito: o corpo continha apenas notificações ou respostas',
+    mcpError404: 'Método MCP desconhecido',
+    mcpError406: 'Falta `application/json` ou `text/event-stream` no cabeçalho `Accept`',
+    mcpError413: 'O corpo da requisição é grande demais',
+    mcpError415: '`Content-Type` deve ser `application/json`',
     seoTitle: 'Gerar o meta título',
     seoDescription: 'Gerar a meta descrição',
     seoUrl: 'Gerar a URL de pré-visualização',
@@ -178,7 +184,7 @@ export const pt: PluginDefaultTranslationsObject = {
     r2UploadDesc:
       'Três etapas numa só rota. Início: envie `collection`, `fileName` e `fileType`. Cada parte: adicione `multipartId`, `multipartKey`, `multipartNumber` e `signedReceipt`, e envie os bytes. Conclusão: o mesmo sem `multipartNumber`, com a lista JSON das partes.',
     r2UploadResult: 'Upload iniciado, parte enviada ou upload concluído (a chave do objeto como texto)',
-    r2Exists: 'Já existe um arquivo nesta chave',
+    r2Error412: 'Já existe um arquivo nesta chave',
 
     localizationHeading: 'Localização',
     localizationNote:

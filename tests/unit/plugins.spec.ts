@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 
 import { resolveOptions } from '@/server/options/resolveOptions.js'
 import { buildDocument } from '@/server/spec/buildDocument.js'
-import { NAV_PLUGINS } from '@/server/spec/tags.js'
+import { buildTagHierarchy, NAV_PLUGINS } from '@/server/spec/tags.js'
 import type { OpenApiPluginOptions, Schema } from '@/shared/types/index.js'
 
 import { baseInput } from '../helpers/context.js'
@@ -105,14 +105,39 @@ describe('spec/plugins', () => {
       endpoints: [ep('post', '/mcp'), ep('get', '/mcp')],
     })
     expect(op(doc, '/api/mcp', 'post')?.operationId).toBe('mcp')
+    expect(Object.keys(op(doc, '/api/mcp', 'post')?.responses ?? {}).toSorted()).toEqual([
+      '200',
+      '202',
+      '400',
+      '401',
+      '404',
+      '406',
+      '413',
+      '415',
+      '500',
+    ])
     expect(Object.keys(op(doc, '/api/mcp', 'get')?.responses ?? {})).toEqual(['405'])
+  })
+
+  it('skips a plugin whose detection throws and keeps the others', async () => {
+    const doc = await build({
+      storage: 'broken',
+      plugins: [plugin('@payloadcms/plugin-seo')],
+      endpoints: [ep('post', '/plugin-seo/generate-title'), ep('post', '/storage-r2-multi-part-upload')],
+    })
+    expect(op(doc, '/api/plugin-seo/generate-title', 'post')).toBeDefined()
+    expect(doc.paths?.['/api/storage-r2-multi-part-upload']).toBeUndefined()
   })
 
   it('documents search reindex on the configured search collection only', async () => {
     const reindex = ep('post', '/reindex')
     const doc = await build(
-      { plugins: [plugin('@payloadcms/plugin-search', { collections: ['posts'], searchOverrides: { slug: 'find' } })] },
-      [coll('find', { endpoints: [reindex] }), coll('other', { endpoints: [reindex] })],
+      {
+        plugins: [
+          plugin('@payloadcms/plugin-search', { collections: ['posts', 'hidden'], searchOverrides: { slug: 'find' } }),
+        ],
+      },
+      [coll('find', { endpoints: [reindex] }), coll('other', { endpoints: [reindex] }), coll('posts')],
     )
     const operation = op(doc, '/api/find/reindex', 'post')
     expect(operation?.operationId).toBe('reindexFind')
@@ -178,6 +203,7 @@ describe('spec/plugins', () => {
     const addItem = op(doc, '/api/carts/{id}/add-item', 'post')
     expect(addItem?.operationId).toBe('addItemCarts')
     expect(addItem?.security).toBeUndefined()
+    expect(Object.keys(addItem?.responses ?? {})).toEqual(expect.arrayContaining(['403', '404']))
     expect(op(doc, '/api/carts/{id}/merge', 'post')?.security).toEqual(secured)
     expect(op(doc, '/api/payments/stripe/initiate', 'post')?.operationId).toBe('initiatePaymentStripe')
     expect(bodySchema(op(doc, '/api/payments/stripe/confirm-order', 'post')).required).toEqual(['paymentIntentID'])
@@ -261,6 +287,18 @@ describe('spec/plugins', () => {
       expect(byName['SEO']?.parent).toBe(NAV_PLUGINS)
       expect(byName['MCP']).toBeUndefined()
       expect(tagNames(doc).filter((name) => name === 'SEO')).toHaveLength(1)
+    })
+
+    it('puts a plugin under the collection tag of the same name', () => {
+      const names = buildTagHierarchy({
+        collections: [{ base: 'Search', hasAuth: false, hasVersions: false }],
+        globals: [],
+        systemTags: [],
+        pluginTags: ['Search', 'SEO'],
+        t: (key) => key,
+        nested: true,
+      }).map((tag) => tag.name)
+      expect(names).toEqual(['Collections', 'Search', NAV_PLUGINS, 'SEO'])
     })
 
     it('emits no plugin tag objects in flat mode', async () => {

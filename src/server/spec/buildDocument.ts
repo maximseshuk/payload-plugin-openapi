@@ -23,6 +23,7 @@ import { buildGlobalPaths } from '@/server/spec/paths/globals.js'
 import { buildJobsPaths } from '@/server/spec/paths/jobs.js'
 import { buildSystemPaths } from '@/server/spec/paths/system.js'
 import { buildVersionPaths, versionComponentSchemas } from '@/server/spec/paths/versions.js'
+import { OFFICIAL_PLUGINS } from '@/server/spec/plugins/index.js'
 import { PLUGIN_NAME } from '@/shared/constants.js'
 import { makeT } from '@/shared/translations/index.js'
 import type { BuildContext, OperationKind, ResolvedOptions } from '@/shared/types/index.js'
@@ -53,7 +54,6 @@ import {
   updateSchemaName,
 } from './names.js'
 import { buildParamSchemas, buildQueryOperationsSchema, collectionHasFilters } from './params.js'
-import { OFFICIAL_PLUGINS } from './plugins/index.js'
 import { applySecurity, evaluateAccess, resolveEntitySecurity, securedRequirement } from './security.js'
 import { buildTagHierarchy, type CollectionTagInfo, type GlobalTagInfo, type SystemTag } from './tags.js'
 
@@ -268,9 +268,9 @@ export const buildDocument = async (input: BuildInput): Promise<Document> => {
 
   const pluginTags: string[] = []
   for (const plugin of OFFICIAL_PLUGINS) {
-    const installed = config.plugins?.find((p) => p.slug === plugin.slug)
-    if (!(plugin.installed?.(config) ?? installed)) continue
     try {
+      const installed = config.plugins?.find((p) => p.slug === plugin.slug)
+      if (!(plugin.installed?.(config) ?? installed)) continue
       const groups = plugin.build({ config, collections, ctx, options: installed?.options, schemas, t })
       for (const group of groups) {
         const finalized = await finalize(group.paths, 'plugin', group.slug, plugin.slug)

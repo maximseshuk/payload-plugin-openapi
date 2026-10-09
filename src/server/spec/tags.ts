@@ -81,9 +81,11 @@ export const buildTagHierarchy = ({
     for (const name of systemTags) tags.push({ name, parent: NAV_SYSTEM, summary: t(SYSTEM_TAG_SUMMARIES[name]) })
   }
 
-  if (pluginTags.length > 0) {
+  const taken = new Set(tags.map((tag) => tag.name))
+  const freePluginTags = pluginTags.filter((name) => !taken.has(name))
+  if (freePluginTags.length > 0) {
     tags.push({ name: NAV_PLUGINS, summary: t('tagPlugins'), description: t('tagPluginsDesc'), kind: 'nav' })
-    for (const name of pluginTags) tags.push({ name, parent: NAV_PLUGINS })
+    for (const name of freePluginTags) tags.push({ name, parent: NAV_PLUGINS })
   }
 
   return tags

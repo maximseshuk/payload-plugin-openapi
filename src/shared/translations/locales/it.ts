@@ -134,7 +134,7 @@ export const it: PluginDefaultTranslationsObject = {
     ecommerceCartAccess:
       'Consentito al proprietario del carrello, o per un carrello ospite con il suo `secret` nel corpo.',
     ecommerceCartResult: 'Il carrello aggiornato',
-    ecommerceCartNotFound: 'Carrello non trovato o non accessibile',
+    ecommerceError404: 'Carrello non trovato o non accessibile',
     ecommerceQuantity: 'Nuova quantità, oppure `{ "$inc": n }` per modificarla di n.',
     ecommerceInitiatePayment: 'Avvia un pagamento con `{{method}}`',
     ecommerceConfirmOrder: 'Conferma il pagamento con `{{method}}` e crea l’ordine',
@@ -146,17 +146,23 @@ export const it: PluginDefaultTranslationsObject = {
     stripeWebhookBody:
       'L’evento Stripe grezzo, firmato nell’header `Stripe-Signature`. Chiamato da Stripe, non dai client dell’API.',
     stripeWebhookResult: 'Evento ricevuto',
-    stripeWebhookInvalid: 'Verifica della firma non riuscita',
+    stripeWebhookError400: 'Verifica della firma non riuscita',
     stripeRest: 'Chiama un metodo consentito dell’API Stripe',
     stripeRestResult: 'Il risultato dell’API Stripe',
-    stripeRestError: 'L’API Stripe ha restituito un errore',
+    stripeRestError404: 'L’API Stripe ha restituito un errore',
     mcp: 'Invia un messaggio MCP JSON-RPC',
     mcpDesc:
-      'Model Context Protocol su Streamable HTTP, con risposte JSON. Le richieste anonime funzionano; gli strumenti elencati dipendono dai permessi dell’utente.',
+      'Model Context Protocol su Streamable HTTP, con risposte JSON. Le richieste anonime funzionano; gli strumenti elencati dipendono dai permessi dell’utente. I client con una versione del protocollo del 2025 devono inviare `Accept: application/json, text/event-stream`.',
     mcpResult: 'Risposta JSON-RPC',
     mcpOverrideAccess: 'Salta i controlli di accesso. Solo per lo sviluppo.',
     mcpGet: 'Non supportato: il server non apre alcun flusso di eventi',
-    mcpGetResult: 'Metodo non consentito, usa POST',
+    mcpGetError405: 'Metodo non consentito, usa POST',
+    mcpProtocolVersion: 'Versione negoziata del protocollo MCP, ad es. `2025-06-18`.',
+    mcpResult202: 'Accettato: il corpo conteneva solo notifiche o risposte',
+    mcpError404: 'Metodo MCP sconosciuto',
+    mcpError406: 'Nell’header `Accept` manca `application/json` o `text/event-stream`',
+    mcpError413: 'Il corpo della richiesta è troppo grande',
+    mcpError415: '`Content-Type` deve essere `application/json`',
     seoTitle: 'Genera il meta titolo',
     seoDescription: 'Genera la meta descrizione',
     seoUrl: 'Genera l’URL di anteprima',
@@ -164,7 +170,7 @@ export const it: PluginDefaultTranslationsObject = {
     seoBody:
       'Il documento in modifica: `collectionSlug` o `globalSlug`, il suo `id` e i dati `doc` correnti. Passato alla tua funzione di generazione.',
     seoResult: 'Il valore generato. Una stringa vuota se non è impostata alcuna funzione di generazione.',
-    searchReindex: 'Ricostruisci l’indice di ricerca per alcune collection',
+    searchReindex: 'Ricostruisci l’indice di ricerca per alcune collezioni',
     searchReindexResult: 'Riepilogo della reindicizzazione',
     tenantOptions: 'Elenca i tenant che l’utente può scegliere',
     tenantOptionsResult: 'Opzioni tenant',
@@ -178,7 +184,7 @@ export const it: PluginDefaultTranslationsObject = {
     r2UploadDesc:
       'Tre passaggi su una sola route. Avvio: invia `collection`, `fileName` e `fileType`. Ogni parte: aggiungi `multipartId`, `multipartKey`, `multipartNumber` e `signedReceipt`, e invia i byte. Completamento: lo stesso senza `multipartNumber`, con l’elenco JSON delle parti.',
     r2UploadResult: 'Caricamento avviato, parte caricata o caricamento completato (la chiave dell’oggetto come testo)',
-    r2Exists: 'Esiste già un file con questa chiave',
+    r2Error412: 'Esiste già un file con questa chiave',
 
     localizationHeading: 'Localizzazione',
     localizationNote:

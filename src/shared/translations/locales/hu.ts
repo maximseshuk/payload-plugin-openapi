@@ -132,7 +132,7 @@ export const hu: PluginDefaultTranslationsObject = {
     ecommerceCartAccess:
       'A kosár tulajdonosának engedélyezett, vagy vendégkosárnál a kérés törzsében lévő `secret` értékkel.',
     ecommerceCartResult: 'A frissített kosár',
-    ecommerceCartNotFound: 'A kosár nem található vagy nem elérhető',
+    ecommerceError404: 'A kosár nem található vagy nem elérhető',
     ecommerceQuantity: 'Új mennyiség, vagy `{ "$inc": n }` az n-nel való módosításhoz.',
     ecommerceInitiatePayment: 'Fizetés indítása ezzel: `{{method}}`',
     ecommerceConfirmOrder: 'Fizetés megerősítése ezzel: `{{method}}`, és a rendelés létrehozása',
@@ -144,17 +144,23 @@ export const hu: PluginDefaultTranslationsObject = {
     stripeWebhookBody:
       'A nyers Stripe-esemény, a `Stripe-Signature` fejlécben aláírva. A Stripe hívja, nem az API-kliensek.',
     stripeWebhookResult: 'Esemény fogadva',
-    stripeWebhookInvalid: 'Az aláírás ellenőrzése sikertelen',
+    stripeWebhookError400: 'Az aláírás ellenőrzése sikertelen',
     stripeRest: 'Engedélyezett Stripe API-metódus hívása',
     stripeRestResult: 'A Stripe API eredménye',
-    stripeRestError: 'A Stripe API hibát adott vissza',
+    stripeRestError404: 'A Stripe API hibát adott vissza',
     mcp: 'MCP JSON-RPC üzenet küldése',
     mcpDesc:
-      'Model Context Protocol Streamable HTTP-n, JSON-válaszokkal. A névtelen kérések működnek; a felsorolt eszközök a felhasználó jogosultságaitól függnek.',
+      'Model Context Protocol Streamable HTTP-n, JSON-válaszokkal. A névtelen kérések működnek; a felsorolt eszközök a felhasználó jogosultságaitól függnek. A 2025-ös protokollverziót használó klienseknek `Accept: application/json, text/event-stream` fejlécet kell küldeniük.',
     mcpResult: 'JSON-RPC válasz',
     mcpOverrideAccess: 'Hozzáférés-ellenőrzések kihagyása. Csak fejlesztéshez.',
     mcpGet: 'Nem támogatott: a szerver nem nyit eseményfolyamot',
-    mcpGetResult: 'A metódus nem engedélyezett, használjon POST-ot',
+    mcpGetError405: 'A metódus nem engedélyezett, használjon POST-ot',
+    mcpProtocolVersion: 'Az egyeztetett MCP-protokollverzió, pl. `2025-06-18`.',
+    mcpResult202: 'Elfogadva: a törzs csak értesítéseket vagy válaszokat tartalmazott',
+    mcpError404: 'Ismeretlen MCP-metódus',
+    mcpError406: 'Az `Accept` fejlécből hiányzik az `application/json` vagy a `text/event-stream`',
+    mcpError413: 'A kérés törzse túl nagy',
+    mcpError415: 'A `Content-Type` értéke csak `application/json` lehet',
     seoTitle: 'Meta cím generálása',
     seoDescription: 'Meta leírás generálása',
     seoUrl: 'Előnézeti URL generálása',
@@ -176,7 +182,7 @@ export const hu: PluginDefaultTranslationsObject = {
     r2UploadDesc:
       'Három lépés egy útvonalon. Kezdés: küldje el a `collection`, `fileName` és `fileType` értékeket. Minden rész: adja hozzá a `multipartId`, `multipartKey`, `multipartNumber` és `signedReceipt` értékeket, és küldje a bájtokat. Befejezés: ugyanez `multipartNumber` nélkül, a részek JSON-listájával.',
     r2UploadResult: 'Feltöltés elindult, rész feltöltve vagy feltöltés kész (az objektumkulcs szövegként)',
-    r2Exists: 'Ezzel a kulccsal már létezik fájl',
+    r2Error412: 'Ezzel a kulccsal már létezik fájl',
 
     localizationHeading: 'Lokalizáció',
     localizationNote:

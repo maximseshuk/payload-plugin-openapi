@@ -134,7 +134,7 @@ export const ca: PluginDefaultTranslationsObject = {
     ecommerceCartAccess:
       'Permès per al propietari de la cistella, o per a una cistella de convidat amb el seu `secret` al cos.',
     ecommerceCartResult: 'La cistella actualitzada',
-    ecommerceCartNotFound: 'Cistella no trobada o no accessible',
+    ecommerceError404: 'Cistella no trobada o no accessible',
     ecommerceQuantity: 'Nova quantitat, o `{ "$inc": n }` per canviar-la en n.',
     ecommerceInitiatePayment: 'Inicia un pagament amb `{{method}}`',
     ecommerceConfirmOrder: 'Confirma el pagament amb `{{method}}` i crea la comanda',
@@ -146,17 +146,23 @@ export const ca: PluginDefaultTranslationsObject = {
     stripeWebhookBody:
       'L’esdeveniment de Stripe en brut, signat a la capçalera `Stripe-Signature`. El crida Stripe, no els clients de l’API.',
     stripeWebhookResult: 'Esdeveniment rebut',
-    stripeWebhookInvalid: 'La comprovació de la signatura ha fallat',
+    stripeWebhookError400: 'La comprovació de la signatura ha fallat',
     stripeRest: 'Crida un mètode permès de l’API de Stripe',
     stripeRestResult: 'El resultat de l’API de Stripe',
-    stripeRestError: 'L’API de Stripe ha retornat un error',
+    stripeRestError404: 'L’API de Stripe ha retornat un error',
     mcp: 'Envia un missatge MCP JSON-RPC',
     mcpDesc:
-      'Model Context Protocol sobre Streamable HTTP, amb respostes JSON. Les sol·licituds anònimes funcionen; les eines llistades depenen dels permisos de l’usuari.',
+      'Model Context Protocol sobre Streamable HTTP, amb respostes JSON. Les sol·licituds anònimes funcionen; les eines llistades depenen dels permisos de l’usuari. Els clients amb una versió del protocol de 2025 han d’enviar `Accept: application/json, text/event-stream`.',
     mcpResult: 'Resposta JSON-RPC',
     mcpOverrideAccess: 'Omet les comprovacions d’accés. Només per a desenvolupament.',
     mcpGet: 'No compatible: el servidor no obre cap flux d’esdeveniments',
-    mcpGetResult: 'Mètode no permès, fes servir POST',
+    mcpGetError405: 'Mètode no permès, fes servir POST',
+    mcpProtocolVersion: 'Versió negociada del protocol MCP, p. ex. `2025-06-18`.',
+    mcpResult202: 'Acceptat: el cos només contenia notificacions o respostes',
+    mcpError404: 'Mètode MCP desconegut',
+    mcpError406: 'La capçalera `Accept` no inclou `application/json` o `text/event-stream`',
+    mcpError413: 'El cos de la sol·licitud és massa gran',
+    mcpError415: '`Content-Type` ha de ser `application/json`',
     seoTitle: 'Genera el metatítol',
     seoDescription: 'Genera la metadescripció',
     seoUrl: 'Genera l’URL de previsualització',
@@ -178,7 +184,7 @@ export const ca: PluginDefaultTranslationsObject = {
     r2UploadDesc:
       'Tres passos en una sola ruta. Inici: envia `collection`, `fileName` i `fileType`. Cada part: afegeix `multipartId`, `multipartKey`, `multipartNumber` i `signedReceipt`, i envia els bytes. Final: el mateix sense `multipartNumber`, amb la llista JSON de parts.',
     r2UploadResult: 'Pujada iniciada, part pujada o pujada completada (la clau de l’objecte com a text)',
-    r2Exists: 'Ja existeix un fitxer amb aquesta clau',
+    r2Error412: 'Ja existeix un fitxer amb aquesta clau',
 
     localizationHeading: 'Localització',
     localizationNote:

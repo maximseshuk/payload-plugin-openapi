@@ -48,9 +48,10 @@ const query: Record<string, SchemaObject> = {
 export const importExport: OfficialPlugin = {
   slug: '@payloadcms/plugin-import-export',
   tag: TAG,
-  build: ({ collections, ctx, t }) =>
-    collectionGroups(collections, ctx, ({ method, path }, collection): OperationObject | undefined => {
-      const slugs = targetSlugs(collection)
+  build: ({ collections, ctx, t }) => {
+    const visible = new Set(collections.map((c) => c.slug))
+    return collectionGroups(collections, ctx, ({ method, path }, collection): OperationObject | undefined => {
+      const slugs = targetSlugs(collection)?.filter((slug) => visible.has(slug))
       if (!slugs || method !== 'post') return undefined
       const name = schemaName(collection.slug)
       const collectionSlug: SchemaObject = { type: 'string', ...(slugs.length > 0 ? { enum: slugs } : {}) }
@@ -146,5 +147,6 @@ export const importExport: OfficialPlugin = {
         }
       }
       return undefined
-    }),
+    })
+  },
 }
