@@ -88,6 +88,7 @@ export const az: PluginDefaultTranslationsObject = {
     uploadPayloadField: 'JSON-a çevrilmiş {{schema}} sahələri. Nümunə: `{"alt":"A caption"}`.',
     fileServe: 'Fayl',
     filePartial: 'Faylın bir hissəsi, `Range` sorğusu üçün',
+    paramFileVersion: 'Bu versiya ID-si ilə saxlanmış faylı qaytarır.',
     uploadInstructionsSummary: 'Sənədi saxlamazdan əvvəl fayl yükləmək üçün təlimat alın',
     uploadInstructionsResult:
       'Fayl baytlarının hara göndəriləcəyi və yaratma və ya yeniləmə sorğusu ilə göndəriləcək `file` dəyəri',

@@ -83,6 +83,7 @@ export const zhTw: PluginDefaultTranslationsObject = {
     uploadPayloadField: 'JSON 字串化的 {{schema}} 欄位。範例：`{"alt":"A caption"}`。',
     fileServe: '檔案',
     filePartial: '`Range` 請求傳回的部分檔案',
+    paramFileVersion: '傳回以此版本 ID 儲存的檔案。',
     uploadInstructionsSummary: '在儲存文件前取得上傳檔案的說明',
     uploadInstructionsResult: '檔案位元組的傳送位置，以及在建立或更新請求中傳送的 `file` 值',
     uploadStagePutSummary: '為暫存上傳傳送檔案位元組',

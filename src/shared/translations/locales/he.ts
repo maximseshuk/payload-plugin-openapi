@@ -84,6 +84,7 @@ export const he: PluginDefaultTranslationsObject = {
     uploadPayloadField: 'שדות {{schema}} מקודדים כ-JSON. דוגמה: `{"alt":"A caption"}`.',
     fileServe: 'הקובץ',
     filePartial: 'חלק מהקובץ, עבור בקשת `Range`',
+    paramFileVersion: 'מחזיר את הקובץ שנשמר עם מזהה הגרסה הזה.',
     uploadInstructionsSummary: 'קבלת הוראות להעלאת קובץ לפני שמירת המסמך',
     uploadInstructionsResult: 'לאן לשלוח את בתי הקובץ, וערך `file` לשליחה עם בקשת היצירה או העדכון',
     uploadStagePutSummary: 'שליחת בתי הקובץ להעלאה זמנית',

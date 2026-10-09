@@ -88,6 +88,7 @@ export const lv: PluginDefaultTranslationsObject = {
     uploadPayloadField: 'JSON virknē pārveidotie {{schema}} lauki. Piemērs: `{"alt":"A caption"}`.',
     fileServe: 'Fails',
     filePartial: 'Faila daļa `Range` pieprasījumam',
+    paramFileVersion: 'Atgriež failu, kas saglabāts ar šo versijas ID.',
     uploadInstructionsSummary: 'Saņemt norādījumus faila augšupielādei pirms dokumenta saglabāšanas',
     uploadInstructionsResult:
       'Kur sūtīt faila baitus un kāda `file` vērtība jāsūta kopā ar izveides vai atjaunināšanas pieprasījumu',

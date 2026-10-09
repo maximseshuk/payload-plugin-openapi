@@ -90,6 +90,7 @@ export const rsLatin: PluginDefaultTranslationsObject = {
     uploadPayloadField: '{{schema}} polja pretvorena u JSON string. Primer: `{"alt":"A caption"}`.',
     fileServe: 'Datoteka',
     filePartial: 'Deo datoteke za `Range` zahtev',
+    paramFileVersion: 'Vraća datoteku sačuvanu sa ovim ID-jem verzije.',
     uploadInstructionsSummary: 'Preuzimanje uputstava za otpremanje datoteke pre čuvanja dokumenta',
     uploadInstructionsResult:
       'Gde poslati bajtove datoteke i vrednost `file` koja se šalje uz zahtev za kreiranje ili ažuriranje',

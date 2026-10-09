@@ -761,6 +761,27 @@ describe('spec/paths/collections', () => {
     expect(paths['/api/posts/file/{filename}']?.get?.responses?.['206']).toBeDefined()
   })
 
+  it('documents file rename only for upload collections, secured like update', () => {
+    expect(buildCollectionPaths({ collection: postsColl(), ctx })['/api/posts/{id}/rename']).toBeUndefined()
+    const security = { update: [{ PayloadAuth: [] }] }
+    const paths = buildCollectionPaths({ collection: postsColl({ upload: {} as never }), ctx, security })
+    const rename = paths['/api/posts/{id}/rename']?.post
+    const body = rename?.requestBody as { content: Record<string, { schema: { required?: string[] } }> }
+    expect(body.content['application/json']?.schema.required).toEqual(['filename'])
+    expect(rename?.security).toEqual(security.update)
+  })
+
+  it('lists the `version` query param on the file endpoint only with versions', () => {
+    const names = (versions: unknown) =>
+      (
+        (buildCollectionPaths({ collection: postsColl({ upload: {} as never, versions } as never), ctx })[
+          '/api/posts/file/{filename}'
+        ]?.parameters ?? []) as { name: string }[]
+      ).map((p) => p.name)
+    expect(names(false)).toEqual(['filename'])
+    expect(names({})).toEqual(['filename', 'version'])
+  })
+
   it('drops bulk update/delete when `disableBulkEdit` is set, keeping by-id ops', () => {
     const paths = buildCollectionPaths({ collection: postsColl({ disableBulkEdit: true }), ctx })
     expect(paths['/api/posts']?.patch).toBeUndefined()

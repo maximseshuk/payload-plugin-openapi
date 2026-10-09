@@ -86,6 +86,7 @@ export const bnBd: PluginDefaultTranslationsObject = {
     uploadPayloadField: 'JSON-স্ট্রিংফাইড {{schema}} ফিল্ড। উদাহরণ: `{"alt":"A caption"}`।',
     fileServe: 'ফাইলটি',
     filePartial: 'ফাইলের একটি অংশ, `Range` রিকোয়েস্টের জন্য',
+    paramFileVersion: 'এই ভার্সন ID-র সাথে সংরক্ষিত ফাইলটি দেয়।',
     uploadInstructionsSummary: 'ডকুমেন্ট সেভ করার আগে ফাইল আপলোডের নির্দেশনা নিন',
     uploadInstructionsResult: 'ফাইলের বাইট কোথায় পাঠাতে হবে এবং তৈরি বা আপডেট রিকোয়েস্টে কোন `file` মান পাঠাতে হবে',
     uploadStagePutSummary: 'অস্থায়ী আপলোডের জন্য ফাইলের বাইট পাঠান',

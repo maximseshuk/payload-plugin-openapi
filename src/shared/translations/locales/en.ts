@@ -86,6 +86,7 @@ export const en: PluginDefaultTranslationsObject = {
     uploadPayloadField: 'JSON-stringified {{schema}} fields. Example: `{"alt":"A caption"}`.',
     fileServe: 'The file',
     filePartial: 'Part of the file, for a `Range` request',
+    paramFileVersion: 'Return the file stored with this version ID.',
     uploadInstructionsSummary: 'Get instructions to upload a file before saving the document',
     uploadInstructionsResult:
       'Where to send the file bytes, and the `file` value to send with the create or update request',

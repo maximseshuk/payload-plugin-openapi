@@ -88,6 +88,7 @@ export const sl: PluginDefaultTranslationsObject = {
     uploadPayloadField: 'Polja {{schema}}, pretvorjena v niz JSON. Primer: `{\\"alt\\":\\"A caption\\"}`.',
     fileServe: 'Datoteka',
     filePartial: 'Del datoteke za zahtevo `Range`',
+    paramFileVersion: 'Vrne datoteko, shranjeno s tem ID-jem različice.',
     uploadInstructionsSummary: 'Pridobi navodila za nalaganje datoteke pred shranjevanjem dokumenta',
     uploadInstructionsResult:
       'Kam poslati bajte datoteke in vrednost `file`, ki jo pošljete z zahtevo za ustvarjanje ali posodobitev',

@@ -89,6 +89,7 @@ export const fr: PluginDefaultTranslationsObject = {
     uploadPayloadField: 'Champs {{schema}} au format JSON. Exemple : `{"alt":"A caption"}`.',
     fileServe: 'Le fichier',
     filePartial: 'Une partie du fichier, pour une requête `Range`',
+    paramFileVersion: 'Renvoie le fichier enregistré avec cet ID de version.',
     uploadInstructionsSummary: "Obtenir les instructions pour téléverser un fichier avant d'enregistrer le document",
     uploadInstructionsResult:
       'Où envoyer les octets du fichier, et la valeur `file` à envoyer avec la requête de création ou de mise à jour',

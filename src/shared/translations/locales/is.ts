@@ -88,6 +88,7 @@ export const is: PluginDefaultTranslationsObject = {
     uploadPayloadField: '{{schema}}-reitir sem JSON-strengur. Dæmi: `{"alt":"A caption"}`.',
     fileServe: 'Skráin',
     filePartial: 'Hluti skrárinnar, fyrir `Range`-beiðni',
+    paramFileVersion: 'Skilar skránni sem var vistuð með þessu útgáfuauðkenni.',
     uploadInstructionsSummary: 'Sækja leiðbeiningar til að hlaða upp skrá áður en skjalið er vistað',
     uploadInstructionsResult:
       'Hvert á að senda bæti skrárinnar og `file`-gildið sem er sent með stofnunar- eða uppfærslubeiðninni',

@@ -89,6 +89,7 @@ export const ca: PluginDefaultTranslationsObject = {
     uploadPayloadField: 'Camps {{schema}} en format JSON. Exemple: `{"alt":"A caption"}`.',
     fileServe: 'El fitxer',
     filePartial: 'Una part del fitxer, per a una petició `Range`',
+    paramFileVersion: 'Retorna el fitxer desat amb aquest ID de versió.',
     uploadInstructionsSummary: 'Obté instruccions per pujar un fitxer abans de desar el document',
     uploadInstructionsResult:
       "On enviar els bytes del fitxer i el valor `file` que cal enviar amb la petició de creació o d'actualització",

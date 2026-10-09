@@ -84,6 +84,7 @@ export const th: PluginDefaultTranslationsObject = {
     uploadPayloadField: 'ฟิลด์ {{schema}} ในรูปแบบ JSON string ตัวอย่าง: `{"alt":"A caption"}`',
     fileServe: 'ไฟล์',
     filePartial: 'ส่วนหนึ่งของไฟล์ สำหรับคำขอ `Range`',
+    paramFileVersion: 'ส่งคืนไฟล์ที่บันทึกไว้กับ ID เวอร์ชันนี้',
     uploadInstructionsSummary: 'รับคำแนะนำในการอัปโหลดไฟล์ก่อนบันทึกเอกสาร',
     uploadInstructionsResult: 'ปลายทางสำหรับส่งไบต์ของไฟล์ และค่า `file` ที่ต้องส่งไปกับคำขอสร้างหรืออัปเดต',
     uploadStagePutSummary: 'ส่งไบต์ของไฟล์สำหรับการอัปโหลดชั่วคราว',

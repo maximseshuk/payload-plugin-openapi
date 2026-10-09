@@ -90,6 +90,7 @@ export const fa: PluginDefaultTranslationsObject = {
     uploadPayloadField: 'فیلدهای {{schema}} به‌صورت JSON رشته‌شده. مثال: `{\\"alt\\":\\"A caption\\"}`.',
     fileServe: 'فایل',
     filePartial: 'بخشی از فایل، برای درخواست `Range`',
+    paramFileVersion: 'فایل ذخیره‌شده با این شناسه نسخه را برمی‌گرداند.',
     uploadInstructionsSummary: 'دریافت دستورالعمل بارگذاری فایل پیش از ذخیره سند',
     uploadInstructionsResult: 'مقصد ارسال بایت‌های فایل و مقدار `file` که همراه درخواست ایجاد یا به‌روزرسانی ارسال می‌شود',
     uploadStagePutSummary: 'ارسال بایت‌های فایل برای بارگذاری موقت',

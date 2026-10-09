@@ -89,6 +89,7 @@ export const et: PluginDefaultTranslationsObject = {
     uploadPayloadField: 'JSON-stringitud {{schema}} väljad. Näide: `{\\"alt\\":\\"A caption\\"}`.',
     fileServe: 'Fail',
     filePartial: 'Osa failist `Range` päringu jaoks',
+    paramFileVersion: 'Tagastab selle versiooni ID-ga salvestatud faili.',
     uploadInstructionsSummary: 'Hangi juhised faili üleslaadimiseks enne dokumendi salvestamist',
     uploadInstructionsResult:
       'Kuhu saata faili baidid ja milline `file` väärtus saata loomise või uuendamise päringuga',

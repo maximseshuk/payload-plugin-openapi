@@ -90,6 +90,7 @@ export const sk: PluginDefaultTranslationsObject = {
     uploadPayloadField: 'Polia {{schema}} serializované do JSON. Príklad: `{\\"alt\\":\\"A caption\\"}`.',
     fileServe: 'Súbor',
     filePartial: 'Časť súboru pre požiadavku `Range`',
+    paramFileVersion: 'Vráti súbor uložený s týmto ID verzie.',
     uploadInstructionsSummary: 'Získať pokyny na nahranie súboru pred uložením dokumentu',
     uploadInstructionsResult:
       'Kam poslať bajty súboru a hodnota `file`, ktorá sa pošle s požiadavkou na vytvorenie alebo úpravu',

@@ -79,6 +79,7 @@ export type PluginDefaultTranslationsObject = {
     uploadPayloadField: string
     fileServe: string
     filePartial: string
+    paramFileVersion: string
     uploadInstructionsSummary: string
     uploadInstructionsResult: string
     uploadStagePutSummary: string

@@ -87,6 +87,7 @@ export const lt: PluginDefaultTranslationsObject = {
     uploadPayloadField: 'JSON eilute pavaizduoti {{schema}} laukai. Pavyzdys: `{"alt":"A caption"}`.',
     fileServe: 'Failas',
     filePartial: 'Failo dalis `Range` užklausai',
+    paramFileVersion: 'Grąžina failą, išsaugotą su šiuo versijos ID.',
     uploadInstructionsSummary: 'Gauti failo įkėlimo instrukcijas prieš išsaugant dokumentą',
     uploadInstructionsResult:
       'Kur siųsti failo baitus ir kokią `file` reikšmę siųsti su kūrimo arba atnaujinimo užklausa',

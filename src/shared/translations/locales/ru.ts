@@ -86,6 +86,7 @@ export const ru: PluginDefaultTranslationsObject = {
     uploadPayloadField: 'Поля {{schema}} в виде JSON-строки. Пример: `{"alt":"A caption"}`.',
     fileServe: 'Файл',
     filePartial: 'Часть файла для запроса с `Range`',
+    paramFileVersion: 'Отдаёт файл, сохранённый с этим ID версии.',
     uploadInstructionsSummary: 'Получить инструкции для загрузки файла до сохранения документа',
     uploadInstructionsResult:
       'Куда отправить байты файла и какое значение `file` передать в запросе на создание или обновление',

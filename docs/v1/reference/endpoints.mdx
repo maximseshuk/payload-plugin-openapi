@@ -17,6 +17,7 @@ The plugin documents the REST endpoints that Payload 4 mounts for your config. A
 | `/api/<slug>/{id}/validate`   | POST                | Always                                               | —                                  |
 | `/api/<slug>/{id}/duplicate`  | POST                | `disableDuplicate` is not set (auth: off by default) | —                                  |
 | `/api/<slug>/file/{filename}` | GET                 | Upload collection                                    | —                                  |
+| `/api/<slug>/{id}/rename`     | POST                | Upload collection                                    | —                                  |
 | `/api/<slug>/versions`        | GET                 | `versions` is not `false`                            | `includeVersions`                  |
 | `/api/<slug>/versions/{id}`   | GET, POST (restore) | `versions` is not `false`                            | `includeVersions`                  |
 | `/api/<slug>/access`          | POST                | Always                                               | `includeAuth` + `includeAdminAuth` |

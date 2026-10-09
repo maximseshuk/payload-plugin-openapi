@@ -88,6 +88,7 @@ export const tr: PluginDefaultTranslationsObject = {
     uploadPayloadField: 'JSON olarak dizgeleştirilmiş {{schema}} alanları. Örnek: `{\\"alt\\":\\"A caption\\"}`.',
     fileServe: 'Dosya',
     filePartial: '`Range` isteği için dosyanın bir bölümü',
+    paramFileVersion: 'Bu sürüm kimliğiyle kaydedilen dosyayı döndürür.',
     uploadInstructionsSummary: 'Dokümanı kaydetmeden önce dosya yükleme talimatlarını alın',
     uploadInstructionsResult:
       'Dosya baytlarının nereye gönderileceği ve oluşturma ya da güncelleme isteğiyle gönderilecek `file` değeri',

@@ -88,6 +88,7 @@ export const nb: PluginDefaultTranslationsObject = {
     uploadPayloadField: 'JSON-strengkodede {{schema}}-felt. Eksempel: `{"alt":"A caption"}`.',
     fileServe: 'Filen',
     filePartial: 'En del av filen ved en `Range`-forespørsel',
+    paramFileVersion: 'Returnerer filen som er lagret med denne versjons-ID-en.',
     uploadInstructionsSummary: 'Hent instruksjoner for å laste opp en fil før dokumentet lagres',
     uploadInstructionsResult:
       'Hvor filens byte skal sendes, og `file`-verdien som skal sendes med opprett- eller oppdater-forespørselen',

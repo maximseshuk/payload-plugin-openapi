@@ -351,6 +351,8 @@ describe('generated document', () => {
     it('documents the file and upload instructions endpoints for upload collections', () => {
       expect(doc.paths['/api/media/file/{filename}']?.get).toBeDefined()
       expect(doc.paths['/api/users/file/{filename}']).toBeUndefined()
+      expect(doc.paths['/api/media/{id}/rename']?.post).toBeDefined()
+      expect(doc.paths['/api/users/{id}/rename']).toBeUndefined()
       const body = doc.paths['/api/upload-instructions']?.post?.requestBody as Body
       const bodySchema = body.content['application/json']!.schema as Schema
       const slug = bodySchema.properties?.collectionSlug as Schema

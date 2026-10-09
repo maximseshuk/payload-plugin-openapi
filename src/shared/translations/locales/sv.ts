@@ -89,6 +89,7 @@ export const sv: PluginDefaultTranslationsObject = {
     uploadPayloadField: 'JSON-strängifierade {{schema}}-fält. Exempel: `{\\"alt\\":\\"A caption\\"}`.',
     fileServe: 'Filen',
     filePartial: 'En del av filen vid en `Range`-begäran',
+    paramFileVersion: 'Returnerar filen som sparades med detta versions-ID.',
     uploadInstructionsSummary: 'Hämta instruktioner för att ladda upp en fil innan dokumentet sparas',
     uploadInstructionsResult:
       'Vart filens byte ska skickas och vilket `file`-värde som ska skickas med skapa- eller uppdatera-begäran',

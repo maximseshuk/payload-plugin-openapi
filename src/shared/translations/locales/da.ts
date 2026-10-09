@@ -88,6 +88,7 @@ export const da: PluginDefaultTranslationsObject = {
     uploadPayloadField: 'JSON-strengkodede {{schema}}-felter. Eksempel: `{"alt":"A caption"}`.',
     fileServe: 'Filen',
     filePartial: 'En del af filen ved en `Range`-anmodning',
+    paramFileVersion: 'Returnerer filen, der er gemt med dette versions-ID.',
     uploadInstructionsSummary: 'Hent instruktioner til at uploade en fil, før dokumentet gemmes',
     uploadInstructionsResult:
       'Hvor filens bytes skal sendes hen, og den `file`-værdi, der skal sendes med opret- eller opdater-anmodningen',

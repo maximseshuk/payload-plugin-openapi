@@ -85,6 +85,7 @@ export const ar: PluginDefaultTranslationsObject = {
     uploadPayloadField: 'حقول {{schema}} بصيغة JSON. مثال: `{"alt":"A caption"}`.',
     fileServe: 'الملف',
     filePartial: 'جزء من الملف، لطلب `Range`',
+    paramFileVersion: 'يعرض الملف المحفوظ مع معرّف الإصدار هذا.',
     uploadInstructionsSummary: 'الحصول على تعليمات رفع ملف قبل حفظ المستند',
     uploadInstructionsResult: 'مكان إرسال بايتات الملف، وقيمة `file` التي تُرسل مع طلب الإنشاء أو التحديث',
     uploadStagePutSummary: 'إرسال بايتات الملف لرفع مؤقت',

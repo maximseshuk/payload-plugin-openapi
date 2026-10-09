@@ -87,6 +87,7 @@ export const ko: PluginDefaultTranslationsObject = {
     uploadPayloadField: 'JSON 문자열로 변환된 {{schema}} 필드입니다. 예: `{"alt":"A caption"}`.',
     fileServe: '파일',
     filePartial: '`Range` 요청에 대한 파일의 일부',
+    paramFileVersion: '이 버전 ID로 저장된 파일을 반환합니다.',
     uploadInstructionsSummary: '문서를 저장하기 전에 파일 업로드 안내를 받습니다',
     uploadInstructionsResult: '파일 바이트를 보낼 위치와 생성 또는 수정 요청에 함께 보낼 `file` 값',
     uploadStagePutSummary: '임시 업로드에 파일 바이트를 보냅니다',

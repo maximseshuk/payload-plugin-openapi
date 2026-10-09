@@ -90,6 +90,7 @@ export const de: PluginDefaultTranslationsObject = {
     uploadPayloadField: 'Als JSON-String serialisierte {{schema}}-Felder. Beispiel: `{"alt":"A caption"}`.',
     fileServe: 'Die Datei',
     filePartial: 'Ein Teil der Datei bei einer `Range`-Anfrage',
+    paramFileVersion: 'Liefert die Datei, die mit dieser Versions-ID gespeichert wurde.',
     uploadInstructionsSummary: 'Anweisungen zum Hochladen einer Datei vor dem Speichern des Dokuments abrufen',
     uploadInstructionsResult:
       'Wohin die Bytes der Datei gesendet werden und welcher `file`-Wert mit der Erstellungs- oder Aktualisierungsanfrage gesendet wird',

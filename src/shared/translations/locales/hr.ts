@@ -89,6 +89,7 @@ export const hr: PluginDefaultTranslationsObject = {
     uploadPayloadField: 'Polja {{schema}} pretvorena u JSON niz. Primjer: `{\\"alt\\":\\"A caption\\"}`.',
     fileServe: 'Datoteka',
     filePartial: 'Dio datoteke za zahtjev `Range`',
+    paramFileVersion: 'Vraća datoteku spremljenu s ovim ID-om verzije.',
     uploadInstructionsSummary: 'Dohvati upute za prijenos datoteke prije spremanja dokumenta',
     uploadInstructionsResult:
       'Kamo poslati bajtove datoteke i vrijednost `file` koja se šalje sa zahtjevom za stvaranje ili ažuriranje',

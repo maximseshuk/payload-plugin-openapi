@@ -84,6 +84,7 @@ export const bnIn: PluginDefaultTranslationsObject = {
     uploadPayloadField: 'JSON-স্ট্রিংকৃত {{schema}} ফিল্ড। উদাহরণ: `{"alt":"A caption"}`।',
     fileServe: 'ফাইলটি',
     filePartial: 'ফাইলের একটি অংশ, `Range` অনুরোধের জন্য',
+    paramFileVersion: 'এই সংস্করণ ID-র সঙ্গে সংরক্ষিত ফাইলটি দেয়।',
     uploadInstructionsSummary: 'নথি সংরক্ষণের আগে ফাইল আপলোডের নির্দেশনা নিন',
     uploadInstructionsResult: 'ফাইলের বাইট কোথায় পাঠাতে হবে এবং তৈরি বা হালনাগাদ অনুরোধে কোন `file` মান পাঠাতে হবে',
     uploadStagePutSummary: 'অস্থায়ী আপলোডের জন্য ফাইলের বাইট পাঠান',

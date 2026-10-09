@@ -86,6 +86,7 @@ export const bg: PluginDefaultTranslationsObject = {
     uploadPayloadField: 'JSON-сериализирани {{schema}} полета. Пример: `{"alt":"A caption"}`.',
     fileServe: 'Файлът',
     filePartial: 'Част от файла при заявка с `Range`',
+    paramFileVersion: 'Връща файла, запазен с това ID на версия.',
     uploadInstructionsSummary: 'Получаване на инструкции за качване на файл преди запис на документа',
     uploadInstructionsResult:
       'Къде да се изпратят байтовете на файла и стойността `file` за заявката за създаване или обновяване',

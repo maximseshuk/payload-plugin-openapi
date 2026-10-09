@@ -86,6 +86,7 @@ export const uk: PluginDefaultTranslationsObject = {
     uploadPayloadField: 'Поля {{schema}} у вигляді JSON-рядка. Приклад: `{"alt":"A caption"}`.',
     fileServe: 'Файл',
     filePartial: 'Частина файлу для запиту з `Range`',
+    paramFileVersion: 'Віддає файл, збережений з цим ID версії.',
     uploadInstructionsSummary: 'Отримати інструкції для завантаження файлу перед збереженням документа',
     uploadInstructionsResult:
       'Куди надіслати байти файлу і яке значення `file` передати в запиті на створення чи оновлення',

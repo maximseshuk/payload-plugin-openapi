@@ -88,6 +88,7 @@ export const id: PluginDefaultTranslationsObject = {
     uploadPayloadField: 'Field {{schema}} yang sudah di-JSON-stringify. Contoh: `{"alt":"A caption"}`.',
     fileServe: 'File',
     filePartial: 'Sebagian file, untuk permintaan `Range`',
+    paramFileVersion: 'Mengembalikan file yang disimpan dengan ID versi ini.',
     uploadInstructionsSummary: 'Dapatkan instruksi untuk mengunggah file sebelum menyimpan dokumen',
     uploadInstructionsResult:
       'Ke mana byte file dikirim, dan nilai `file` yang dikirim bersama permintaan buat atau perbarui',

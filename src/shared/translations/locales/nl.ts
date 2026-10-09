@@ -90,6 +90,7 @@ export const nl: PluginDefaultTranslationsObject = {
     uploadPayloadField: '{{schema}}-velden als JSON-string. Voorbeeld: `{"alt":"A caption"}`.',
     fileServe: 'Het bestand',
     filePartial: 'Een deel van het bestand, voor een `Range`-verzoek',
+    paramFileVersion: 'Geeft het bestand terug dat met deze versie-ID is opgeslagen.',
     uploadInstructionsSummary: 'Instructies ophalen om een bestand te uploaden voordat het document wordt opgeslagen',
     uploadInstructionsResult:
       'Waar de bytes van het bestand naartoe moeten, en de `file`-waarde die met het aanmaak- of bijwerkverzoek mee moet',

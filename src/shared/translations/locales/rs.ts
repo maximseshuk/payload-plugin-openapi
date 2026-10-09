@@ -87,6 +87,7 @@ export const rs: PluginDefaultTranslationsObject = {
     uploadPayloadField: 'Поља {{schema}} у JSON стринг формату. Пример: `{"alt":"A caption"}`.',
     fileServe: 'Датотека',
     filePartial: 'Део датотеке за `Range` захтев',
+    paramFileVersion: 'Враћа датотеку сачувану са овим ID-јем верзије.',
     uploadInstructionsSummary: 'Преузимање упутстава за отпремање датотеке пре чувања документа',
     uploadInstructionsResult:
       'Где послати бајтове датотеке и вредност `file` која се шаље уз захтев за креирање или ажурирање',

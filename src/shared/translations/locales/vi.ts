@@ -87,6 +87,7 @@ export const vi: PluginDefaultTranslationsObject = {
     uploadPayloadField: 'Các trường {{schema}} đã được chuyển thành chuỗi JSON. Ví dụ: `{"alt":"A caption"}`.',
     fileServe: 'Tệp',
     filePartial: 'Một phần của tệp, cho yêu cầu `Range`',
+    paramFileVersion: 'Trả về tệp được lưu với ID phiên bản này.',
     uploadInstructionsSummary: 'Lấy hướng dẫn tải tệp lên trước khi lưu tài liệu',
     uploadInstructionsResult: 'Nơi gửi các byte của tệp, và giá trị `file` cần gửi kèm yêu cầu tạo hoặc cập nhật',
     uploadStagePutSummary: 'Gửi các byte của tệp cho một lần tải lên tạm thời',

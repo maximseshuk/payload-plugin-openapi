@@ -89,6 +89,7 @@ export const ro: PluginDefaultTranslationsObject = {
     uploadPayloadField: 'Câmpuri {{schema}} serializate în JSON. Exemplu: `{\\"alt\\":\\"A caption\\"}`.',
     fileServe: 'Fișierul',
     filePartial: 'O parte din fișier, pentru o cerere `Range`',
+    paramFileVersion: 'Returnează fișierul salvat cu acest ID de versiune.',
     uploadInstructionsSummary: 'Obține instrucțiuni pentru încărcarea unui fișier înainte de salvarea documentului',
     uploadInstructionsResult:
       'Unde se trimit octeții fișierului și valoarea `file` de trimis cu cererea de creare sau actualizare',

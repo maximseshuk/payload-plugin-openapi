@@ -85,6 +85,7 @@ export const my: PluginDefaultTranslationsObject = {
     uploadPayloadField: 'JSON-stringified {{schema}} အကွက်များ။ ဥပမာ: `{"alt":"A caption"}`။',
     fileServe: 'ဖိုင်',
     filePartial: '`Range` request အတွက် ဖိုင်၏ အစိတ်အပိုင်း',
+    paramFileVersion: 'ဤဗားရှင်း ID ဖြင့် သိမ်းထားသော ဖိုင်ကို ပြန်ပေးသည်။',
     uploadInstructionsSummary: 'စာရွက်စာတမ်းကို မသိမ်းမီ ဖိုင်အပ်လုဒ်လုပ်ရန် ညွှန်ကြားချက်များ ရယူသည်',
     uploadInstructionsResult: 'ဖိုင် bytes ပို့ရမည့်နေရာနှင့် create သို့မဟုတ် update request နှင့်အတူ ပို့ရမည့် `file` တန်ဖိုး',
     uploadStagePutSummary: 'ယာယီအပ်လုဒ်အတွက် ဖိုင် bytes ပို့သည်',

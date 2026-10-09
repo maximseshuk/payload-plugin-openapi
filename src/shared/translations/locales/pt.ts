@@ -89,6 +89,7 @@ export const pt: PluginDefaultTranslationsObject = {
     uploadPayloadField: 'Campos {{schema}} em JSON stringificado. Exemplo: `{"alt":"A caption"}`.',
     fileServe: 'O arquivo',
     filePartial: 'Uma parte do arquivo, para uma requisição `Range`',
+    paramFileVersion: 'Retorna o arquivo salvo com este ID de versão.',
     uploadInstructionsSummary: 'Obter instruções para enviar um arquivo antes de salvar o documento',
     uploadInstructionsResult:
       'Para onde enviar os bytes do arquivo e o valor `file` a enviar com a requisição de criação ou atualização',

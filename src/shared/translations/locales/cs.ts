@@ -87,6 +87,7 @@ export const cs: PluginDefaultTranslationsObject = {
     uploadPayloadField: 'Pole {{schema}} serializovaná do JSON. Příklad: `{\\"alt\\":\\"A caption\\"}`.',
     fileServe: 'Soubor',
     filePartial: 'Část souboru pro požadavek `Range`',
+    paramFileVersion: 'Vrátí soubor uložený s tímto ID verze.',
     uploadInstructionsSummary: 'Získat pokyny k nahrání souboru před uložením dokumentu',
     uploadInstructionsResult: 'Kam poslat bajty souboru a hodnota `file` pro požadavek na vytvoření nebo úpravu',
     uploadStagePutSummary: 'Odeslat bajty souboru pro dočasné nahrání',

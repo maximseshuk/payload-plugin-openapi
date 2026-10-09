@@ -1,4 +1,5 @@
 import type {
+  ParameterObject,
   PathsObject,
   ReferenceObject,
   RequestBodyObject,
@@ -263,8 +264,12 @@ export const buildCollectionPaths = ({
 
   if (isUpload) {
     const file = { content: { '*/*': { schema: { type: 'string', format: 'binary' } } } } as const
+    const fileParams: ParameterObject[] = [{ name: 'filename', in: 'path', required: true, schema: { type: 'string' } }]
+    if (collection.versions) {
+      fileParams.push({ name: 'version', in: 'query', description: t('paramFileVersion'), schema: { type: idType } })
+    }
     paths[`${base}/file/{filename}`] = {
-      parameters: [{ name: 'filename', in: 'path', required: true, schema: { type: 'string' } }],
+      parameters: fileParams,
       get: {
         tags: [name],
         operationId: `get${name}File`,
@@ -274,6 +279,27 @@ export const buildCollectionPaths = ({
           ...errorResponses(['400', '403', '404', '500'], t),
         },
         security: secRead,
+      },
+    }
+    paths[`${base}/{id}/rename`] = {
+      parameters: [{ name: 'id', in: 'path', required: true, schema: { type: idType } }],
+      post: {
+        tags: [name],
+        operationId: `rename${name}File`,
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: { filename: { type: 'string' }, draft: { type: 'boolean' } },
+                required: ['filename'],
+              },
+            },
+          },
+        },
+        responses: updateResponse,
+        security: secUpdate,
       },
     }
   }

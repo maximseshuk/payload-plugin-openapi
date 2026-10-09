@@ -87,6 +87,7 @@ export const hu: PluginDefaultTranslationsObject = {
     uploadPayloadField: 'JSON-stringgé alakított {{schema}} mezők. Példa: `{"alt":"A caption"}`.',
     fileServe: 'A fájl',
     filePartial: 'A fájl egy része `Range` kéréshez',
+    paramFileVersion: 'Az ezzel a verzióazonosítóval mentett fájlt adja vissza.',
     uploadInstructionsSummary: 'Utasítások lekérése fájl feltöltéséhez a dokumentum mentése előtt',
     uploadInstructionsResult:
       'Hová kell küldeni a fájl bájtjait, és milyen `file` értéket kell küldeni a létrehozási vagy frissítési kéréssel',

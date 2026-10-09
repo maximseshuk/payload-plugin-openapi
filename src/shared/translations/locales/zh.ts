@@ -83,6 +83,7 @@ export const zh: PluginDefaultTranslationsObject = {
     uploadPayloadField: 'JSON 字符串化的 {{schema}} 字段。示例：`{"alt":"A caption"}`。',
     fileServe: '文件',
     filePartial: '`Range` 请求返回的部分文件',
+    paramFileVersion: '返回以此版本 ID 保存的文件。',
     uploadInstructionsSummary: '在保存文档前获取上传文件的说明',
     uploadInstructionsResult: '文件字节的发送位置，以及在创建或更新请求中发送的 `file` 值',
     uploadStagePutSummary: '为临时上传发送文件字节',

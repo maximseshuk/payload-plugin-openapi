@@ -88,6 +88,7 @@ export const ta: PluginDefaultTranslationsObject = {
     uploadPayloadField: 'JSON-stringified {{schema}} புலங்கள். எடுத்துக்காட்டு: `{"alt":"A caption"}`.',
     fileServe: 'கோப்பு',
     filePartial: '`Range` கோரிக்கைக்கான கோப்பின் ஒரு பகுதி',
+    paramFileVersion: 'இந்தப் பதிப்பு ID உடன் சேமிக்கப்பட்ட கோப்பைத் தருகிறது.',
     uploadInstructionsSummary: 'ஆவணத்தைச் சேமிக்கும் முன் கோப்பைப் பதிவேற்றுவதற்கான வழிமுறைகளைப் பெறவும்',
     uploadInstructionsResult:
       'கோப்பின் பைட்டுகளை எங்கு அனுப்ப வேண்டும் மற்றும் உருவாக்கு அல்லது புதுப்பி கோரிக்கையுடன் அனுப்ப வேண்டிய `file` மதிப்பு',

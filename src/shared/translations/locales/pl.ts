@@ -88,6 +88,7 @@ export const pl: PluginDefaultTranslationsObject = {
     uploadPayloadField: 'Pola {{schema}} w postaci ciągu JSON. Przykład: `{\\"alt\\":\\"A caption\\"}`.',
     fileServe: 'Plik',
     filePartial: 'Część pliku dla żądania `Range`',
+    paramFileVersion: 'Zwraca plik zapisany z tym ID wersji.',
     uploadInstructionsSummary: 'Pobierz instrukcje przesłania pliku przed zapisaniem dokumentu',
     uploadInstructionsResult:
       'Dokąd wysłać bajty pliku i jaką wartość `file` wysłać z żądaniem utworzenia lub aktualizacji',

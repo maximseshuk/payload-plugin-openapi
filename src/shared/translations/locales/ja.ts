@@ -89,6 +89,7 @@ export const ja: PluginDefaultTranslationsObject = {
     uploadPayloadField: 'JSON 文字列化した {{schema}} フィールド。例: `{"alt":"A caption"}`。',
     fileServe: 'ファイル',
     filePartial: '`Range` リクエストに対するファイルの一部',
+    paramFileVersion: 'このバージョン ID で保存されたファイルを返します。',
     uploadInstructionsSummary: 'ドキュメントを保存する前にファイルをアップロードする手順を取得します',
     uploadInstructionsResult: 'ファイルのバイトの送信先と、作成または更新リクエストで送信する `file` の値',
     uploadStagePutSummary: '一時アップロードにファイルのバイトを送信します',

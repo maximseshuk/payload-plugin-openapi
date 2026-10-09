@@ -90,6 +90,7 @@ export const hy: PluginDefaultTranslationsObject = {
     uploadPayloadField: 'JSON-ի տողի վերածված {{schema}} դաշտեր։ Օրինակ՝ `{"alt":"A caption"}`։',
     fileServe: 'Ֆայլը',
     filePartial: 'Ֆայլի մի մասը՝ `Range` հարցման համար',
+    paramFileVersion: 'Վերադարձնում է այս տարբերակի ID-ով պահված ֆայլը։',
     uploadInstructionsSummary: 'Ստանալ ֆայլի վերբեռնման հրահանգներ մինչև փաստաթղթի պահպանումը',
     uploadInstructionsResult:
       'Որտեղ ուղարկել ֆայլի բայթերը և `file` արժեքը, որն ուղարկվում է ստեղծման կամ թարմացման հարցման հետ',
