@@ -57,6 +57,8 @@ import { buildParamSchemas, buildQueryOperationsSchema, collectionHasFilters } f
 import { applySecurity, evaluateAccess, resolveEntitySecurity, securedRequirement } from './security.js'
 import { buildTagHierarchy, type CollectionTagInfo, type GlobalTagInfo, type SystemTag } from './tags.js'
 
+const OPERATION_METHODS = new Set(['get', 'put', 'post', 'delete', 'options', 'head', 'patch', 'trace', 'query'])
+
 const resolveDescription = (description: unknown, ctx: BuildContext): string | undefined => {
   if (description == null) return undefined
   const resolved: unknown = getTranslation(description as string, ctx.i18n)
@@ -349,7 +351,15 @@ export const buildDocument = async (input: BuildInput): Promise<Document> => {
 
   for (const ext of options.extensions) {
     if (ext.paths) {
-      doc.paths = deepMerge(doc.paths ?? {}, ext.paths) as PathsObject
+      const base: PathsObject = { ...doc.paths }
+      for (const [path, item] of Object.entries(ext.paths)) {
+        const current = base[path]
+        if (!current || !item) continue
+        base[path] = Object.fromEntries(
+          Object.entries(current).filter(([key]) => !(OPERATION_METHODS.has(key) && key in item)),
+        )
+      }
+      doc.paths = deepMerge(base, ext.paths) as PathsObject
     }
     if (ext.components) {
       doc.components = deepMerge(

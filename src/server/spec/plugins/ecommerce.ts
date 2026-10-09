@@ -106,7 +106,7 @@ export const ecommerce: OfficialPlugin = {
             }),
             ...messageErrors(merge ? ['400', '401'] : ['400'], t, failure),
             ...errorResponses(['403'], t),
-            '404': jsonResponse(t('ecommerceError404'), {
+            '404': jsonResponse(t('error404Ecommerce'), {
               oneOf: [
                 {
                   type: 'object',

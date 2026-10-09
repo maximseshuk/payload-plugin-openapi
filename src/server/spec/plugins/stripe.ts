@@ -33,7 +33,7 @@ export const stripeWebhookOperation = ({
     },
     responses: {
       '200': jsonResponse(t('stripeWebhookResult'), received),
-      '400': jsonResponse(t('stripeWebhookError400'), received),
+      '400': jsonResponse(t('error400StripeWebhook'), received),
     },
   }
 }
@@ -63,7 +63,7 @@ export const stripe: OfficialPlugin = {
           required: ['data', 'status'],
         }),
         ...messageErrors(['400', '401', '403'], t),
-        '404': jsonResponse(t('stripeRestError404'), {
+        '404': jsonResponse(t('error404StripeRest'), {
           type: 'object',
           properties: { message: { type: 'string' }, status: { type: 'integer', enum: [404] } },
           required: ['message', 'status'],

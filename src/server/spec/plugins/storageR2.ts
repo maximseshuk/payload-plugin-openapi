@@ -73,7 +73,7 @@ export const storageR2: OfficialPlugin = {
           },
         },
         ...errorResponses(['400', '403', '500'], t),
-        '412': { description: t('r2Error412'), content: { 'text/plain': { schema: { type: 'string' } } } },
+        '412': { description: t('error412R2'), content: { 'text/plain': { schema: { type: 'string' } } } },
       },
       security: securedRequirement(),
     })

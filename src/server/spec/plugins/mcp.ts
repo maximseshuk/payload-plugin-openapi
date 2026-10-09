@@ -67,13 +67,13 @@ export const mcp: OfficialPlugin = {
       responses: {
         '200': jsonResponse(t('mcpResult'), jsonRpcBatch),
         '202': { description: t('mcpResult202') },
-        '400': jsonResponse(t('pluginError400'), { oneOf: [jsonRpcError, { $ref: refTo(ERROR_SCHEMA_NAME) }] }),
+        '400': jsonResponse(t('error400Plugin'), { oneOf: [jsonRpcError, { $ref: refTo(ERROR_SCHEMA_NAME) }] }),
         ...errorResponses(['401'], t),
-        '404': rpcError(t('mcpError404')),
-        '406': rpcError(t('mcpError406')),
-        '413': rpcError(t('mcpError413')),
-        '415': rpcError(t('mcpError415')),
-        '500': rpcError(t('pluginError500')),
+        '404': rpcError(t('error404Mcp')),
+        '406': rpcError(t('error406Mcp')),
+        '413': rpcError(t('error413Mcp')),
+        '415': rpcError(t('error415Mcp')),
+        '500': rpcError(t('error500Plugin')),
       },
     }
     const get: OperationObject = {
@@ -81,7 +81,7 @@ export const mcp: OfficialPlugin = {
       operationId: 'mcpStream',
       summary: t('mcpGet'),
       responses: {
-        '405': { description: t('mcpGetError405'), headers: { Allow: { schema: { type: 'string', enum: ['POST'] } } } },
+        '405': { description: t('error405McpGet'), headers: { Allow: { schema: { type: 'string', enum: ['POST'] } } } },
       },
     }
     return [

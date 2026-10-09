@@ -42,6 +42,12 @@ openapi({
 | `tags`       | `TagObject[]`                                        | —       | Extra tags appended to the document's `tags`                   |
 | `transform`  | `({ doc, ...ctx }) => Document \| Promise<Document>` | —       | Post-build hook over the finished document. It can be `async`. |
 
+## Your paths take priority
+
+An operation in `paths` replaces the generated operation with the same path and method in full. Nothing from the generated operation is kept: not its `security`, `tags` or `responses`. Other methods on the same path stay. Path-level fields such as `summary` and `parameters` merge into the generated path item.
+
+To change one field of a generated operation, use [`custom.openapi`](/v1/guides/custom-endpoints) on the endpoint or a `transform`.
+
 ## The `transform` hook
 
 `transform` receives one object, the `ExtensionContext`: the full built document as `doc` plus the build environment. It **must return the document** to serve. Mutate and return the same object, or return a new one — either works, but a missing `return` drops the document. It can be `async`.

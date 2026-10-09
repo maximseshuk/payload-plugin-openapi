@@ -68,11 +68,11 @@ export const messageSchema: SchemaObject = {
 }
 
 const MESSAGE_ERROR_KEYS = {
-  '400': 'pluginError400',
-  '401': 'pluginError401',
-  '403': 'pluginError403',
-  '404': 'pluginError404',
-  '500': 'pluginError500',
+  '400': 'error400Plugin',
+  '401': 'error401Plugin',
+  '403': 'error403Plugin',
+  '404': 'error404Plugin',
+  '500': 'error500Plugin',
 } as const
 
 export const messageErrors = (

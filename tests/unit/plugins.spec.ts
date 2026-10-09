@@ -84,6 +84,21 @@ describe('spec/plugins', () => {
     expect(tagNames(doc)).not.toContain('SEO')
   })
 
+  it('lets an operation in `extensions.paths` replace the generated one', async () => {
+    const mine = { operationId: 'mine', responses: { '200': { description: 'ok' } } }
+    const doc = await build(
+      {
+        plugins: [plugin('@payloadcms/plugin-mcp')],
+        endpoints: [ep('post', '/mcp'), ep('get', '/mcp')],
+      },
+      [],
+      { extensions: [{ paths: { '/api/mcp': { summary: 'MCP', post: mine } } }] },
+    )
+    expect(op(doc, '/api/mcp', 'post')).toEqual(mine)
+    expect(op(doc, '/api/mcp', 'get')?.operationId).toBe('mcpStream')
+    expect(doc.paths?.['/api/mcp']?.summary).toBe('MCP')
+  })
+
   it('documents the Stripe webhook as public and the REST proxy as secured', async () => {
     const doc = await build({
       plugins: [
