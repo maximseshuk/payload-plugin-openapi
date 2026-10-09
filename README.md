@@ -121,6 +121,10 @@ Full docs are at **<https://payload-plugin-openapi.seshuk.im/>**:
 - [CLI — `openapi:generate`](https://payload-plugin-openapi.seshuk.im/v1/cli/generate)
 - [Examples](https://payload-plugin-openapi.seshuk.im/v1/guides/examples)
 
+## Official plugins
+
+When you install an official Payload plugin, the spec documents the REST endpoints it mounts: `@payloadcms/plugin-ecommerce`, `plugin-stripe`, `plugin-mcp`, `plugin-seo`, `plugin-search`, `plugin-multi-tenant`, `plugin-import-export` and `storage-r2`. There is nothing to configure. Filter them with `excludeOperations: [{ plugin: '@payloadcms/plugin-stripe' }]` or `{ kind: 'plugin' }`. See [Official plugins](https://payload-plugin-openapi.seshuk.im/v1/reference/endpoints#official-plugins).
+
 ## For plugin authors
 
 If you maintain a Payload plugin, attach a `custom.openapi` Operation Object to the endpoints you add and they show up in the generated spec — no dependency on this package, and nothing for your users to wire up. The same key works on fields. If this plugin isn't installed, the metadata is inert. See [For plugin authors](https://payload-plugin-openapi.seshuk.im/v1/guides/plugin-authors).

@@ -38,7 +38,7 @@ import {
   securityScheme,
 } from './components.js'
 import { buildBlockSchema, buildEntitySchemas } from './entitySchemas.js'
-import { filterOperations, shouldIncludeCollection, shouldIncludeGlobal } from './filters.js'
+import { filterOperations, shouldIncludeCollection, shouldIncludeGlobal, stripPluginKeys } from './filters.js'
 import { applyHierarchy } from './hierarchy.js'
 import {
   blockSchemaName,
@@ -53,6 +53,7 @@ import {
   updateSchemaName,
 } from './names.js'
 import { buildParamSchemas, buildQueryOperationsSchema, collectionHasFilters } from './params.js'
+import { OFFICIAL_PLUGINS } from './plugins/index.js'
 import { applySecurity, evaluateAccess, resolveEntitySecurity, securedRequirement } from './security.js'
 import { buildTagHierarchy, type CollectionTagInfo, type GlobalTagInfo, type SystemTag } from './tags.js'
 
@@ -93,11 +94,17 @@ export const buildDocument = async (input: BuildInput): Promise<Document> => {
 
   const { filters } = options
   const login = options.serve && options.interactiveAuth.enabled
-  const finalize = async (group: PathsObject, kind: OperationKind, slug?: string): Promise<PathsObject> =>
+  const finalize = async (
+    group: PathsObject,
+    kind: OperationKind,
+    slug?: string,
+    plugin?: string,
+  ): Promise<PathsObject> =>
     applySecurity({
-      paths: await filterOperations({ paths: group, slug, kind, filters }),
+      paths: await filterOperations({ paths: group, slug, kind, filters, plugin }),
       slug,
       kind,
+      plugin,
       security: options.security,
       login,
     })
@@ -230,7 +237,10 @@ export const buildDocument = async (input: BuildInput): Promise<Document> => {
 
   if (filters.includeCustom) {
     try {
-      Object.assign(paths, await finalize(buildCustomEndpointPaths({ config, collections, globals, ctx }), 'custom'))
+      Object.assign(
+        paths,
+        stripPluginKeys(await finalize(buildCustomEndpointPaths({ config, collections, globals, ctx }), 'custom')),
+      )
     } catch (error) {
       logger.warn(`${PLUGIN_NAME}: failed to collect custom endpoints: ${(error as Error).message}`)
     }
@@ -255,6 +265,23 @@ export const buildDocument = async (input: BuildInput): Promise<Document> => {
 
   const uploadSlugs = collections.filter((c) => c.upload).map((c) => c.slug)
   Object.assign(paths, await finalize(buildSystemPaths({ ctx, access, uploadSlugs }), 'system'))
+
+  const pluginTags: string[] = []
+  for (const plugin of OFFICIAL_PLUGINS) {
+    const installed = config.plugins?.find((p) => p.slug === plugin.slug)
+    if (!(plugin.installed?.(config) ?? installed)) continue
+    try {
+      const groups = plugin.build({ config, collections, ctx, options: installed?.options, schemas, t })
+      for (const group of groups) {
+        const finalized = await finalize(group.paths, 'plugin', group.slug, plugin.slug)
+        if (Object.keys(finalized).length === 0) continue
+        Object.assign(paths, finalized)
+        if (!pluginTags.includes(plugin.tag)) pluginTags.push(plugin.tag)
+      }
+    } catch (error) {
+      logger.warn(`${PLUGIN_NAME}: skipped plugin "${plugin.slug}": ${(error as Error).message}`)
+    }
+  }
 
   const systemTags: SystemTag[] = []
   if (hasJobs) systemTags.push('Jobs')
@@ -313,6 +340,7 @@ export const buildDocument = async (input: BuildInput): Promise<Document> => {
       collections: collectionTagInfos,
       globals: globalTagInfos,
       systemTags,
+      pluginTags,
       t,
       nested: options.nestedTags,
     }),

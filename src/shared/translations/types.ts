@@ -106,6 +106,60 @@ export type PluginDefaultTranslationsObject = {
     tagJobs: string
     tagUploads: string
     tagAccess: string
+    tagPlugins: string
+    tagPluginsDesc: string
+    pluginError400: string
+    pluginError401: string
+    pluginError403: string
+    pluginError404: string
+    pluginError500: string
+    ecommerceAddItem: string
+    ecommerceRemoveItem: string
+    ecommerceUpdateItem: string
+    ecommerceClearCart: string
+    ecommerceMergeCart: string
+    ecommerceCartAccess: string
+    ecommerceCartResult: string
+    ecommerceCartNotFound: string
+    ecommerceQuantity: string
+    ecommerceInitiatePayment: string
+    ecommerceConfirmOrder: string
+    ecommercePaymentBody: string
+    ecommerceInitiateResult: string
+    ecommerceConfirmResult: string
+    stripeWebhook: string
+    stripeWebhookBody: string
+    stripeWebhookResult: string
+    stripeWebhookInvalid: string
+    stripeRest: string
+    stripeRestResult: string
+    stripeRestError: string
+    mcp: string
+    mcpDesc: string
+    mcpResult: string
+    mcpOverrideAccess: string
+    mcpGet: string
+    mcpGetResult: string
+    seoTitle: string
+    seoDescription: string
+    seoUrl: string
+    seoImage: string
+    seoBody: string
+    seoResult: string
+    searchReindex: string
+    searchReindexResult: string
+    tenantOptions: string
+    tenantOptionsResult: string
+    exportDownload: string
+    exportDownloadResult: string
+    exportPreview: string
+    importPreview: string
+    previewResult: string
+    importFileData: string
+    r2Upload: string
+    r2UploadDesc: string
+    r2UploadResult: string
+    r2Exists: string
 
     localizationHeading: string
     localizationNote: string

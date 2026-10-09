@@ -49,10 +49,10 @@ All public types come from the same entry point, so editor autocomplete picks th
 | `LocalizedText`          | A string, a language-keyed object or a `({ t, i18n }) => string` function                                                                             |
 | `OpenApiVersion`         | `'3.0' \| '3.1' \| '3.2'`                                                                                                                             |
 | `FilterOptions`          | The `filters` object — entity include/exclude, endpoint-group toggles, operation rules ([Filters](/v1/configuration/filters))                         |
-| `OperationContext`       | `{ method, path, slug, kind }` passed to `filters.excludeOperations` functions and `security`                                                         |
-| `OperationRule`          | One `filters.excludeOperations` rule — `method`, `slug`, `kind`, `path`                                                                               |
+| `OperationContext`       | `{ method, path, slug, kind, plugin }` passed to `filters.excludeOperations` functions and `security`                                                 |
+| `OperationRule`          | One `filters.excludeOperations` rule — `method`, `slug`, `kind`, `path`, `plugin`                                                                     |
 | `OperationFilter`        | One `filters.excludeOperations` entry: an `OperationRule` or a function                                                                               |
-| `OperationKind`          | `'collection' \| 'global' \| 'custom' \| 'jobs' \| 'system'`                                                                                          |
+| `OperationKind`          | `'collection' \| 'global' \| 'custom' \| 'jobs' \| 'system' \| 'plugin'`                                                                              |
 | `SecurityOption`         | The `security` function ([Security marking](/v1/configuration/security-marking))                                                                      |
 | `SecurityMarking`        | `'public' \| 'secured'`                                                                                                                               |
 | `AccessOption`           | The `access` function of `openapi()`, `scalar()` and `swaggerUi()`                                                                                    |

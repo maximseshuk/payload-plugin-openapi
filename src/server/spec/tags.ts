@@ -5,6 +5,7 @@ import type { Translate } from '@/shared/translations/types.js'
 export const NAV_COLLECTIONS = 'Collections'
 export const NAV_GLOBALS = 'Globals'
 export const NAV_SYSTEM = 'System'
+export const NAV_PLUGINS = 'Plugins'
 
 export const entityTagName = (base: string): string => base
 export const authTagName = (base: string): string => `${base} Auth`
@@ -31,11 +32,19 @@ export interface TagHierarchyInput {
   collections: CollectionTagInfo[]
   globals: GlobalTagInfo[]
   systemTags: SystemTag[]
+  pluginTags?: string[]
   t: Translate
   nested: boolean
 }
 
-export const buildTagHierarchy = ({ collections, globals, systemTags, t, nested }: TagHierarchyInput): TagObject[] => {
+export const buildTagHierarchy = ({
+  collections,
+  globals,
+  systemTags,
+  pluginTags = [],
+  t,
+  nested,
+}: TagHierarchyInput): TagObject[] => {
   if (!nested) {
     return [
       ...collections.map((c) => ({ name: entityTagName(c.base), description: c.description })),
@@ -70,6 +79,11 @@ export const buildTagHierarchy = ({ collections, globals, systemTags, t, nested 
   if (systemTags.length > 0) {
     tags.push({ name: NAV_SYSTEM, summary: t('tagSystem'), description: t('tagSystemDesc'), kind: 'nav' })
     for (const name of systemTags) tags.push({ name, parent: NAV_SYSTEM, summary: t(SYSTEM_TAG_SUMMARIES[name]) })
+  }
+
+  if (pluginTags.length > 0) {
+    tags.push({ name: NAV_PLUGINS, summary: t('tagPlugins'), description: t('tagPluginsDesc'), kind: 'nav' })
+    for (const name of pluginTags) tags.push({ name, parent: NAV_PLUGINS })
   }
 
   return tags

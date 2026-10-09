@@ -73,7 +73,7 @@ openapi({
 })
 ```
 
-The function receives `{ method, path, slug, kind, detected }` for each operation. `kind` is `'collection'`, `'global'`, `'custom'`, `'jobs'` or `'system'`, and `slug` is set only for collections and globals. `detected` is the marking the plugin found, `'public'` or `'secured'`. The function can be `async`.
+The function receives `{ method, path, slug, kind, plugin, detected }` for each operation. `kind` is `'collection'`, `'global'`, `'custom'`, `'jobs'`, `'system'` or `'plugin'`. `slug` is set for collections and globals, and for plugin operations mounted on a collection. `plugin` is the package name of the [official plugin](/v1/reference/endpoints#official-plugins) that added the operation, or the `x-payload-plugin` value of a custom endpoint. `detected` is the marking the plugin found, `'public'` or `'secured'`. The function can be `async`.
 
 When [interactive auth](/v1/configuration/interactive-auth) is on, every secured operation also lists the `PayloadLogin` scheme, so the docs UI sends the token it got from the login dialog.
 

@@ -104,7 +104,7 @@ filters: {
 
 ## Dropping individual operations
 
-`include` / `exclude` work at the entity level. To remove specific operations — one method on one collection, every `DELETE`, anything under a path prefix — use `excludeOperations`. It applies to every operation in the spec: collection, global, custom, jobs and system (upload instructions, `/api/access`) operations.
+`include` / `exclude` work at the entity level. To remove specific operations — one method on one collection, every `DELETE`, anything under a path prefix — use `excludeOperations`. It applies to every operation in the spec: collection, global, custom, jobs, system (upload instructions, `/api/access`) and [official plugin](/v1/reference/endpoints#official-plugins) operations.
 
 ### Rules
 
@@ -116,8 +116,11 @@ Each rule is a set of conditions. Within one rule, every field you set must matc
 | `slug`   | `string \| RegExp`           | The collection or global slug, exact string or pattern; omit to match any |
 | `kind`   | `OperationKind`              | Restrict to one group; omit to match all                                  |
 | `path`   | `RegExp`                     | Tested against the final route path (e.g. `/api/posts/{id}`)              |
+| `plugin` | `string \| RegExp`           | The plugin that added the operation, exact string or pattern              |
 
-`kind` is one of `'collection'`, `'global'`, `'custom'` (endpoints with `custom.openapi`), `'jobs'` or `'system'`. Custom, jobs and system operations have no slug, so a rule with `slug` never matches them.
+`kind` is one of `'collection'`, `'global'`, `'custom'` (endpoints with `custom.openapi`), `'jobs'`, `'system'` or `'plugin'` (endpoints of an official Payload plugin). Custom, jobs and system operations have no slug, so a rule with `slug` never matches them. A plugin operation mounted on a collection, such as `/api/search/reindex`, has that collection's slug. One mounted at the API root has none.
+
+`plugin` is the plugin's package name, such as `'@payloadcms/plugin-search'`, for `'plugin'` operations. A rule with `plugin` never matches an operation without one.
 
 ```ts payload.config.ts
 filters: {
@@ -128,13 +131,26 @@ filters: {
     { slug: 'posts', method: ['post', 'patch', 'put'] },
     // Drop anything matching a path, regardless of method or entity.
     { path: /\/preview$/ },
+    // Drop everything the Stripe plugin adds.
+    { plugin: '@payloadcms/plugin-stripe' },
   ],
+}
+```
+
+A custom endpoint can name its plugin too. Set `'x-payload-plugin'` in its `custom.openapi`. The operation keeps the `'custom'` kind, and rules and functions see the value as `plugin`. The key is removed from the final document.
+
+```ts my-plugin.ts
+{
+  path: '/my-plugin/sync',
+  method: 'post',
+  handler,
+  custom: { openapi: { 'x-payload-plugin': 'my-plugin', summary: 'Sync now', responses: { '200': { description: 'Done' } } } },
 }
 ```
 
 ### Functions
 
-For logic that doesn't fit a rule, put a function in the same list. It receives the `method`, `path`, `slug` and `kind` of every operation. The operation is dropped only when the function returns `true`. An `async` function is awaited:
+For logic that doesn't fit a rule, put a function in the same list. It receives the `method`, `path`, `slug`, `kind` and `plugin` of every operation. The operation is dropped only when the function returns `true`. An `async` function is awaited:
 
 ```ts payload.config.ts
 filters: {
