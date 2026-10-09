@@ -186,23 +186,23 @@ importers:
         version: 0.9.7
     devDependencies:
       '@payloadcms/db-sqlite':
-        specifier: 4.0.0-canary.38
-        version: 4.0.0-canary.38(payload@4.0.0-canary.38(graphql@16.11.0)(typescript@7.0.2))
+        specifier: 4.0.0-beta.0
+        version: 4.0.0-beta.0(payload@4.0.0-beta.0(graphql@16.11.0)(typescript@7.0.2))
       '@payloadcms/next':
-        specifier: 4.0.0-canary.38
-        version: 4.0.0-canary.38(@types/react@19.2.15)(graphql@16.11.0)(monaco-editor@0.55.1)(next@16.4.0(@types/node@26.6.4)(babel-plugin-macros@3.1.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.77.4))(payload@4.0.0-canary.38(graphql@16.11.0)(typescript@7.0.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2)
+        specifier: 4.0.0-beta.0
+        version: 4.0.0-beta.0(@types/react@19.2.15)(graphql@16.11.0)(monaco-editor@0.55.1)(next@16.4.0(@types/node@26.6.4)(babel-plugin-macros@3.1.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.77.4))(payload@4.0.0-beta.0(graphql@16.11.0)(typescript@7.0.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2)
       '@payloadcms/translations':
-        specifier: 4.0.0-canary.38
-        version: 4.0.0-canary.38
+        specifier: 4.0.0-beta.0
+        version: 4.0.0-beta.0
       '@payloadcms/ui':
-        specifier: 4.0.0-canary.38
-        version: 4.0.0-canary.38(@types/react@19.2.15)(monaco-editor@0.55.1)(payload@4.0.0-canary.38(graphql@16.11.0)(typescript@7.0.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2)
+        specifier: 4.0.0-beta.0
+        version: 4.0.0-beta.0(@types/react@19.2.15)(monaco-editor@0.55.1)(payload@4.0.0-beta.0(graphql@16.11.0)(typescript@7.0.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2)
       '@seriousme/openapi-schema-validator':
         specifier: ^2.9.0
         version: 2.11.0
       '@seshuk/payload-plugin-tooling':
         specifier: 0.2.3
-        version: 0.2.3(@payloadcms/db-sqlite@4.0.0-canary.38(payload@4.0.0-canary.38(graphql@16.11.0)(typescript@7.0.2)))(oxfmt@0.72.0)(oxlint@1.87.0)(payload@4.0.0-canary.38(graphql@16.11.0)(typescript@7.0.2))(tsdown@0.23.0(oxc-resolver@11.20.0)(tsx@4.23.15)(typescript@7.0.2))(vitest@5.0.3)
+        version: 0.2.3(@payloadcms/db-sqlite@4.0.0-beta.0(payload@4.0.0-beta.0(graphql@16.11.0)(typescript@7.0.2)))(oxfmt@0.72.0)(oxlint@1.87.0)(payload@4.0.0-beta.0(graphql@16.11.0)(typescript@7.0.2))(tsdown@0.23.0(oxc-resolver@11.20.0)(tsx@4.23.15)(typescript@7.0.2))(vitest@5.0.3)
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.4
@@ -222,8 +222,8 @@ importers:
         specifier: ^1.86.0
         version: 1.87.0
       payload:
-        specifier: 4.0.0-canary.38
-        version: 4.0.0-canary.38(graphql@16.11.0)(typescript@7.0.2)
+        specifier: 4.0.0-beta.0
+        version: 4.0.0-beta.0(graphql@16.11.0)(typescript@7.0.2)
       react:
         specifier: 'catalog:'
         version: 19.3.0
@@ -2222,39 +2222,39 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@payloadcms/db-sqlite@4.0.0-canary.38':
-    resolution: {integrity: sha512-4cIMI6XscQaSimiX6J+yEjsIVcdzkaXSGq9HbvyXqoyKWRkDkAqQrJ+aEmQ2PpTQICnFGXeOH1EK57C/5XYhPA==}
+  '@payloadcms/db-sqlite@4.0.0-beta.0':
+    resolution: {integrity: sha512-MlQBlPbIg/tMFGXEzfuP+xZGm3vMebuMXTYVSgzizpA2hZQZbZAowkM2MKqpyfN8s2BfzL1DB9Oz/JlcOD4JDg==}
     peerDependencies:
-      payload: 4.0.0-canary.38
+      payload: 4.0.0-beta.0
 
-  '@payloadcms/drizzle@4.0.0-canary.38':
-    resolution: {integrity: sha512-IntAuQqgNzor1ZvzlhD0Bb9w8XrUWPYH62UKYhDVUcA00XFs6etkggeGt4iULweM7sMZZI82dm0syJ6JfT6eHA==}
+  '@payloadcms/drizzle@4.0.0-beta.0':
+    resolution: {integrity: sha512-UuOLOENnJSt5AcHxtDap0XUiJwJ7sOdTSVQMA+jmasf7IsBoiPXohfO+bUj05hm9eU6QWzvK8Psp5PDsqSA/dQ==}
     peerDependencies:
-      payload: 4.0.0-canary.38
+      payload: 4.0.0-beta.0
 
-  '@payloadcms/graphql@4.0.0-canary.38':
-    resolution: {integrity: sha512-JZvndTmx1pnVM95HEDEba1zGHVo2SuQwbMz37GlJ+gdDuIVktTLLQBP8gTrRLl9stdf3RL/h6oeA7uxEinkvmw==}
+  '@payloadcms/graphql@4.0.0-beta.0':
+    resolution: {integrity: sha512-w+eavvxipQjhjXbsmiR25aiggmp/o/CJ3kDQ/wyvLSrW8HwIxbX0s8rUcGo2RtezGJ1F2LQdZdhNeQBLhGlWpA==}
     hasBin: true
     peerDependencies:
       graphql: ^16.8.1
-      payload: 4.0.0-canary.38
+      payload: 4.0.0-beta.0
 
-  '@payloadcms/next@4.0.0-canary.38':
-    resolution: {integrity: sha512-AJrDVOVw4V1gqDvCYCDnEd10quw7rHtRHaCRe6tYWtkyB3s3lcRveuM0mPWxmNFWMeYAgkhp57doDV18Psn66A==}
+  '@payloadcms/next@4.0.0-beta.0':
+    resolution: {integrity: sha512-KHGJnqgMJtLCOVF1w6axTCmm/B+RYq8jgkCTSnW11QKeoLSu+71V4RpzAnXJk0onq5JYtvw1imzEfP4Z82jo4g==}
     engines: {node: '>=24.15.0'}
     peerDependencies:
       graphql: ^16.8.1
       next: '>=16.4.0 <17.0.0'
-      payload: 4.0.0-canary.38
+      payload: 4.0.0-beta.0
 
-  '@payloadcms/translations@4.0.0-canary.38':
-    resolution: {integrity: sha512-7ao8otvtNFYVr13uZvZqr5LiP7ey4DdczL0ikuPi8LvM3QBo7WklCxgK5YrFt8WSAhwZamDNY1V73DGQmAPWjw==}
+  '@payloadcms/translations@4.0.0-beta.0':
+    resolution: {integrity: sha512-/7xz7eBWYvQFiUu9v8CJM2RZpISYvu7xPtBiQ7PYx1xwHOb409W6SB1toEZHLeIpUvEsQaF+J4G4M1P5/D+P9Q==}
 
-  '@payloadcms/ui@4.0.0-canary.38':
-    resolution: {integrity: sha512-+NIwg3zX+U+O8Bsz1vUhx+raAKn1Dgj437c85Vs/IbOv6wq41Rv2+iAS+yMaB+Uu0kcCiYxAeJC2wbw6oYW47w==}
+  '@payloadcms/ui@4.0.0-beta.0':
+    resolution: {integrity: sha512-EnV4VlluR6DZUfkkfCpbQE62xGoSnsT0MhG1T7lmvMtUoOnbJ7nAtcGBtsS0n1j+G8cTl8D4J/u5IaGR5gbBTw==}
     engines: {node: '>=24.15.0'}
     peerDependencies:
-      payload: 4.0.0-canary.38
+      payload: 4.0.0-beta.0
       react: ^19.0.1 || ^19.1.2 || ^19.2.1
       react-dom: ^19.0.1 || ^19.1.2 || ^19.2.1
 
@@ -4497,10 +4497,6 @@ packages:
     resolution: {integrity: sha512-T1gkAiYYDWYx3V5Bmyu7HcfcvL7mUrTWiM6yOfa3PIphViJ/gFPbvidQ+veqSOHci/PxBcDabeUNCzpOODJZig==}
     engines: {node: '>= 14'}
 
-  http-status@2.1.0:
-    resolution: {integrity: sha512-O5kPr7AW7wYd/BBiOezTwnVAnmSNFY+J7hlZD2X5IOxVBetjcHAiTXhzj0gMrnojQlwy+UT1/Y3H3vJ3UlmvLA==}
-    engines: {node: '>= 0.4.0'}
-
   http2-wrapper@2.2.1:
     resolution: {integrity: sha512-V5nVw1PAOgfI3Lmeaj2Exmeg7fenjhRUgz1lPSezy1CuhPYbgQtbQj4jZfEAEMlaL+vupsvhjqCyjzob0yxsmQ==}
     engines: {node: '>=10.19.0'}
@@ -4799,8 +4795,8 @@ packages:
     resolution: {integrity: sha512-/imKNG4EbWNrVjoNC/1H5/9GFy+tqjGBHCaSsN+P2RnPqjsLmv6UD3Ej+Kj8nBWaRAwyk7kK5ZUc+OEatnTR3A==}
     hasBin: true
 
-  jose@6.2.3:
-    resolution: {integrity: sha512-YYVDInQKFJfR/xa3ojUTl8c2KoTwiL1R5Wg9YCydwH0x0B9grbzlg5HC7mMjCtUJjbQ/YnGEZIhI5tCgfTb4Hw==}
+  jose@6.2.12:
+    resolution: {integrity: sha512-9NiFmJEex0sy2Dk58j2UGBSHgUs2ypF9eZSu4L6vjOX3Dp96Sw1F3uL+H+D1sx02jZZdzUT0HgvCy59CuvXcWw==}
 
   jose@6.2.9:
     resolution: {integrity: sha512-XrchZOFZUl/T3vTwRe8XK+cJrGtMF4th1ARnDfwbBXFKThGhlsxEE4Zu03AD/bjJSt/9jT/mxrOCkJWOg77aPA==}
@@ -5521,8 +5517,8 @@ packages:
     resolution: {integrity: sha512-gDKb8aZMDeD/tZWs9P6+q0J9Mwkdl6xMV8TjnGP3qJVJ06bdMgkbBlLU8IdfOsIsFz2BW1rNVT3XuNEl8zPAvw==}
     engines: {node: '>=8'}
 
-  payload@4.0.0-canary.38:
-    resolution: {integrity: sha512-PJMpPqTIsd4DIOyVo3aYVETfvOfsfVd7PfqwJjnbCCqv0Zafzx/H0zACJbhMt1N5CtT5ID4HL6SnNmLWMsgqBQ==}
+  payload@4.0.0-beta.0:
+    resolution: {integrity: sha512-eOFGdWPyGMlghjJ3sys4JqRJBEP1NNElOenUvXddkHU39LwqSrnJYrvERI3cuD4duxz7VYPePo52giGcctsMbA==}
     engines: {node: '>=24.15.0'}
     hasBin: true
     peerDependencies:
@@ -8674,14 +8670,14 @@ snapshots:
   '@oxlint/binding-win32-x64-msvc@1.87.0':
     optional: true
 
-  '@payloadcms/db-sqlite@4.0.0-canary.38(payload@4.0.0-canary.38(graphql@16.11.0)(typescript@7.0.2))':
+  '@payloadcms/db-sqlite@4.0.0-beta.0(payload@4.0.0-beta.0(graphql@16.11.0)(typescript@7.0.2))':
     dependencies:
       '@libsql/client': 0.14.0
-      '@payloadcms/drizzle': 4.0.0-canary.38(@libsql/client@0.14.0)(payload@4.0.0-canary.38(graphql@16.11.0)(typescript@7.0.2))
+      '@payloadcms/drizzle': 4.0.0-beta.0(@libsql/client@0.14.0)(payload@4.0.0-beta.0(graphql@16.11.0)(typescript@7.0.2))
       console-table-printer: 2.15.0
       drizzle-kit: 0.31.7
       drizzle-orm: 0.45.2(@libsql/client@0.14.0)
-      payload: 4.0.0-canary.38(graphql@16.11.0)(typescript@7.0.2)
+      payload: 4.0.0-beta.0(graphql@16.11.0)(typescript@7.0.2)
       prompts: 2.4.2
       to-snake-case: 1.0.0
       uuid: 14.0.0
@@ -8718,12 +8714,12 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@payloadcms/drizzle@4.0.0-canary.38(@libsql/client@0.14.0)(payload@4.0.0-canary.38(graphql@16.11.0)(typescript@7.0.2))':
+  '@payloadcms/drizzle@4.0.0-beta.0(@libsql/client@0.14.0)(payload@4.0.0-beta.0(graphql@16.11.0)(typescript@7.0.2))':
     dependencies:
       console-table-printer: 2.15.0
       dequal: 2.0.3
       drizzle-orm: 0.45.2(@libsql/client@0.14.0)
-      payload: 4.0.0-canary.38(graphql@16.11.0)(typescript@7.0.2)
+      payload: 4.0.0-beta.0(graphql@16.11.0)(typescript@7.0.2)
       prompts: 2.4.2
       to-snake-case: 1.0.0
       uuid: 14.0.0
@@ -8758,35 +8754,34 @@ snapshots:
       - sql.js
       - sqlite3
 
-  '@payloadcms/graphql@4.0.0-canary.38(graphql@16.11.0)(payload@4.0.0-canary.38(graphql@16.11.0)(typescript@7.0.2))(typescript@7.0.2)':
+  '@payloadcms/graphql@4.0.0-beta.0(graphql@16.11.0)(payload@4.0.0-beta.0(graphql@16.11.0)(typescript@7.0.2))(typescript@7.0.2)':
     dependencies:
       graphql: 16.11.0
       graphql-scalars: 1.22.2(graphql@16.11.0)
-      payload: 4.0.0-canary.38(graphql@16.11.0)(typescript@7.0.2)
+      payload: 4.0.0-beta.0(graphql@16.11.0)(typescript@7.0.2)
       pluralize: 8.0.0
       ts-essentials: 10.0.3(typescript@7.0.2)
       tsx: 4.23.15
     transitivePeerDependencies:
       - typescript
 
-  '@payloadcms/next@4.0.0-canary.38(@types/react@19.2.15)(graphql@16.11.0)(monaco-editor@0.55.1)(next@16.4.0(@types/node@26.6.4)(babel-plugin-macros@3.1.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.77.4))(payload@4.0.0-canary.38(graphql@16.11.0)(typescript@7.0.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2)':
+  '@payloadcms/next@4.0.0-beta.0(@types/react@19.2.15)(graphql@16.11.0)(monaco-editor@0.55.1)(next@16.4.0(@types/node@26.6.4)(babel-plugin-macros@3.1.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.77.4))(payload@4.0.0-beta.0(graphql@16.11.0)(typescript@7.0.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2)':
     dependencies:
       '@dnd-kit/core': 6.3.1(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@dnd-kit/modifiers': 9.0.0(@dnd-kit/core@6.3.1(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(react@19.3.0)
       '@dnd-kit/sortable': 10.0.0(@dnd-kit/core@6.3.1(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(react@19.3.0)
-      '@payloadcms/graphql': 4.0.0-canary.38(graphql@16.11.0)(payload@4.0.0-canary.38(graphql@16.11.0)(typescript@7.0.2))(typescript@7.0.2)
-      '@payloadcms/translations': 4.0.0-canary.38
-      '@payloadcms/ui': 4.0.0-canary.38(@types/react@19.2.15)(monaco-editor@0.55.1)(payload@4.0.0-canary.38(graphql@16.11.0)(typescript@7.0.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2)
+      '@payloadcms/graphql': 4.0.0-beta.0(graphql@16.11.0)(payload@4.0.0-beta.0(graphql@16.11.0)(typescript@7.0.2))(typescript@7.0.2)
+      '@payloadcms/translations': 4.0.0-beta.0
+      '@payloadcms/ui': 4.0.0-beta.0(@types/react@19.2.15)(monaco-editor@0.55.1)(payload@4.0.0-beta.0(graphql@16.11.0)(typescript@7.0.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2)
       busboy: 1.6.0
       dequal: 2.0.3
       file-type: 22.0.1
       graphql: 16.11.0
       graphql-http: 1.22.4(graphql@16.11.0)
       graphql-playground-html: 1.6.30
-      http-status: 2.1.0
       next: 16.4.0(@types/node@26.6.4)(babel-plugin-macros@3.1.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.77.4)
       path-to-regexp: 6.3.0
-      payload: 4.0.0-canary.38(graphql@16.11.0)(typescript@7.0.2)
+      payload: 4.0.0-beta.0(graphql@16.11.0)(typescript@7.0.2)
       qs-esm: 8.0.1
       sass: 1.77.4
       uuid: 14.0.0
@@ -8799,11 +8794,11 @@ snapshots:
       - supports-color
       - typescript
 
-  '@payloadcms/translations@4.0.0-canary.38':
+  '@payloadcms/translations@4.0.0-beta.0':
     dependencies:
       date-fns: 4.4.0
 
-  '@payloadcms/ui@4.0.0-canary.38(@types/react@19.2.15)(monaco-editor@0.55.1)(payload@4.0.0-canary.38(graphql@16.11.0)(typescript@7.0.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2)':
+  '@payloadcms/ui@4.0.0-beta.0(@types/react@19.2.15)(monaco-editor@0.55.1)(payload@4.0.0-beta.0(graphql@16.11.0)(typescript@7.0.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2)':
     dependencies:
       '@date-fns/tz': 1.2.0
       '@dnd-kit/core': 6.3.1(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -8815,7 +8810,7 @@ snapshots:
       '@faceless-ui/window-info': 3.0.1(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@floating-ui/dom': 1.7.6
       '@monaco-editor/react': 4.7.0(monaco-editor@0.55.1)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
-      '@payloadcms/translations': 4.0.0-canary.38
+      '@payloadcms/translations': 4.0.0-beta.0
       '@swc/helpers': 0.5.23
       bson-objectid: 2.0.4
       date-fns: 4.4.0
@@ -8823,7 +8818,7 @@ snapshots:
       md5: 2.3.0
       object-to-formdata: 4.5.1
       path-to-regexp: 6.3.0
-      payload: 4.0.0-canary.38(graphql@16.11.0)(typescript@7.0.2)
+      payload: 4.0.0-beta.0(graphql@16.11.0)(typescript@7.0.2)
       qs-esm: 8.0.1
       react: 19.3.0
       react-datepicker: 9.1.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -9001,12 +8996,12 @@ snapshots:
       ajv-formats: 3.0.1
       yaml: 2.9.1
 
-  '@seshuk/payload-plugin-tooling@0.2.3(@payloadcms/db-sqlite@4.0.0-canary.38(payload@4.0.0-canary.38(graphql@16.11.0)(typescript@7.0.2)))(oxfmt@0.72.0)(oxlint@1.87.0)(payload@4.0.0-canary.38(graphql@16.11.0)(typescript@7.0.2))(tsdown@0.23.0(oxc-resolver@11.20.0)(tsx@4.23.15)(typescript@7.0.2))(vitest@5.0.3)':
+  '@seshuk/payload-plugin-tooling@0.2.3(@payloadcms/db-sqlite@4.0.0-beta.0(payload@4.0.0-beta.0(graphql@16.11.0)(typescript@7.0.2)))(oxfmt@0.72.0)(oxlint@1.87.0)(payload@4.0.0-beta.0(graphql@16.11.0)(typescript@7.0.2))(tsdown@0.23.0(oxc-resolver@11.20.0)(tsx@4.23.15)(typescript@7.0.2))(vitest@5.0.3)':
     optionalDependencies:
-      '@payloadcms/db-sqlite': 4.0.0-canary.38(payload@4.0.0-canary.38(graphql@16.11.0)(typescript@7.0.2))
+      '@payloadcms/db-sqlite': 4.0.0-beta.0(payload@4.0.0-beta.0(graphql@16.11.0)(typescript@7.0.2))
       oxfmt: 0.72.0
       oxlint: 1.87.0
-      payload: 4.0.0-canary.38(graphql@16.11.0)(typescript@7.0.2)
+      payload: 4.0.0-beta.0(graphql@16.11.0)(typescript@7.0.2)
       tsdown: 0.23.0(oxc-resolver@11.20.0)(tsx@4.23.15)(typescript@7.0.2)
       vitest: 5.0.3(@types/node@26.6.4)(@vitest/coverage-v8@5.0.3)(vite@7.3.3(@types/node@26.6.4)(jiti@1.21.7)(sass@1.77.4)(tsx@4.23.15)(yaml@2.9.1))
 
@@ -10059,7 +10054,8 @@ snapshots:
 
   dataloader@2.2.3: {}
 
-  date-fns@4.1.0: {}
+  date-fns@4.1.0:
+    optional: true
 
   date-fns@4.4.0: {}
 
@@ -11231,8 +11227,6 @@ snapshots:
       - supports-color
     optional: true
 
-  http-status@2.1.0: {}
-
   http2-wrapper@2.2.1:
     dependencies:
       quick-lru: 5.1.1
@@ -11533,7 +11527,7 @@ snapshots:
 
   jiti@1.21.7: {}
 
-  jose@6.2.3: {}
+  jose@6.2.12: {}
 
   jose@6.2.9: {}
 
@@ -12626,10 +12620,10 @@ snapshots:
 
   path-type@4.0.0: {}
 
-  payload@4.0.0-canary.38(graphql@16.11.0)(typescript@7.0.2):
+  payload@4.0.0-beta.0(graphql@16.11.0)(typescript@7.0.2):
     dependencies:
       '@next/env': 16.4.0
-      '@payloadcms/translations': 4.0.0-canary.38
+      '@payloadcms/translations': 4.0.0-beta.0
       '@standard-schema/spec': 1.1.0
       '@types/busboy': 1.5.4
       bson-objectid: 2.0.4
@@ -12645,10 +12639,9 @@ snapshots:
       file-type: 22.0.1
       get-tsconfig: 4.14.0
       graphql: 16.11.0
-      http-status: 2.1.0
       image-dimensions: 2.5.1
       ipaddr.js: 2.3.0
-      jose: 6.2.3
+      jose: 6.2.12
       json-schema-to-typescript: 15.0.3
       path-to-regexp: 6.3.0
       pino: 10.3.1
@@ -12935,7 +12928,7 @@ snapshots:
     dependencies:
       '@floating-ui/react': 0.27.19(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       clsx: 2.1.1
-      date-fns: 4.1.0
+      date-fns: 4.4.0
       react: 19.3.0
       react-dom: 19.3.0(react@19.3.0)
 

@@ -74,10 +74,10 @@
     "@scalar/openapi-types": "^0.9.7"
   },
   "devDependencies": {
-    "@payloadcms/db-sqlite": "4.0.0-canary.38",
-    "@payloadcms/next": "4.0.0-canary.38",
-    "@payloadcms/translations": "4.0.0-canary.38",
-    "@payloadcms/ui": "4.0.0-canary.38",
+    "@payloadcms/db-sqlite": "4.0.0-beta.0",
+    "@payloadcms/next": "4.0.0-beta.0",
+    "@payloadcms/translations": "4.0.0-beta.0",
+    "@payloadcms/ui": "4.0.0-beta.0",
     "@seriousme/openapi-schema-validator": "^2.9.0",
     "@seshuk/payload-plugin-tooling": "0.2.3",
     "@types/node": "catalog:",
@@ -86,7 +86,7 @@
     "next": "16.4.0",
     "oxfmt": "^0.72.0",
     "oxlint": "^1.86.0",
-    "payload": "4.0.0-canary.38",
+    "payload": "4.0.0-beta.0",
     "react": "catalog:",
     "react-dom": "catalog:",
     "tsdown": "^0.23.0",
@@ -94,8 +94,8 @@
     "vitest": "^5.0.3"
   },
   "peerDependencies": {
-    "@payloadcms/translations": "4.0.0-canary.38",
-    "payload": "4.0.0-canary.38"
+    "@payloadcms/translations": "^4.0.0-beta.0",
+    "payload": "^4.0.0-beta.0"
   },
   "devEngines": {
     "packageManager": {

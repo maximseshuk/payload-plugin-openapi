@@ -3,7 +3,7 @@ title: 'Upgrade guide'
 description: 'Upgrade the OpenAPI plugin from 0.x to v1: renamed options, entity security values and changed defaults.'
 ---
 
-This guide covers upgrading from 0.x to v1. v1 needs Payload `4.0.0-canary.38` and Next.js 16.4 or later.
+This guide covers upgrading from 0.x to v1. v1 needs Payload `4.0.0-beta.0` or later and Next.js 16.4 or later.
 
 ## 0.x to v1
 
@@ -64,4 +64,4 @@ Some defaults changed too:
 - The spec no longer takes `servers` from the request `Host` header, because a client can fake it. It uses `serverURL` from your Payload config, or `servers`. To keep the old behavior for known hosts, list them in [`trustedHosts`](/v1/configuration/info#trusted-hosts).
 - An extension `transform` that throws now fails the spec request. Before, the plugin logged the error and served the document without that transform.
 - The docs UI loads a pinned library version with [Subresource Integrity](/v1/configuration/docs-ui#pinned-versions-and-sri).
-- Upload read schemas show `variants` instead of `sizes`, because Payload renamed image sizes to variants. See the [Payload release notes](https://github.com/payloadcms/payload/releases/tag/v4.0.0-canary.38).
+- Upload read schemas show `variants` instead of `sizes`, because Payload renamed image sizes to variants. See the [Payload v4 migration guide](https://payloadcms.com/docs/beta/migration-guide/v4#upload-image-data-now-uses-variants).

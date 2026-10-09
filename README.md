@@ -31,7 +31,7 @@
 
 ## Quick start
 
-Requires **Payload 4.0.0-canary.38**, **Next.js 16.4 or later** and **Node.js 24.15 or later**. On Payload 3, use `@seshuk/payload-plugin-openapi@0`.
+Requires **Payload 4.0.0-beta.0 or later**, **Next.js 16.4 or later** and **Node.js 24.15 or later**. On Payload 3, use `@seshuk/payload-plugin-openapi@0`.
 
 ### Install
 
@@ -39,7 +39,7 @@ Requires **Payload 4.0.0-canary.38**, **Next.js 16.4 or later** and **Node.js 24
 npm install @seshuk/payload-plugin-openapi@beta
 ```
 
-v1 is in beta under the `beta` npm tag, and Payload 4 is published under `canary`.
+v1 is in beta under the `beta` npm tag, and Payload 4 is published under `beta`.
 
 ### Configure
 
