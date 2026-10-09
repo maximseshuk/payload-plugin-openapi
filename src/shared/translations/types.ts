@@ -108,11 +108,11 @@ export type PluginDefaultTranslationsObject = {
     tagAccess: string
     tagPlugins: string
     tagPluginsDesc: string
-    error400Plugin: string
-    error401Plugin: string
-    error403Plugin: string
-    error404Plugin: string
-    error500Plugin: string
+    errorPlugin400: string
+    errorPlugin401: string
+    errorPlugin403: string
+    errorPlugin404: string
+    errorPlugin500: string
     ecommerceAddItem: string
     ecommerceRemoveItem: string
     ecommerceUpdateItem: string
@@ -120,7 +120,7 @@ export type PluginDefaultTranslationsObject = {
     ecommerceMergeCart: string
     ecommerceCartAccess: string
     ecommerceCartResult: string
-    error404Ecommerce: string
+    errorEcommerce404: string
     ecommerceQuantity: string
     ecommerceInitiatePayment: string
     ecommerceConfirmOrder: string
@@ -130,22 +130,22 @@ export type PluginDefaultTranslationsObject = {
     stripeWebhook: string
     stripeWebhookBody: string
     stripeWebhookResult: string
-    error400StripeWebhook: string
+    errorStripeWebhook400: string
     stripeRest: string
     stripeRestResult: string
-    error404StripeRest: string
+    errorStripeRest404: string
     mcp: string
     mcpDesc: string
     mcpResult: string
     mcpOverrideAccess: string
     mcpGet: string
-    error405McpGet: string
+    errorMcpGet405: string
     mcpProtocolVersion: string
     mcpResult202: string
-    error404Mcp: string
-    error406Mcp: string
-    error413Mcp: string
-    error415Mcp: string
+    errorMcp404: string
+    errorMcp406: string
+    errorMcp413: string
+    errorMcp415: string
     seoTitle: string
     seoDescription: string
     seoUrl: string
@@ -165,7 +165,7 @@ export type PluginDefaultTranslationsObject = {
     r2Upload: string
     r2UploadDesc: string
     r2UploadResult: string
-    error412R2: string
+    errorR2412: string
 
     localizationHeading: string
     localizationNote: string
