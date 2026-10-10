@@ -8,6 +8,6 @@ permissions:
   contents: read
 jobs:
   ci:
-    uses: maximseshuk/payload-plugin-tooling/.github/workflows/ci.yml@v0.2.3
+    uses: maximseshuk/payload-plugin-tooling/.github/workflows/ci.yml@v0.2.4
     with:
       node-versions: '["24"]'

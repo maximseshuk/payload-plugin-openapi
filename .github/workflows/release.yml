@@ -6,7 +6,7 @@ permissions:
   contents: read
 jobs:
   release:
-    uses: maximseshuk/payload-plugin-tooling/.github/workflows/release.yml@v0.2.3
+    uses: maximseshuk/payload-plugin-tooling/.github/workflows/release.yml@v0.2.4
     permissions:
       contents: write
       id-token: write
