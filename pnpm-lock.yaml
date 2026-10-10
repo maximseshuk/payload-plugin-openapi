@@ -225,8 +225,8 @@ importers:
         specifier: ^2.9.0
         version: 2.11.0
       '@seshuk/payload-plugin-tooling':
-        specifier: 0.2.3
-        version: 0.2.3(@payloadcms/db-sqlite@4.0.0-beta.0(payload@4.0.0-beta.0(graphql@16.11.0)(typescript@7.0.2)))(oxfmt@0.72.0)(oxlint@1.87.0)(payload@4.0.0-beta.0(graphql@16.11.0)(typescript@7.0.2))(tsdown@0.23.0(oxc-resolver@11.20.0)(tsx@4.23.15)(typescript@7.0.2))(vitest@5.0.3)
+        specifier: 0.2.4
+        version: 0.2.4(@payloadcms/db-sqlite@4.0.0-beta.0(payload@4.0.0-beta.0(graphql@16.11.0)(typescript@7.0.2)))(oxfmt@0.72.0)(oxlint@1.87.0)(payload@4.0.0-beta.0(graphql@16.11.0)(typescript@7.0.2))(tsdown@0.23.0(oxc-resolver@11.20.0)(tsx@4.23.15)(typescript@7.0.2))(vitest@5.0.3)
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.4
@@ -2697,8 +2697,8 @@ packages:
     resolution: {integrity: sha512-DL8TjmjkUS76OaK/TinoRtf6PrirsWfMZiv62ifP9eq3UOpoLqSGZKpCErxMzz0i1pjECSPYY+qZ1SRYEgiEvg==}
     hasBin: true
 
-  '@seshuk/payload-plugin-tooling@0.2.3':
-    resolution: {integrity: sha512-qlAfCM1iSVSmKQFBfwP3l3yHbJNhaCOofrvqwk5rtvcdE5JAWZCoSx9HsHoNdka9+0eEjBNLeaHYYkChkOdl+Q==}
+  '@seshuk/payload-plugin-tooling@0.2.4':
+    resolution: {integrity: sha512-oJjkyMTdT6nUn0pq0g6P0OPSoVLbpaxX2Z2cgf+BVMuzo7dWea+9eNOztK+/WJMaiAfGMEYjgh3928NXPCcLlg==}
     engines: {node: '>=24.15.0'}
     peerDependencies:
       '@electric-sql/pglite': '>=0.5.0'
@@ -9595,7 +9595,7 @@ snapshots:
       ajv-formats: 3.0.1
       yaml: 2.9.1
 
-  '@seshuk/payload-plugin-tooling@0.2.3(@payloadcms/db-sqlite@4.0.0-beta.0(payload@4.0.0-beta.0(graphql@16.11.0)(typescript@7.0.2)))(oxfmt@0.72.0)(oxlint@1.87.0)(payload@4.0.0-beta.0(graphql@16.11.0)(typescript@7.0.2))(tsdown@0.23.0(oxc-resolver@11.20.0)(tsx@4.23.15)(typescript@7.0.2))(vitest@5.0.3)':
+  '@seshuk/payload-plugin-tooling@0.2.4(@payloadcms/db-sqlite@4.0.0-beta.0(payload@4.0.0-beta.0(graphql@16.11.0)(typescript@7.0.2)))(oxfmt@0.72.0)(oxlint@1.87.0)(payload@4.0.0-beta.0(graphql@16.11.0)(typescript@7.0.2))(tsdown@0.23.0(oxc-resolver@11.20.0)(tsx@4.23.15)(typescript@7.0.2))(vitest@5.0.3)':
     optionalDependencies:
       '@payloadcms/db-sqlite': 4.0.0-beta.0(payload@4.0.0-beta.0(graphql@16.11.0)(typescript@7.0.2))
       oxfmt: 0.72.0

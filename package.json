@@ -87,7 +87,7 @@
     "@payloadcms/translations": "4.0.0-beta.0",
     "@payloadcms/ui": "4.0.0-beta.0",
     "@seriousme/openapi-schema-validator": "^2.9.0",
-    "@seshuk/payload-plugin-tooling": "0.2.3",
+    "@seshuk/payload-plugin-tooling": "0.2.4",
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "^5.0.3",
     "cross-env": "^10.1.0",
