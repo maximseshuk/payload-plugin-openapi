@@ -92,14 +92,14 @@ export const my: PluginDefaultTranslationsObject = {
     uploadStageDeleteSummary: 'ယာယီအပ်လုဒ်ကို ဖျက်သည်',
     uploadStageResult: 'ပြီးပါပြီ၊ အကြောင်းအရာ မရှိပါ',
     paramPreferenceKey: 'Preference ၏ key၊ ဥပမာ `nav`။',
-    preferenceGet: 'လက်ရှိအသုံးပြုသူ၏ preference တစ်ခုကို ရယူသည်',
+    preferenceGet: 'လက်ရှိအသုံးပြုသူ၏ preference တစ်ခုကို ရယူရန်',
     preferenceGetResult: 'သိမ်းထားသော preference၊ မရှိပါက `value: null`',
-    preferenceSet: 'လက်ရှိအသုံးပြုသူ၏ preference တစ်ခုကို သိမ်းသည်',
+    preferenceSet: 'လက်ရှိအသုံးပြုသူ၏ preference တစ်ခုကို သိမ်းရန်',
     preferenceSetBody: 'တန်ဖိုးကို `value` ဖြင့် ပို့ပါ။ `value` မပါသော body ကို တစ်ခုလုံး တန်ဖိုးအဖြစ် သိမ်းသည်။',
     preferenceSetResult: 'သိမ်းထားသော preference',
-    preferenceDelete: 'လက်ရှိအသုံးပြုသူ၏ preference တစ်ခုကို ဖျက်သည်',
+    preferenceDelete: 'လက်ရှိအသုံးပြုသူ၏ preference တစ်ခုကို ဖျက်ရန်',
     preferenceDeleteResult: 'ဖျက်လိုက်သော preference',
-    reorder: 'စီစဉ်နိုင်သော စာရင်းတွင် စာရွက်စာတမ်းများကို ရွှေ့သည်',
+    reorder: 'စီစဉ်နိုင်သော စာရင်းတွင် စာရွက်စာတမ်းများကို ရွှေ့ရန်',
     reorderBody:
       '`newKeyWillBe: "greater"` ဖြစ်ပါက `docsToMove` ကို `target` ၏ နောက်သို့၊ `"less"` ဖြစ်ပါက ရှေ့သို့ ရွှေ့သည်။ `orderableFieldName` သည် စီစဉ်နိုင်သော collection အတွက် `_order` ဖြစ်ပြီး စီစဉ်နိုင်သော join အတွက် ၎င်း၏ order field ဖြစ်သည်။ `target.key` မပါပါက Payload သည် order key မရှိသေးသော စာရွက်စာတမ်းများကိုသာ order key ပေးသည်။',
     reorderResult:
