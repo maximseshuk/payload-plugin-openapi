@@ -135,7 +135,7 @@ export const nl: PluginDefaultTranslationsObject = {
     ecommerceCartAccess:
       'Toegestaan voor de eigenaar van de winkelwagen, of voor een gastwinkelwagen met zijn `secret` in de body.',
     ecommerceCartResult: 'De bijgewerkte winkelwagen',
-    errorEcommerce404: 'Winkelwagen niet gevonden of niet toegankelijk',
+    errorPluginEcommerce404: 'Winkelwagen niet gevonden of niet toegankelijk',
     ecommerceQuantity: 'Nieuwe hoeveelheid, of `{ "$inc": n }` om die met n te wijzigen.',
     ecommerceInitiatePayment: 'Een betaling starten met `{{method}}`',
     ecommerceConfirmOrder: 'De betaling met `{{method}}` bevestigen en de bestelling aanmaken',
@@ -147,23 +147,23 @@ export const nl: PluginDefaultTranslationsObject = {
     stripeWebhookBody:
       'Het ruwe Stripe-event, ondertekend in de header `Stripe-Signature`. Wordt door Stripe aangeroepen, niet door API-clients.',
     stripeWebhookResult: 'Event ontvangen',
-    errorStripeWebhook400: 'De handtekeningcontrole is mislukt',
+    errorPluginStripeWebhook400: 'De handtekeningcontrole is mislukt',
     stripeRest: 'Een toegestane Stripe API-methode aanroepen',
     stripeRestResult: 'Het resultaat van de Stripe API',
-    errorStripeRest404: 'De Stripe API gaf een fout terug',
+    errorPluginStripeRest404: 'De Stripe API gaf een fout terug',
     mcp: 'Een MCP JSON-RPC-bericht versturen',
     mcpDesc:
       'Model Context Protocol via Streamable HTTP, met JSON-antwoorden. Anonieme verzoeken werken; welke tools worden getoond, hangt af van de rechten van de gebruiker. Clients met een protocolversie uit 2025 moeten `Accept: application/json, text/event-stream` meesturen.',
     mcpResult: 'JSON-RPC-antwoord',
     mcpOverrideAccess: 'Toegangscontroles overslaan. Alleen voor ontwikkeling.',
     mcpGet: 'Niet ondersteund: de server opent geen eventstream',
-    errorMcpGet405: 'Methode niet toegestaan, gebruik POST',
+    errorPluginMcpGet405: 'Methode niet toegestaan, gebruik POST',
     mcpProtocolVersion: 'Overeengekomen MCP-protocolversie, bijv. `2025-06-18`.',
     mcpResult202: 'Geaccepteerd: de body bevatte alleen notificaties of antwoorden',
-    errorMcp404: 'Onbekende MCP-methode',
-    errorMcp406: 'In de header `Accept` ontbreekt `application/json` of `text/event-stream`',
-    errorMcp413: 'De body van het verzoek is te groot',
-    errorMcp415: '`Content-Type` moet `application/json` zijn',
+    errorPluginMcp404: 'Onbekende MCP-methode',
+    errorPluginMcp406: 'In de header `Accept` ontbreekt `application/json` of `text/event-stream`',
+    errorPluginMcp413: 'De body van het verzoek is te groot',
+    errorPluginMcp415: '`Content-Type` moet `application/json` zijn',
     seoTitle: 'De metatitel genereren',
     seoDescription: 'De metabeschrijving genereren',
     seoUrl: 'De preview-URL genereren',
@@ -185,7 +185,7 @@ export const nl: PluginDefaultTranslationsObject = {
     r2UploadDesc:
       'Drie stappen op één route. Start: stuur `collection`, `fileName` en `fileType`. Elk deel: voeg `multipartId`, `multipartKey`, `multipartNumber` en `signedReceipt` toe en stuur de bytes. Afronden: hetzelfde zonder `multipartNumber`, met de JSON-lijst van delen.',
     r2UploadResult: 'Upload gestart, deel geüpload of upload voltooid (de objectsleutel als tekst)',
-    errorR2412: 'Er bestaat al een bestand met deze sleutel',
+    errorPluginStorageR2412: 'Er bestaat al een bestand met deze sleutel',
 
     localizationHeading: 'Lokalisatie',
     localizationNote:

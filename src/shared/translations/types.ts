@@ -120,7 +120,7 @@ export type PluginDefaultTranslationsObject = {
     ecommerceMergeCart: string
     ecommerceCartAccess: string
     ecommerceCartResult: string
-    errorEcommerce404: string
+    errorPluginEcommerce404: string
     ecommerceQuantity: string
     ecommerceInitiatePayment: string
     ecommerceConfirmOrder: string
@@ -130,22 +130,22 @@ export type PluginDefaultTranslationsObject = {
     stripeWebhook: string
     stripeWebhookBody: string
     stripeWebhookResult: string
-    errorStripeWebhook400: string
+    errorPluginStripeWebhook400: string
     stripeRest: string
     stripeRestResult: string
-    errorStripeRest404: string
+    errorPluginStripeRest404: string
     mcp: string
     mcpDesc: string
     mcpResult: string
     mcpOverrideAccess: string
     mcpGet: string
-    errorMcpGet405: string
+    errorPluginMcpGet405: string
     mcpProtocolVersion: string
     mcpResult202: string
-    errorMcp404: string
-    errorMcp406: string
-    errorMcp413: string
-    errorMcp415: string
+    errorPluginMcp404: string
+    errorPluginMcp406: string
+    errorPluginMcp413: string
+    errorPluginMcp415: string
     seoTitle: string
     seoDescription: string
     seoUrl: string
@@ -165,7 +165,7 @@ export type PluginDefaultTranslationsObject = {
     r2Upload: string
     r2UploadDesc: string
     r2UploadResult: string
-    errorR2412: string
+    errorPluginStorageR2412: string
 
     localizationHeading: string
     localizationNote: string

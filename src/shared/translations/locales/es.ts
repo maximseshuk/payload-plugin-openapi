@@ -133,7 +133,7 @@ export const es: PluginDefaultTranslationsObject = {
     ecommerceCartAccess:
       'Permitido para el dueño del carrito, o para un carrito de invitado con su `secret` en el cuerpo.',
     ecommerceCartResult: 'El carrito actualizado',
-    errorEcommerce404: 'Carrito no encontrado o no accesible',
+    errorPluginEcommerce404: 'Carrito no encontrado o no accesible',
     ecommerceQuantity: 'Nueva cantidad, o `{ "$inc": n }` para cambiarla en n.',
     ecommerceInitiatePayment: 'Iniciar un pago con `{{method}}`',
     ecommerceConfirmOrder: 'Confirmar el pago con `{{method}}` y crear el pedido',
@@ -145,23 +145,23 @@ export const es: PluginDefaultTranslationsObject = {
     stripeWebhookBody:
       'El evento de Stripe sin procesar, firmado en la cabecera `Stripe-Signature`. Lo llama Stripe, no los clientes de la API.',
     stripeWebhookResult: 'Evento recibido',
-    errorStripeWebhook400: 'La verificación de la firma falló',
+    errorPluginStripeWebhook400: 'La verificación de la firma falló',
     stripeRest: 'Llamar a un método permitido de la API de Stripe',
     stripeRestResult: 'El resultado de la API de Stripe',
-    errorStripeRest404: 'La API de Stripe devolvió un error',
+    errorPluginStripeRest404: 'La API de Stripe devolvió un error',
     mcp: 'Enviar un mensaje MCP JSON-RPC',
     mcpDesc:
       'Model Context Protocol sobre Streamable HTTP, con respuestas JSON. Las solicitudes anónimas funcionan; las herramientas listadas dependen de los permisos del usuario. Los clientes con una versión del protocolo de 2025 deben enviar `Accept: application/json, text/event-stream`.',
     mcpResult: 'Respuesta JSON-RPC',
     mcpOverrideAccess: 'Omitir las comprobaciones de acceso. Solo para desarrollo.',
     mcpGet: 'No compatible: el servidor no abre ningún flujo de eventos',
-    errorMcpGet405: 'Método no permitido, use POST',
+    errorPluginMcpGet405: 'Método no permitido, use POST',
     mcpProtocolVersion: 'Versión negociada del protocolo MCP, p. ej. `2025-06-18`.',
     mcpResult202: 'Aceptado: el cuerpo solo contenía notificaciones o respuestas',
-    errorMcp404: 'Método MCP desconocido',
-    errorMcp406: 'A la cabecera `Accept` le falta `application/json` o `text/event-stream`',
-    errorMcp413: 'El cuerpo de la solicitud es demasiado grande',
-    errorMcp415: '`Content-Type` debe ser `application/json`',
+    errorPluginMcp404: 'Método MCP desconocido',
+    errorPluginMcp406: 'A la cabecera `Accept` le falta `application/json` o `text/event-stream`',
+    errorPluginMcp413: 'El cuerpo de la solicitud es demasiado grande',
+    errorPluginMcp415: '`Content-Type` debe ser `application/json`',
     seoTitle: 'Generar el meta título',
     seoDescription: 'Generar la meta descripción',
     seoUrl: 'Generar la URL de vista previa',
@@ -183,7 +183,7 @@ export const es: PluginDefaultTranslationsObject = {
     r2UploadDesc:
       'Tres pasos en una sola ruta. Inicio: envía `collection`, `fileName` y `fileType`. Cada parte: añade `multipartId`, `multipartKey`, `multipartNumber` y `signedReceipt`, y envía los bytes. Final: lo mismo sin `multipartNumber`, con la lista JSON de partes.',
     r2UploadResult: 'Subida iniciada, parte subida o subida completada (la clave del objeto como texto)',
-    errorR2412: 'Ya existe un archivo con esta clave',
+    errorPluginStorageR2412: 'Ya existe un archivo con esta clave',
 
     localizationHeading: 'Localización',
     localizationNote:

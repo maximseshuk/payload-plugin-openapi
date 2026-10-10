@@ -135,7 +135,7 @@ export const de: PluginDefaultTranslationsObject = {
     ecommerceCartAccess:
       'Erlaubt für den Besitzer des Warenkorbs oder für einen Gast-Warenkorb mit seinem `secret` im Body.',
     ecommerceCartResult: 'Der aktualisierte Warenkorb',
-    errorEcommerce404: 'Warenkorb nicht gefunden oder nicht zugänglich',
+    errorPluginEcommerce404: 'Warenkorb nicht gefunden oder nicht zugänglich',
     ecommerceQuantity: 'Neue Menge, oder `{ "$inc": n }`, um sie um n zu ändern.',
     ecommerceInitiatePayment: 'Zahlung mit `{{method}}` starten',
     ecommerceConfirmOrder: 'Zahlung mit `{{method}}` bestätigen und Bestellung anlegen',
@@ -147,23 +147,23 @@ export const de: PluginDefaultTranslationsObject = {
     stripeWebhookBody:
       'Das rohe Stripe-Ereignis, signiert im Header `Stripe-Signature`. Wird von Stripe aufgerufen, nicht von API-Clients.',
     stripeWebhookResult: 'Ereignis empfangen',
-    errorStripeWebhook400: 'Die Signaturprüfung ist fehlgeschlagen',
+    errorPluginStripeWebhook400: 'Die Signaturprüfung ist fehlgeschlagen',
     stripeRest: 'Eine erlaubte Stripe-API-Methode aufrufen',
     stripeRestResult: 'Das Ergebnis der Stripe-API',
-    errorStripeRest404: 'Die Stripe-API hat einen Fehler gemeldet',
+    errorPluginStripeRest404: 'Die Stripe-API hat einen Fehler gemeldet',
     mcp: 'Eine MCP-JSON-RPC-Nachricht senden',
     mcpDesc:
       'Model Context Protocol über Streamable HTTP mit JSON-Antworten. Anonyme Anfragen funktionieren; welche Tools aufgelistet werden, hängt von den Rechten des Benutzers ab. Clients mit einer Protokollversion von 2025 müssen `Accept: application/json, text/event-stream` senden.',
     mcpResult: 'JSON-RPC-Antwort',
     mcpOverrideAccess: 'Zugriffsprüfungen überspringen. Nur für die Entwicklung.',
     mcpGet: 'Nicht unterstützt: Der Server öffnet keinen Event-Stream',
-    errorMcpGet405: 'Methode nicht erlaubt, POST verwenden',
+    errorPluginMcpGet405: 'Methode nicht erlaubt, POST verwenden',
     mcpProtocolVersion: 'Ausgehandelte MCP-Protokollversion, z. B. `2025-06-18`.',
     mcpResult202: 'Angenommen: Der Body enthielt nur Benachrichtigungen oder Antworten',
-    errorMcp404: 'Unbekannte MCP-Methode',
-    errorMcp406: 'Dem Header `Accept` fehlt `application/json` oder `text/event-stream`',
-    errorMcp413: 'Der Request-Body ist zu groß',
-    errorMcp415: '`Content-Type` muss `application/json` sein',
+    errorPluginMcp404: 'Unbekannte MCP-Methode',
+    errorPluginMcp406: 'Dem Header `Accept` fehlt `application/json` oder `text/event-stream`',
+    errorPluginMcp413: 'Der Request-Body ist zu groß',
+    errorPluginMcp415: '`Content-Type` muss `application/json` sein',
     seoTitle: 'Meta-Titel generieren',
     seoDescription: 'Meta-Beschreibung generieren',
     seoUrl: 'Vorschau-URL generieren',
@@ -185,7 +185,7 @@ export const de: PluginDefaultTranslationsObject = {
     r2UploadDesc:
       'Drei Schritte auf einer Route. Start: `collection`, `fileName` und `fileType` senden. Jeden Teil hochladen: `multipartId`, `multipartKey`, `multipartNumber` und `signedReceipt` ergänzen und die Bytes senden. Abschließen: dasselbe ohne `multipartNumber`, mit der JSON-Liste der Teile.',
     r2UploadResult: 'Upload gestartet, Teil hochgeladen oder Upload abgeschlossen (der Objektschlüssel als Text)',
-    errorR2412: 'Unter diesem Schlüssel existiert bereits eine Datei',
+    errorPluginStorageR2412: 'Unter diesem Schlüssel existiert bereits eine Datei',
 
     localizationHeading: 'Lokalisierung',
     localizationNote:
