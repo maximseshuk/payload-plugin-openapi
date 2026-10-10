@@ -183,7 +183,7 @@ export const sv: PluginDefaultTranslationsObject = {
     r2UploadDesc:
       'Tre steg på en route. Start: skicka `collection`, `fileName` och `fileType`. Varje del: lägg till `multipartId`, `multipartKey`, `multipartNumber` och `signedReceipt` och skicka byten. Slutför: samma sak utan `multipartNumber`, med JSON-listan över delar.',
     r2UploadResult: 'Uppladdningen startad, del uppladdad eller uppladdningen klar (objektnyckeln som text)',
-    errorPluginStorageR2412: 'Det finns redan en fil med den här nyckeln',
+    errorStorageR2412: 'Det finns redan en fil med den här nyckeln',
 
     localizationHeading: 'Lokalisering',
     localizationNote:

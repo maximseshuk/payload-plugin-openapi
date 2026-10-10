@@ -185,7 +185,7 @@ export const nl: PluginDefaultTranslationsObject = {
     r2UploadDesc:
       'Drie stappen op één route. Start: stuur `collection`, `fileName` en `fileType`. Elk deel: voeg `multipartId`, `multipartKey`, `multipartNumber` en `signedReceipt` toe en stuur de bytes. Afronden: hetzelfde zonder `multipartNumber`, met de JSON-lijst van delen.',
     r2UploadResult: 'Upload gestart, deel geüpload of upload voltooid (de objectsleutel als tekst)',
-    errorPluginStorageR2412: 'Er bestaat al een bestand met deze sleutel',
+    errorStorageR2412: 'Er bestaat al een bestand met deze sleutel',
 
     localizationHeading: 'Lokalisatie',
     localizationNote:

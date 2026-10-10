@@ -181,7 +181,7 @@ export const lt: PluginDefaultTranslationsObject = {
     r2UploadDesc:
       'Trys žingsniai viename maršrute. Pradžia: siųskite `collection`, `fileName` ir `fileType`. Kiekviena dalis: pridėkite `multipartId`, `multipartKey`, `multipartNumber` ir `signedReceipt` ir siųskite baitus. Pabaiga: tas pats be `multipartNumber`, su dalių JSON sąrašu.',
     r2UploadResult: 'Įkėlimas pradėtas, dalis įkelta arba įkėlimas baigtas (objekto raktas tekstu)',
-    errorPluginStorageR2412: 'Failas su šiuo raktu jau egzistuoja',
+    errorStorageR2412: 'Failas su šiuo raktu jau egzistuoja',
 
     localizationHeading: 'Lokalizacija',
     localizationNote:

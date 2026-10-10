@@ -165,7 +165,7 @@ export type PluginDefaultTranslationsObject = {
     r2Upload: string
     r2UploadDesc: string
     r2UploadResult: string
-    errorPluginStorageR2412: string
+    errorStorageR2412: string
 
     localizationHeading: string
     localizationNote: string

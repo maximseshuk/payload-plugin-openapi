@@ -180,7 +180,7 @@ export const ko: PluginDefaultTranslationsObject = {
     r2UploadDesc:
       '하나의 경로에서 세 단계로 진행합니다. 시작: `collection`, `fileName`, `fileType`을 보냅니다. 각 부분: `multipartId`, `multipartKey`, `multipartNumber`, `signedReceipt`를 추가하고 바이트를 보냅니다. 완료: `multipartNumber` 없이 같은 값과 부분 목록 JSON을 보냅니다.',
     r2UploadResult: '업로드 시작, 부분 업로드 또는 업로드 완료(객체 키를 텍스트로 반환)',
-    errorPluginStorageR2412: '이 키에 이미 파일이 있습니다',
+    errorStorageR2412: '이 키에 이미 파일이 있습니다',
 
     localizationHeading: '현지화',
     localizationNote:

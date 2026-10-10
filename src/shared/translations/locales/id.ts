@@ -182,7 +182,7 @@ export const id: PluginDefaultTranslationsObject = {
     r2UploadDesc:
       'Tiga langkah pada satu rute. Mulai: kirim `collection`, `fileName`, dan `fileType`. Setiap bagian: tambahkan `multipartId`, `multipartKey`, `multipartNumber`, dan `signedReceipt`, lalu kirim byte-nya. Selesai: sama tanpa `multipartNumber`, dengan daftar JSON bagian.',
     r2UploadResult: 'Unggahan dimulai, bagian diunggah, atau unggahan selesai (kunci objek sebagai teks)',
-    errorPluginStorageR2412: 'File dengan kunci ini sudah ada',
+    errorStorageR2412: 'File dengan kunci ini sudah ada',
 
     localizationHeading: 'Localization',
     localizationNote:

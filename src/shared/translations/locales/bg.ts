@@ -180,7 +180,7 @@ export const bg: PluginDefaultTranslationsObject = {
     r2UploadDesc:
       'Три стъпки на един маршрут. Начало: изпратете `collection`, `fileName` и `fileType`. Всяка част: добавете `multipartId`, `multipartKey`, `multipartNumber` и `signedReceipt` и изпратете байтовете. Завършване: същото без `multipartNumber`, с JSON списъка на частите.',
     r2UploadResult: 'Качването е започнато, частта е качена или качването е завършено (ключът на обекта като текст)',
-    errorPluginStorageR2412: 'Вече има файл с този ключ',
+    errorStorageR2412: 'Вече има файл с този ключ',
 
     localizationHeading: 'Локализация',
     localizationNote:

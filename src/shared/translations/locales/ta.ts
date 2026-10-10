@@ -181,7 +181,7 @@ export const ta: PluginDefaultTranslationsObject = {
     r2UploadDesc:
       'ஒரே வழியில் மூன்று படிகள். தொடக்கம்: `collection`, `fileName`, `fileType` அனுப்பவும். ஒவ்வொரு பகுதியும்: `multipartId`, `multipartKey`, `multipartNumber`, `signedReceipt` சேர்த்து பைட்டுகளை அனுப்பவும். நிறைவு: `multipartNumber` இல்லாமல் அதே, பகுதிகளின் JSON பட்டியலுடன்.',
     r2UploadResult: 'பதிவேற்றம் தொடங்கியது, பகுதி பதிவேற்றப்பட்டது அல்லது பதிவேற்றம் முடிந்தது (பொருள் விசை உரையாக)',
-    errorPluginStorageR2412: 'இந்த விசையில் ஏற்கனவே ஒரு கோப்பு உள்ளது',
+    errorStorageR2412: 'இந்த விசையில் ஏற்கனவே ஒரு கோப்பு உள்ளது',
 
     localizationHeading: 'உள்ளூராக்கம்',
     localizationNote:

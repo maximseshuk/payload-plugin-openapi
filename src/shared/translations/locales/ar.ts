@@ -177,7 +177,7 @@ export const ar: PluginDefaultTranslationsObject = {
     r2UploadDesc:
       'ثلاث خطوات على مسار واحد. البدء: أرسل `collection` و`fileName` و`fileType`. كل جزء: أضف `multipartId` و`multipartKey` و`multipartNumber` و`signedReceipt` وأرسل البايتات. الإنهاء: الشيء نفسه بدون `multipartNumber`، مع قائمة JSON بالأجزاء.',
     r2UploadResult: 'بدأ الرفع، أو رُفع جزء، أو اكتمل الرفع (مفتاح الكائن كنص)',
-    errorPluginStorageR2412: 'يوجد ملف بالفعل عند هذا المفتاح',
+    errorStorageR2412: 'يوجد ملف بالفعل عند هذا المفتاح',
 
     localizationHeading: 'الترجمة',
     localizationNote:

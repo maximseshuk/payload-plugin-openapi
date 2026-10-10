@@ -182,7 +182,7 @@ export const da: PluginDefaultTranslationsObject = {
     r2UploadDesc:
       'Tre trin på én rute. Start: send `collection`, `fileName` og `fileType`. Hver del: tilføj `multipartId`, `multipartKey`, `multipartNumber` og `signedReceipt`, og send bytes. Afslut: det samme uden `multipartNumber`, med JSON-listen over dele.',
     r2UploadResult: 'Upload startet, del uploadet eller upload fuldført (objektnøglen som tekst)',
-    errorPluginStorageR2412: 'Der findes allerede en fil med denne nøgle',
+    errorStorageR2412: 'Der findes allerede en fil med denne nøgle',
 
     localizationHeading: 'Lokalisering',
     localizationNote:

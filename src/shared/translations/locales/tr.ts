@@ -182,7 +182,7 @@ export const tr: PluginDefaultTranslationsObject = {
     r2UploadDesc:
       'Tek rotada üç adım. Başlangıç: `collection`, `fileName` ve `fileType` gönderin. Her parça: `multipartId`, `multipartKey`, `multipartNumber` ve `signedReceipt` ekleyip baytları gönderin. Bitiş: aynısını `multipartNumber` olmadan, parçaların JSON listesiyle gönderin.',
     r2UploadResult: 'Yükleme başladı, parça yüklendi veya yükleme tamamlandı (metin olarak nesne anahtarı)',
-    errorPluginStorageR2412: 'Bu anahtarda zaten bir dosya var',
+    errorStorageR2412: 'Bu anahtarda zaten bir dosya var',
 
     localizationHeading: 'Yerelleştirme',
     localizationNote:

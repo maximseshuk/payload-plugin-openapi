@@ -184,7 +184,7 @@ export const rsLatin: PluginDefaultTranslationsObject = {
     r2UploadDesc:
       'Tri koraka na jednoj ruti. Početak: pošaljite `collection`, `fileName` i `fileType`. Svaki deo: dodajte `multipartId`, `multipartKey`, `multipartNumber` i `signedReceipt` i pošaljite bajtove. Kraj: isto bez `multipartNumber`, sa JSON listom delova.',
     r2UploadResult: 'Otpremanje započeto, deo otpremljen ili otpremanje završeno (ključ objekta kao tekst)',
-    errorPluginStorageR2412: 'Fajl sa ovim ključem već postoji',
+    errorStorageR2412: 'Fajl sa ovim ključem već postoji',
 
     localizationHeading: 'Lokalizacija',
     localizationNote:

@@ -183,7 +183,7 @@ export const fa: PluginDefaultTranslationsObject = {
     r2UploadDesc:
       'سه مرحله روی یک مسیر. شروع: `collection`، `fileName` و `fileType` را بفرستید. هر بخش: `multipartId`، `multipartKey`، `multipartNumber` و `signedReceipt` را اضافه کنید و بایت‌ها را بفرستید. پایان: همان، بدون `multipartNumber`، با فهرست JSON بخش‌ها.',
     r2UploadResult: 'بارگذاری شروع شد، بخش بارگذاری شد یا بارگذاری کامل شد (کلید شیء به‌صورت متن)',
-    errorPluginStorageR2412: 'فایلی با این کلید از قبل وجود دارد',
+    errorStorageR2412: 'فایلی با این کلید از قبل وجود دارد',
 
     localizationHeading: 'بومی‌سازی',
     localizationNote:

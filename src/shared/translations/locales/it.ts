@@ -184,7 +184,7 @@ export const it: PluginDefaultTranslationsObject = {
     r2UploadDesc:
       'Tre passaggi su una sola route. Avvio: invia `collection`, `fileName` e `fileType`. Ogni parte: aggiungi `multipartId`, `multipartKey`, `multipartNumber` e `signedReceipt`, e invia i byte. Completamento: lo stesso senza `multipartNumber`, con l’elenco JSON delle parti.',
     r2UploadResult: 'Caricamento avviato, parte caricata o caricamento completato (la chiave dell’oggetto come testo)',
-    errorPluginStorageR2412: 'Esiste già un file con questa chiave',
+    errorStorageR2412: 'Esiste già un file con questa chiave',
 
     localizationHeading: 'Localizzazione',
     localizationNote:

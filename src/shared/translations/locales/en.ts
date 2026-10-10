@@ -179,7 +179,7 @@ export const en: PluginDefaultTranslationsObject = {
     r2UploadDesc:
       'Three steps on one route. Start: send `collection`, `fileName` and `fileType`. Upload each part: add `multipartId`, `multipartKey`, `multipartNumber` and `signedReceipt`, and send the bytes. Complete: the same without `multipartNumber`, with the JSON list of parts.',
     r2UploadResult: 'Upload started, part uploaded, or upload completed (the object key as text)',
-    errorPluginStorageR2412: 'A file already exists at this key',
+    errorStorageR2412: 'A file already exists at this key',
 
     localizationHeading: 'Localization',
     localizationNote:

@@ -183,7 +183,7 @@ export const ro: PluginDefaultTranslationsObject = {
     r2UploadDesc:
       'Trei pași pe o singură rută. Start: trimite `collection`, `fileName` și `fileType`. Fiecare parte: adaugă `multipartId`, `multipartKey`, `multipartNumber` și `signedReceipt` și trimite octeții. Final: la fel, fără `multipartNumber`, cu lista JSON a părților.',
     r2UploadResult: 'Încărcare pornită, parte încărcată sau încărcare finalizată (cheia obiectului ca text)',
-    errorPluginStorageR2412: 'Există deja un fișier la această cheie',
+    errorStorageR2412: 'Există deja un fișier la această cheie',
 
     localizationHeading: 'Localizare',
     localizationNote:

@@ -180,7 +180,7 @@ export const uk: PluginDefaultTranslationsObject = {
     r2UploadDesc:
       'Три кроки на одному маршруті. Початок: передайте `collection`, `fileName` і `fileType`. Кожна частина: додайте `multipartId`, `multipartKey`, `multipartNumber` і `signedReceipt` та надішліть байти. Завершення: те саме без `multipartNumber`, зі списком частин у JSON.',
     r2UploadResult: 'Завантаження розпочато, частину завантажено або завантаження завершено (ключ об’єкта текстом)',
-    errorPluginStorageR2412: 'Файл із цим ключем уже існує',
+    errorStorageR2412: 'Файл із цим ключем уже існує',
 
     localizationHeading: 'Локалізація',
     localizationNote:

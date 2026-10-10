@@ -180,7 +180,7 @@ export const vi: PluginDefaultTranslationsObject = {
     r2UploadDesc:
       'Ba bước trên một route. Bắt đầu: gửi `collection`, `fileName` và `fileType`. Mỗi phần: thêm `multipartId`, `multipartKey`, `multipartNumber` và `signedReceipt`, rồi gửi các byte. Hoàn tất: như trên nhưng không có `multipartNumber`, kèm danh sách JSON các phần.',
     r2UploadResult: 'Đã bắt đầu tải lên, đã tải lên một phần hoặc đã hoàn tất (khóa đối tượng dạng văn bản)',
-    errorPluginStorageR2412: 'Đã có tệp tại khóa này',
+    errorStorageR2412: 'Đã có tệp tại khóa này',
 
     localizationHeading: 'Đa ngôn ngữ',
     localizationNote:

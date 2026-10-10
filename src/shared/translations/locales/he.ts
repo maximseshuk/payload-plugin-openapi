@@ -175,7 +175,7 @@ export const he: PluginDefaultTranslationsObject = {
     r2UploadDesc:
       'שלושה שלבים בנתיב אחד. התחלה: שלחו `collection`, `fileName` ו-`fileType`. כל חלק: הוסיפו `multipartId`, `multipartKey`, `multipartNumber` ו-`signedReceipt` ושלחו את הבתים. סיום: אותו דבר בלי `multipartNumber`, עם רשימת החלקים ב-JSON.',
     r2UploadResult: 'ההעלאה התחילה, חלק הועלה או שההעלאה הושלמה (מפתח האובייקט כטקסט)',
-    errorPluginStorageR2412: 'כבר קיים קובץ במפתח זה',
+    errorStorageR2412: 'כבר קיים קובץ במפתח זה',
 
     localizationHeading: 'לוקליזציה',
     localizationNote:

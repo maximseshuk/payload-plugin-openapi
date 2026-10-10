@@ -184,7 +184,7 @@ export const ca: PluginDefaultTranslationsObject = {
     r2UploadDesc:
       'Tres passos en una sola ruta. Inici: envia `collection`, `fileName` i `fileType`. Cada part: afegeix `multipartId`, `multipartKey`, `multipartNumber` i `signedReceipt`, i envia els bytes. Final: el mateix sense `multipartNumber`, amb la llista JSON de parts.',
     r2UploadResult: 'Pujada iniciada, part pujada o pujada completada (la clau de l’objecte com a text)',
-    errorPluginStorageR2412: 'Ja existeix un fitxer amb aquesta clau',
+    errorStorageR2412: 'Ja existeix un fitxer amb aquesta clau',
 
     localizationHeading: 'Localització',
     localizationNote:

@@ -182,7 +182,7 @@ export const is: PluginDefaultTranslationsObject = {
     r2UploadDesc:
       'Þrjú skref á einni leið. Byrjun: sendu `collection`, `fileName` og `fileType`. Hver hluti: bættu við `multipartId`, `multipartKey`, `multipartNumber` og `signedReceipt` og sendu bætin. Lok: það sama án `multipartNumber`, með JSON-lista yfir hluta.',
     r2UploadResult: 'Upphleðsla hafin, hluta hlaðið upp eða upphleðslu lokið (lykill hlutarins sem texti)',
-    errorPluginStorageR2412: 'Skrá er þegar til með þessum lykli',
+    errorStorageR2412: 'Skrá er þegar til með þessum lykli',
 
     localizationHeading: 'Staðfærsla',
     localizationNote:

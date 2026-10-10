@@ -183,7 +183,7 @@ export const ja: PluginDefaultTranslationsObject = {
       '1 つのルートで 3 ステップ。開始: `collection`、`fileName`、`fileType` を送信。各パート: `multipartId`、`multipartKey`、`multipartNumber`、`signedReceipt` を追加してバイト列を送信。完了: `multipartNumber` を除いた同じパラメーターで、パートの JSON リストを送信。',
     r2UploadResult:
       'アップロード開始、パートのアップロード、またはアップロード完了（オブジェクトキーをテキストで返す）',
-    errorPluginStorageR2412: 'このキーのファイルはすでに存在します',
+    errorStorageR2412: 'このキーのファイルはすでに存在します',
 
     localizationHeading: 'ローカライズ',
     localizationNote:

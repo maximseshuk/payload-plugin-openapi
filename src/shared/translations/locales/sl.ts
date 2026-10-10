@@ -182,7 +182,7 @@ export const sl: PluginDefaultTranslationsObject = {
     r2UploadDesc:
       'Trije koraki na eni poti. Začetek: pošljite `collection`, `fileName` in `fileType`. Vsak del: dodajte `multipartId`, `multipartKey`, `multipartNumber` in `signedReceipt` ter pošljite bajte. Zaključek: enako brez `multipartNumber`, s seznamom delov v JSON.',
     r2UploadResult: 'Nalaganje se je začelo, del je naložen ali nalaganje je končano (ključ objekta kot besedilo)',
-    errorPluginStorageR2412: 'Datoteka s tem ključem že obstaja',
+    errorStorageR2412: 'Datoteka s tem ključem že obstaja',
 
     localizationHeading: 'Lokalizacija',
     localizationNote:

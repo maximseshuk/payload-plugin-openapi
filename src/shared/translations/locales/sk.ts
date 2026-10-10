@@ -184,7 +184,7 @@ export const sk: PluginDefaultTranslationsObject = {
     r2UploadDesc:
       'Tri kroky na jednej ceste. Začiatok: pošlite `collection`, `fileName` a `fileType`. Každá časť: pridajte `multipartId`, `multipartKey`, `multipartNumber` a `signedReceipt` a pošlite bajty. Dokončenie: to isté bez `multipartNumber`, so zoznamom častí v JSON.',
     r2UploadResult: 'Nahrávanie spustené, časť nahraná alebo nahrávanie dokončené (kľúč objektu ako text)',
-    errorPluginStorageR2412: 'Pod týmto kľúčom už súbor existuje',
+    errorStorageR2412: 'Pod týmto kľúčom už súbor existuje',
 
     localizationHeading: 'Lokalizácia',
     localizationNote:

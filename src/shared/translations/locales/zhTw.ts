@@ -173,7 +173,7 @@ export const zhTw: PluginDefaultTranslationsObject = {
     r2UploadDesc:
       '同一路由分三步。開始：傳送 `collection`、`fileName` 和 `fileType`。每個分段：加上 `multipartId`、`multipartKey`、`multipartNumber` 和 `signedReceipt`，並傳送位元組。完成：相同參數但不含 `multipartNumber`，並附上分段的 JSON 清單。',
     r2UploadResult: '上傳已開始、分段已上傳或上傳已完成（以文字回傳物件鍵）',
-    errorPluginStorageR2412: '此鍵已存在檔案',
+    errorStorageR2412: '此鍵已存在檔案',
 
     localizationHeading: '本地化',
     localizationNote:

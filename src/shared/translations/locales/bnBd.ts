@@ -177,7 +177,7 @@ export const bnBd: PluginDefaultTranslationsObject = {
     r2UploadDesc:
       'একই রুটে তিন ধাপ। শুরু: `collection`, `fileName` ও `fileType` পাঠান। প্রতিটি অংশ: `multipartId`, `multipartKey`, `multipartNumber` ও `signedReceipt` যোগ করে বাইট পাঠান। শেষ: `multipartNumber` ছাড়া একই, অংশগুলোর JSON তালিকাসহ।',
     r2UploadResult: 'আপলোড শুরু, অংশ আপলোড বা আপলোড সম্পন্ন (অবজেক্ট কী টেক্সট হিসেবে)',
-    errorPluginStorageR2412: 'এই কী-তে ইতিমধ্যে একটি ফাইল আছে',
+    errorStorageR2412: 'এই কী-তে ইতিমধ্যে একটি ফাইল আছে',
 
     localizationHeading: 'লোকালাইজেশন',
     localizationNote:

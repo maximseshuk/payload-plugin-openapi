@@ -182,7 +182,7 @@ export const az: PluginDefaultTranslationsObject = {
     r2UploadDesc:
       'Bir marşrutda üç addım. Başlanğıc: `collection`, `fileName` və `fileType` göndərin. Hər hissə: `multipartId`, `multipartKey`, `multipartNumber` və `signedReceipt` əlavə edib baytları göndərin. Tamamlama: eynisi `multipartNumber` olmadan, hissələrin JSON siyahısı ilə.',
     r2UploadResult: 'Yükləmə başladı, hissə yükləndi və ya yükləmə tamamlandı (obyekt açarı mətn kimi)',
-    errorPluginStorageR2412: 'Bu açarla artıq fayl mövcuddur',
+    errorStorageR2412: 'Bu açarla artıq fayl mövcuddur',
 
     localizationHeading: 'Lokallaşdırma',
     localizationNote:

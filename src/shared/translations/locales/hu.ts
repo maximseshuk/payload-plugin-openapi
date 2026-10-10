@@ -182,7 +182,7 @@ export const hu: PluginDefaultTranslationsObject = {
     r2UploadDesc:
       'Három lépés egy útvonalon. Kezdés: küldje el a `collection`, `fileName` és `fileType` értékeket. Minden rész: adja hozzá a `multipartId`, `multipartKey`, `multipartNumber` és `signedReceipt` értékeket, és küldje a bájtokat. Befejezés: ugyanez `multipartNumber` nélkül, a részek JSON-listájával.',
     r2UploadResult: 'Feltöltés elindult, rész feltöltve vagy feltöltés kész (az objektumkulcs szövegként)',
-    errorPluginStorageR2412: 'Ezzel a kulccsal már létezik fájl',
+    errorStorageR2412: 'Ezzel a kulccsal már létezik fájl',
 
     localizationHeading: 'Lokalizáció',
     localizationNote:

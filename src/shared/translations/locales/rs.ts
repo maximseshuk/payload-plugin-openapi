@@ -181,7 +181,7 @@ export const rs: PluginDefaultTranslationsObject = {
     r2UploadDesc:
       'Три корака на једној рути. Почетак: пошаљите `collection`, `fileName` и `fileType`. Сваки део: додајте `multipartId`, `multipartKey`, `multipartNumber` и `signedReceipt` и пошаљите бајтове. Крај: исто без `multipartNumber`, са JSON листом делова.',
     r2UploadResult: 'Отпремање започето, део отпремљен или отпремање завршено (кључ објекта као текст)',
-    errorPluginStorageR2412: 'Фајл са овим кључем већ постоји',
+    errorStorageR2412: 'Фајл са овим кључем већ постоји',
 
     localizationHeading: 'Локализација',
     localizationNote:

@@ -184,7 +184,7 @@ export const hy: PluginDefaultTranslationsObject = {
     r2UploadDesc:
       'Երեք քայլ մեկ երթուղու վրա։ Սկիզբ՝ ուղարկեք `collection`, `fileName` և `fileType`։ Յուրաքանչյուր մաս՝ ավելացրեք `multipartId`, `multipartKey`, `multipartNumber` և `signedReceipt` և ուղարկեք բայթերը։ Ավարտ՝ նույնը առանց `multipartNumber`-ի, մասերի JSON ցուցակով։',
     r2UploadResult: 'Վերբեռնումը սկսված է, մասը վերբեռնված է կամ վերբեռնումն ավարտված է (օբյեկտի բանալին՝ տեքստով)',
-    errorPluginStorageR2412: 'Այս բանալիով ֆայլ արդեն կա',
+    errorStorageR2412: 'Այս բանալիով ֆայլ արդեն կա',
 
     localizationHeading: 'Տեղայնացում',
     localizationNote:

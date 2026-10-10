@@ -178,7 +178,7 @@ export const my: PluginDefaultTranslationsObject = {
     r2UploadDesc:
       'route တစ်ခုတည်းတွင် အဆင့်သုံးဆင့်။ စတင်: `collection`၊ `fileName` နှင့် `fileType` ပို့ပါ။ အပိုင်းတိုင်း: `multipartId`၊ `multipartKey`၊ `multipartNumber` နှင့် `signedReceipt` ထည့်ပြီး byte များ ပို့ပါ။ ပြီးဆုံး: `multipartNumber` မပါဘဲ အလားတူ၊ အပိုင်းများ၏ JSON စာရင်းနှင့်။',
     r2UploadResult: 'upload စတင်ပြီး၊ အပိုင်း upload ပြီး သို့မဟုတ် upload ပြီးဆုံး (object key ကို text အဖြစ်)',
-    errorPluginStorageR2412: 'ဤ key တွင် file ရှိပြီးသားဖြစ်သည်',
+    errorStorageR2412: 'ဤ key တွင် file ရှိပြီးသားဖြစ်သည်',
 
     localizationHeading: 'Localization',
     localizationNote:

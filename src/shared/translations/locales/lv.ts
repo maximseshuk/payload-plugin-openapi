@@ -182,7 +182,7 @@ export const lv: PluginDefaultTranslationsObject = {
     r2UploadDesc:
       'Trīs soļi vienā maršrutā. Sākums: nosūtiet `collection`, `fileName` un `fileType`. Katra daļa: pievienojiet `multipartId`, `multipartKey`, `multipartNumber` un `signedReceipt` un nosūtiet baitus. Pabeigšana: tas pats bez `multipartNumber`, ar daļu JSON sarakstu.',
     r2UploadResult: 'Augšupielāde sākta, daļa augšupielādēta vai augšupielāde pabeigta (objekta atslēga kā teksts)',
-    errorPluginStorageR2412: 'Fails ar šo atslēgu jau pastāv',
+    errorStorageR2412: 'Fails ar šo atslēgu jau pastāv',
 
     localizationHeading: 'Lokalizācija',
     localizationNote:

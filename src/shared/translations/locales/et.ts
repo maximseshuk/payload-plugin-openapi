@@ -183,7 +183,7 @@ export const et: PluginDefaultTranslationsObject = {
     r2UploadDesc:
       'Kolm sammu ühel marsruudil. Algus: saada `collection`, `fileName` ja `fileType`. Iga osa: lisa `multipartId`, `multipartKey`, `multipartNumber` ja `signedReceipt` ning saada baidid. Lõpp: sama ilma `multipartNumber`-ita, koos osade JSON-loendiga.',
     r2UploadResult: 'Üleslaadimine alustatud, osa üles laaditud või üleslaadimine lõpetatud (objekti võti tekstina)',
-    errorPluginStorageR2412: 'Selle võtmega fail on juba olemas',
+    errorStorageR2412: 'Selle võtmega fail on juba olemas',
 
     localizationHeading: 'Lokaliseerimine',
     localizationNote:

@@ -175,7 +175,7 @@ export const th: PluginDefaultTranslationsObject = {
     r2UploadDesc:
       'สามขั้นตอนบนเส้นทางเดียว เริ่ม: ส่ง `collection`, `fileName` และ `fileType` แต่ละส่วน: เพิ่ม `multipartId`, `multipartKey`, `multipartNumber` และ `signedReceipt` แล้วส่งไบต์ เสร็จสิ้น: ส่งแบบเดิมโดยไม่มี `multipartNumber` พร้อมรายการส่วนแบบ JSON',
     r2UploadResult: 'เริ่มอัปโหลด อัปโหลดส่วนแล้ว หรืออัปโหลดเสร็จ (คีย์ของออบเจ็กต์เป็นข้อความ)',
-    errorPluginStorageR2412: 'มีไฟล์ที่คีย์นี้อยู่แล้ว',
+    errorStorageR2412: 'มีไฟล์ที่คีย์นี้อยู่แล้ว',
 
     localizationHeading: 'การแปลภาษา',
     localizationNote:
