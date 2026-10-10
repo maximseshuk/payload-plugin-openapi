@@ -140,6 +140,14 @@ export const ecommerce: OfficialPlugin = {
       description: t('ecommercePaymentBody'),
     })
 
+    const usedIds = new Set<string>()
+    const uniqueId = (base: string) => {
+      let operationId = base
+      for (let n = 2; usedIds.has(operationId); n++) operationId = `${base}${n}`
+      usedIds.add(operationId)
+      return operationId
+    }
+
     const payments = mountEndpoints(config.endpoints, ctx.apiRoute, ({ method, path }) => {
       if (method !== 'post') return undefined
       if (path === '/payments/stripe/webhooks') {
@@ -153,7 +161,7 @@ export const ecommerce: OfficialPlugin = {
       if (step === 'initiate') {
         return {
           tags: [TAG],
-          operationId: `initiatePayment${suffix}`,
+          operationId: uniqueId(`initiatePayment${suffix}`),
           summary: t('ecommerceInitiatePayment', { method: methodName }),
           requestBody: paymentBody({}),
           responses: {
@@ -172,7 +180,7 @@ export const ecommerce: OfficialPlugin = {
       }
       return {
         tags: [TAG],
-        operationId: `confirmOrder${suffix}`,
+        operationId: uniqueId(`confirmOrder${suffix}`),
         summary: t('ecommerceConfirmOrder', { method: methodName }),
         requestBody: paymentBody(stripe ? { paymentIntentID: { type: 'string' } } : {}),
         responses: {

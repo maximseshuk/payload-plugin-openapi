@@ -20,7 +20,7 @@
 
 ## Features
 
-- **Full spec from your config** — collections, globals, auth, versions, uploads, and jobs are documented with zero annotation. See the [endpoint list](https://payload-plugin-openapi.seshuk.im/v1/reference/endpoints).
+- **Full spec from your config** — collections, globals, auth, versions, uploads, jobs, and the endpoints of official Payload plugins are documented with zero annotation. See the [endpoint list](https://payload-plugin-openapi.seshuk.im/v1/reference/endpoints).
 - **Interactive docs included** — mount Scalar or Swagger UI, or both on different paths.
 - **Native metadata** — document custom endpoints and refine field schemas through Payload's own `custom.openapi` key. No wrapper, no separate registry.
 - **Precise filtering** — choose exactly which entities and operations end up in the spec.

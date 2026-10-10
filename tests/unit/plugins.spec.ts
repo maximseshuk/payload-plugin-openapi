@@ -226,6 +226,46 @@ describe('spec/plugins', () => {
     expect(op(doc, '/api/payments/bank-transfer/initiate', 'post')?.operationId).toBe('initiatePaymentBankTransfer')
   })
 
+  it('keeps ecommerce payment operation ids unique', async () => {
+    const doc = await build({
+      plugins: [plugin('@payloadcms/plugin-ecommerce')],
+      endpoints: [ep('post', '/payments/bank-transfer/initiate'), ep('post', '/payments/bank_transfer/initiate')],
+    })
+    expect(op(doc, '/api/payments/bank-transfer/initiate', 'post')?.operationId).toBe('initiatePaymentBankTransfer')
+    expect(op(doc, '/api/payments/bank_transfer/initiate', 'post')?.operationId).toBe('initiatePaymentBankTransfer2')
+  })
+
+  it('keeps a custom operation on the same path as a plugin operation', async () => {
+    const doc = await build({
+      plugins: [plugin('@payloadcms/plugin-mcp')],
+      endpoints: [
+        ep('post', '/mcp'),
+        ep('get', '/mcp', {
+          custom: { openapi: { operationId: 'mine', responses: { '200': { description: 'ok' } } } },
+        }),
+      ],
+    })
+    expect(op(doc, '/api/mcp', 'get')?.operationId).toBe('mine')
+    expect(op(doc, '/api/mcp', 'post')?.operationId).toBe('mcp')
+  })
+
+  it('does not leak a transform mutation into the next build', async () => {
+    const config = { plugins: [plugin('@payloadcms/plugin-mcp')], endpoints: [ep('post', '/mcp')] }
+    await build(config, [], {
+      extensions: [
+        {
+          transform: ({ doc }) => {
+            const schema = bodySchema(op(doc, '/api/mcp', 'post'))
+            schema.oneOf?.push({ type: 'null' })
+            return doc
+          },
+        },
+      ],
+    })
+    const doc = await build(config)
+    expect(bodySchema(op(doc, '/api/mcp', 'post')).oneOf).toHaveLength(2)
+  })
+
   it('detects the R2 adapter from `storage` and keeps the route suffix', async () => {
     const doc = await build({
       storage: [{ name: 'r2' }],

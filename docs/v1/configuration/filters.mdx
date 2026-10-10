@@ -22,6 +22,8 @@ description: 'Control what ends up in the spec: which entities are documented, w
 
 See [Endpoints](/v1/reference/endpoints) for the full list of endpoints and the option that controls each one.
 
+`includeCustom` does not cover [official plugin](/v1/reference/endpoints#official-plugins) endpoints. To hide them, add `{ kind: 'plugin' }` to `excludeOperations`.
+
 ## Choosing entities with `include` and `exclude`
 
 These two lists pick which collections and globals are documented. Each entry is an `EntityMatcher` — one of three shapes:

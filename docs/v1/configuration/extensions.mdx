@@ -37,7 +37,7 @@ openapi({
 
 | Option       | Type                                                 | Default | Description                                                    |
 | ------------ | ---------------------------------------------------- | ------- | -------------------------------------------------------------- |
-| `paths`      | `PathsObject`                                        | —       | Extra path items merged into the document's `paths`            |
+| `paths`      | `PathsObject`                                        | —       | Extra path items merged into `paths`. See below                |
 | `components` | `ComponentsObject`                                   | —       | Extra schemas, security schemes, etc. merged into `components` |
 | `tags`       | `TagObject[]`                                        | —       | Extra tags appended to the document's `tags`                   |
 | `transform`  | `({ doc, ...ctx }) => Document \| Promise<Document>` | —       | Post-build hook over the finished document. It can be `async`. |

@@ -239,7 +239,7 @@ export interface FilterOptions {
 }
 
 export interface OpenApiExtension {
-  /** Paths deep-merged into the generated ones. */
+  /** Paths merged into the generated ones. An operation here replaces the generated operation with the same path and method. */
   paths?: PathsObject
   /** Components deep-merged into the generated ones. */
   components?: ComponentsObject

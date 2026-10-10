@@ -277,7 +277,7 @@ export const buildDocument = async (input: BuildInput): Promise<Document> => {
       for (const group of groups) {
         const finalized = await finalize(group.paths, 'plugin', group.slug, plugin.slug)
         if (Object.keys(finalized).length === 0) continue
-        Object.assign(paths, finalized)
+        for (const [path, item] of Object.entries(finalized)) paths[path] = { ...paths[path], ...item }
         if (!pluginTags.includes(plugin.tag)) pluginTags.push(plugin.tag)
       }
     } catch (error) {
@@ -348,6 +348,8 @@ export const buildDocument = async (input: BuildInput): Promise<Document> => {
     }),
     'x-doc-languages': ctx.docLanguages,
   } as Document
+
+  if (options.extensions.some((ext) => ext.transform)) doc = structuredClone(doc)
 
   for (const ext of options.extensions) {
     if (ext.paths) {

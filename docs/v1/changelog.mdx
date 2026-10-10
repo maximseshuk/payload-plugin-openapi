@@ -5,6 +5,23 @@ description: 'Release history for the OpenAPI plugin for Payload CMS.'
 
 Notable changes per release. For the full commit-level history, see the [GitHub releases](https://github.com/maximseshuk/payload-plugin-openapi/releases).
 
+<Update label="v1.0.0-beta.2" description="October 11, 2026">
+
+**Breaking changes**
+
+- Payload 4.0.0-beta.0 or later is required.
+- An operation in extension `paths` now [replaces the generated operation](/v1/configuration/extensions#your-paths-take-priority) with the same path and method. Before, the two were deep-merged.
+- `OperationKind` and `OperationContext.kind` can be `'plugin'`. An exhaustive `switch` over `kind` needs a new case.
+- Endpoints of official Payload plugins now appear in the spec. `includeCustom: false` does not hide them. Add `{ kind: 'plugin' }` to `excludeOperations` to drop them.
+
+**New features**
+
+- Endpoints of the official ecommerce, Stripe, MCP, SEO, search, multi-tenant, import-export and R2 storage plugins are documented when the plugin is installed. See [Official plugins](/v1/reference/endpoints#official-plugins).
+- `excludeOperations` rules take `plugin`, the package name of the plugin that added the operation. A custom endpoint sets it with `'x-payload-plugin'` in `custom.openapi`. See [Rules](/v1/configuration/filters#rules).
+- `POST /api/<slug>/{id}/rename` for upload collections, and the `version` query param on `GET /api/<slug>/file/{filename}`.
+
+</Update>
+
 <Update label="v1.0.0-beta.1" description="October 3, 2026">
 
 **Breaking changes**
