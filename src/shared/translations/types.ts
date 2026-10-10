@@ -79,11 +79,24 @@ export type PluginDefaultTranslationsObject = {
     uploadPayloadField: string
     fileServe: string
     filePartial: string
+    paramFileVersion: string
     uploadInstructionsSummary: string
     uploadInstructionsResult: string
     uploadStagePutSummary: string
     uploadStageDeleteSummary: string
     uploadStageResult: string
+    paramPreferenceKey: string
+    preferenceGet: string
+    preferenceGetResult: string
+    preferenceSet: string
+    preferenceSetBody: string
+    preferenceSetResult: string
+    preferenceDelete: string
+    preferenceDeleteResult: string
+    reorder: string
+    reorderBody: string
+    reorderResult: string
+    errorReorder400: string
 
     error400: string
     error401: string
@@ -105,6 +118,67 @@ export type PluginDefaultTranslationsObject = {
     tagJobs: string
     tagUploads: string
     tagAccess: string
+    tagReorder: string
+    tagPlugins: string
+    tagPluginsDesc: string
+    errorPlugin400: string
+    errorPlugin401: string
+    errorPlugin403: string
+    errorPlugin404: string
+    errorPlugin500: string
+    ecommerceAddItem: string
+    ecommerceRemoveItem: string
+    ecommerceUpdateItem: string
+    ecommerceClearCart: string
+    ecommerceMergeCart: string
+    ecommerceCartAccess: string
+    ecommerceCartResult: string
+    errorPluginEcommerce404: string
+    ecommerceQuantity: string
+    ecommerceInitiatePayment: string
+    ecommerceConfirmOrder: string
+    ecommercePaymentBody: string
+    ecommerceInitiateResult: string
+    ecommerceConfirmResult: string
+    stripeWebhook: string
+    stripeWebhookBody: string
+    stripeWebhookResult: string
+    errorPluginStripeWebhook400: string
+    stripeRest: string
+    stripeRestResult: string
+    errorPluginStripeRest404: string
+    mcp: string
+    mcpDesc: string
+    mcpResult: string
+    mcpOverrideAccess: string
+    mcpGet: string
+    errorPluginMcpGet405: string
+    mcpProtocolVersion: string
+    mcpResult202: string
+    errorPluginMcp404: string
+    errorPluginMcp406: string
+    errorPluginMcp413: string
+    errorPluginMcp415: string
+    seoTitle: string
+    seoDescription: string
+    seoUrl: string
+    seoImage: string
+    seoBody: string
+    seoResult: string
+    searchReindex: string
+    searchReindexResult: string
+    tenantOptions: string
+    tenantOptionsResult: string
+    exportDownload: string
+    exportDownloadResult: string
+    exportPreview: string
+    importPreview: string
+    previewResult: string
+    importFileData: string
+    r2Upload: string
+    r2UploadDesc: string
+    r2UploadResult: string
+    errorStorageR2412: string
 
     localizationHeading: string
     localizationNote: string

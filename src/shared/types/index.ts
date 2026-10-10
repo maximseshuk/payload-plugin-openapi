@@ -17,7 +17,7 @@ export type OpenApiVersion = '3.0' | '3.1' | '3.2'
 
 export type EntityKind = 'collection' | 'global'
 
-export type OperationKind = EntityKind | 'custom' | 'jobs' | 'system'
+export type OperationKind = EntityKind | 'custom' | 'jobs' | 'system' | 'plugin'
 
 export type HttpMethod = 'get' | 'post' | 'patch' | 'put' | 'delete'
 
@@ -130,24 +130,38 @@ export type EntityMatcher = string | RegExp | { kind: EntityKind; slug: string }
  * an operation is removed if any rule matches it. Fields:
  *   - `method` — HTTP method(s); omit to match any.
  *   - `slug`   — collection or global slug, exact string or RegExp; omit to match any.
- *     A rule with `slug` never matches custom, jobs or system operations.
+ *     A rule with `slug` never matches custom, jobs or system operations, or plugin
+ *     operations mounted at the API root.
  *   - `kind`   — restrict to one operation group; omit to match all.
  *   - `path`   — RegExp tested against the final route path (e.g. `/api/posts/{id}`).
+ *   - `plugin` — slug of the plugin that adds the operation (e.g. `'@payloadcms/plugin-seo'`),
+ *     exact string or RegExp; omit to match any. A rule with `plugin` never matches an
+ *     operation without one.
  */
 export interface OperationRule {
   method?: HttpMethod | HttpMethod[]
   slug?: string | RegExp
   kind?: OperationKind
   path?: RegExp
+  plugin?: string | RegExp
 }
 
 /** Context passed to `excludeOperations` functions and `security` for each operation. */
 export interface OperationContext {
   method: HttpMethod
   path: string
-  /** Collection or global slug. Unset for custom, jobs and system operations. */
+  /**
+   * Collection or global slug. For plugin operations, the collection the plugin
+   * mounts them on. Unset for custom, jobs and system operations.
+   */
   slug?: string
   kind: OperationKind
+  /**
+   * Slug of the plugin that adds the operation: an official Payload plugin
+   * (kind `'plugin'`), or the `x-payload-plugin` value of a custom endpoint's
+   * `custom.openapi`.
+   */
+  plugin?: string
 }
 
 /** A rule, or a function that drops the operation when it returns (or resolves to) `true`. */
@@ -216,16 +230,16 @@ export interface FilterOptions {
    */
   includeJobs?: boolean
   /**
-   * Drops operations from every group: collection, global, custom, jobs and
-   * system. An operation is removed when any rule matches it or any function
-   * returns `true`.
+   * Drops operations from every group: collection, global, custom, jobs,
+   * system and plugin. An operation is removed when any rule matches it or any
+   * function returns `true`.
    * @default []
    */
   excludeOperations?: OperationFilter[]
 }
 
 export interface OpenApiExtension {
-  /** Paths deep-merged into the generated ones. */
+  /** Paths merged into the generated ones. An operation here replaces the generated operation with the same path and method. */
   paths?: PathsObject
   /** Components deep-merged into the generated ones. */
   components?: ComponentsObject

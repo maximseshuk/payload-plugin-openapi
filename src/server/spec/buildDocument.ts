@@ -18,11 +18,12 @@ import type {
 
 import { buildAuthPaths } from '@/server/spec/paths/auth.js'
 import { buildCollectionPaths } from '@/server/spec/paths/collections.js'
-import { buildCustomEndpointPaths } from '@/server/spec/paths/custom.js'
+import { buildCustomEndpointPaths, getOpenapiMeta } from '@/server/spec/paths/custom.js'
 import { buildGlobalPaths } from '@/server/spec/paths/globals.js'
 import { buildJobsPaths } from '@/server/spec/paths/jobs.js'
 import { buildSystemPaths } from '@/server/spec/paths/system.js'
 import { buildVersionPaths, versionComponentSchemas } from '@/server/spec/paths/versions.js'
+import { OFFICIAL_PLUGINS } from '@/server/spec/plugins/index.js'
 import { PLUGIN_NAME } from '@/shared/constants.js'
 import { makeT } from '@/shared/translations/index.js'
 import type { BuildContext, OperationKind, ResolvedOptions } from '@/shared/types/index.js'
@@ -38,7 +39,7 @@ import {
   securityScheme,
 } from './components.js'
 import { buildBlockSchema, buildEntitySchemas } from './entitySchemas.js'
-import { filterOperations, shouldIncludeCollection, shouldIncludeGlobal } from './filters.js'
+import { filterOperations, shouldIncludeCollection, shouldIncludeGlobal, stripPluginKeys } from './filters.js'
 import { applyHierarchy } from './hierarchy.js'
 import {
   blockSchemaName,
@@ -55,6 +56,8 @@ import {
 import { buildParamSchemas, buildQueryOperationsSchema, collectionHasFilters } from './params.js'
 import { applySecurity, evaluateAccess, resolveEntitySecurity, securedRequirement } from './security.js'
 import { buildTagHierarchy, type CollectionTagInfo, type GlobalTagInfo, type SystemTag } from './tags.js'
+
+const OPERATION_METHODS = new Set(['get', 'put', 'post', 'delete', 'options', 'head', 'patch', 'trace', 'query'])
 
 const resolveDescription = (description: unknown, ctx: BuildContext): string | undefined => {
   if (description == null) return undefined
@@ -93,11 +96,17 @@ export const buildDocument = async (input: BuildInput): Promise<Document> => {
 
   const { filters } = options
   const login = options.serve && options.interactiveAuth.enabled
-  const finalize = async (group: PathsObject, kind: OperationKind, slug?: string): Promise<PathsObject> =>
+  const finalize = async (
+    group: PathsObject,
+    kind: OperationKind,
+    slug?: string,
+    plugin?: string,
+  ): Promise<PathsObject> =>
     applySecurity({
-      paths: await filterOperations({ paths: group, slug, kind, filters }),
+      paths: await filterOperations({ paths: group, slug, kind, filters, plugin }),
       slug,
       kind,
+      plugin,
       security: options.security,
       login,
     })
@@ -230,7 +239,10 @@ export const buildDocument = async (input: BuildInput): Promise<Document> => {
 
   if (filters.includeCustom) {
     try {
-      Object.assign(paths, await finalize(buildCustomEndpointPaths({ config, collections, globals, ctx }), 'custom'))
+      Object.assign(
+        paths,
+        stripPluginKeys(await finalize(buildCustomEndpointPaths({ config, collections, globals, ctx }), 'custom')),
+      )
     } catch (error) {
       logger.warn(`${PLUGIN_NAME}: failed to collect custom endpoints: ${(error as Error).message}`)
     }
@@ -254,11 +266,42 @@ export const buildDocument = async (input: BuildInput): Promise<Document> => {
   }
 
   const uploadSlugs = collections.filter((c) => c.upload).map((c) => c.slug)
-  Object.assign(paths, await finalize(buildSystemPaths({ ctx, access, uploadSlugs }), 'system'))
+  const reorderMounted = config.endpoints?.some(
+    (e) => e.method === 'post' && e.path === '/reorder' && !getOpenapiMeta(e),
+  )
+  const orderableJoinTargets = new Set(
+    input.collections.flatMap((c) =>
+      Object.entries(c.joins ?? {})
+        .filter(([, joins]) => joins.some((j) => j.field.orderable))
+        .map(([slug]) => slug),
+    ),
+  )
+  const reorderSlugs = reorderMounted
+    ? collections.filter((c) => c.orderable || orderableJoinTargets.has(c.slug)).map((c) => c.slug)
+    : []
+  Object.assign(paths, await finalize(buildSystemPaths({ ctx, access, uploadSlugs, reorderSlugs }), 'system'))
+
+  const pluginTags: string[] = []
+  for (const plugin of OFFICIAL_PLUGINS) {
+    try {
+      const installed = config.plugins?.find((p) => p.slug === plugin.slug)
+      if (!(plugin.installed?.(config) ?? installed)) continue
+      const groups = plugin.build({ config, collections, ctx, options: installed?.options, schemas, t })
+      for (const group of groups) {
+        const finalized = await finalize(group.paths, 'plugin', group.slug, plugin.slug)
+        if (Object.keys(finalized).length === 0) continue
+        for (const [path, item] of Object.entries(finalized)) paths[path] = { ...paths[path], ...item }
+        if (!pluginTags.includes(plugin.tag)) pluginTags.push(plugin.tag)
+      }
+    } catch (error) {
+      logger.warn(`${PLUGIN_NAME}: skipped plugin "${plugin.slug}": ${(error as Error).message}`)
+    }
+  }
 
   const systemTags: SystemTag[] = []
   if (hasJobs) systemTags.push('Jobs')
   if (uploadSlugs.length > 0) systemTags.push('Uploads')
+  if (reorderSlugs.length > 0) systemTags.push('Reorder')
   if (access) systemTags.push('Access')
 
   const supportedTimezones = config.admin?.timezones?.supportedTimezones
@@ -313,15 +356,26 @@ export const buildDocument = async (input: BuildInput): Promise<Document> => {
       collections: collectionTagInfos,
       globals: globalTagInfos,
       systemTags,
+      pluginTags,
       t,
       nested: options.nestedTags,
     }),
     'x-doc-languages': ctx.docLanguages,
   } as Document
 
+  if (options.extensions.some((ext) => ext.transform)) doc = structuredClone(doc)
+
   for (const ext of options.extensions) {
     if (ext.paths) {
-      doc.paths = deepMerge(doc.paths ?? {}, ext.paths) as PathsObject
+      const base: PathsObject = { ...doc.paths }
+      for (const [path, item] of Object.entries(ext.paths)) {
+        const current = base[path]
+        if (!current || !item) continue
+        base[path] = Object.fromEntries(
+          Object.entries(current).filter(([key]) => !(OPERATION_METHODS.has(key) && key in item)),
+        )
+      }
+      doc.paths = deepMerge(base, ext.paths) as PathsObject
     }
     if (ext.components) {
       doc.components = deepMerge(

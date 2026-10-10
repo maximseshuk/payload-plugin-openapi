@@ -17,6 +17,7 @@ The plugin documents the REST endpoints that Payload 4 mounts for your config. A
 | `/api/<slug>/{id}/validate`   | POST                | Always                                               | —                                  |
 | `/api/<slug>/{id}/duplicate`  | POST                | `disableDuplicate` is not set (auth: off by default) | —                                  |
 | `/api/<slug>/file/{filename}` | GET                 | Upload collection                                    | —                                  |
+| `/api/<slug>/{id}/rename`     | POST                | Upload collection                                    | —                                  |
 | `/api/<slug>/versions`        | GET                 | `versions` is not `false`                            | `includeVersions`                  |
 | `/api/<slug>/versions/{id}`   | GET, POST (restore) | `versions` is not `false`                            | `includeVersions`                  |
 | `/api/<slug>/access`          | POST                | Always                                               | `includeAuth` + `includeAdminAuth` |
@@ -52,13 +53,28 @@ The plugin documents the REST endpoints that Payload 4 mounts for your config. A
 
 ## System
 
-| Endpoint                              | Method      | When                              | Filter                             |
-| ------------------------------------- | ----------- | --------------------------------- | ---------------------------------- |
-| `/api/access`                         | GET         | Always                            | `includeAuth` + `includeAdminAuth` |
-| `/api/upload-instructions`            | POST        | At least one upload collection    | —                                  |
-| `/api/upload-instructions/{uploadId}` | PUT, DELETE | At least one upload collection    | —                                  |
-| `/api/payload-jobs/run`               | GET         | Tasks or workflows are configured | `includeJobs`                      |
-| `/api/payload-jobs/handle-schedules`  | GET         | Tasks or workflows are configured | `includeJobs`                      |
+| Endpoint                              | Method      | When                                | Filter                             |
+| ------------------------------------- | ----------- | ----------------------------------- | ---------------------------------- |
+| `/api/access`                         | GET         | Always                              | `includeAuth` + `includeAdminAuth` |
+| `/api/upload-instructions`            | POST        | At least one upload collection      | —                                  |
+| `/api/upload-instructions/{uploadId}` | PUT, DELETE | At least one upload collection      | —                                  |
+| `/api/reorder`                        | POST        | A collection or join is `orderable` | —                                  |
+| `/api/payload-jobs/run`               | GET         | Tasks or workflows are configured   | `includeJobs`                      |
+| `/api/payload-jobs/handle-schedules`  | GET         | Tasks or workflows are configured   | `includeJobs`                      |
+
+`POST /api/reorder` is the drag-and-drop endpoint of `orderable` collections and orderable join fields. It is listed when Payload mounts it, and its `collectionSlug` is an enum of the documented collections that can be reordered. It needs a logged-in user with update access. A bad body returns `400` with `{ error }`, not the usual error shape.
+
+## Preferences
+
+The `payload-preferences` collection is hidden unless [`includeSystem`](/v1/configuration/filters) is on. With it, the spec lists the routes that store admin panel preferences for the current user:
+
+| Endpoint                        | Method | Does                                                       |
+| ------------------------------- | ------ | ---------------------------------------------------------- |
+| `/api/payload-preferences/{id}` | GET    | Returns the preference, or `{ message, value: null }`      |
+| `/api/payload-preferences/{id}` | POST   | Saves `value` from the body and returns `{ doc, message }` |
+| `/api/payload-preferences/{id}` | DELETE | Deletes the preference and returns it with `message`       |
+
+Here the `{id}` segment is the preference key, such as `nav`. Payload matches these routes before the standard ones, so `GET /count`, `POST /validate` and `POST /access` on this collection would read or save a preference named `count`, `validate` or `access`. The spec leaves them out. `PATCH /api/payload-preferences/{id}` still updates by document ID. Every route needs a logged-in user.
 
 ## Request and response bodies
 
@@ -122,6 +138,90 @@ The spec also covers the fields that Payload adds:
 
 Payload fills `_h_slugPath` and `_h_titlePath` only when you ask for them. The `GET /api/<slug>` and `GET /api/<slug>/{id}` operations of a folder or tag collection list a `computeHierarchyPaths` query param for this. Selecting either field with `select` computes them too. Both fields work in `sort`. If you rename them with `slugPathFieldName` or `titlePathFieldName`, the spec uses your names.
 
+## Official plugins
+
+The spec documents the REST endpoints of these official Payload plugins. You don't need to set anything. The plugin finds an installed plugin by its `slug` in `config.plugins`, and the R2 adapter by its name in `config.storage`. It documents only the endpoints that are mounted, at the path they are mounted on. An endpoint with its own `custom.openapi` is documented from that instead.
+
+Each plugin gets one tag. With `nestedTags`, the tags sit under a `Plugins` group. A plugin tag with the same name as a collection tag, such as `Search`, stays under that collection. Rules and functions in `excludeOperations` and `security` see these operations with `kind: 'plugin'` and the package name as `plugin`. An endpoint mounted on a collection has that collection's `slug`, and the plugin documents it only when the collection passes your filters. See [Filters](/v1/configuration/filters#rules).
+
+### `@payloadcms/plugin-ecommerce`
+
+| Endpoint                               | Method | Auth                                      |
+| -------------------------------------- | ------ | ----------------------------------------- |
+| `/api/<carts>/{id}/add-item`           | POST   | Cart owner, or a guest cart with `secret` |
+| `/api/<carts>/{id}/remove-item`        | POST   | Cart owner, or a guest cart with `secret` |
+| `/api/<carts>/{id}/update-item`        | POST   | Cart owner, or a guest cart with `secret` |
+| `/api/<carts>/{id}/clear`              | POST   | Cart owner, or a guest cart with `secret` |
+| `/api/<carts>/{id}/merge`              | POST   | Logged in                                 |
+| `/api/payments/<method>/initiate`      | POST   | Optional. A guest sends `customerEmail`   |
+| `/api/payments/<method>/confirm-order` | POST   | Optional. A guest sends `customerEmail`   |
+| `/api/payments/stripe/webhooks`        | POST   | None, called by Stripe                    |
+
+`<carts>` is the carts collection, found by its `/:id/add-item` endpoint. `<method>` is the `name` of each payment adapter. The Stripe adapter adds `paymentIntentID` to the confirm body and `clientSecret` to the initiate response.
+
+### `@payloadcms/plugin-stripe`
+
+| Endpoint               | Method | Auth                   |
+| ---------------------- | ------ | ---------------------- |
+| `/api/stripe/webhooks` | POST   | None, called by Stripe |
+| `/api/stripe/rest`     | POST   | `rest.access`          |
+
+`/api/stripe/rest` is listed when `rest` is set. Its `stripeMethod` is an enum of `rest.allowedMethods`.
+
+### `@payloadcms/plugin-mcp`
+
+| Endpoint   | Method | Auth                                                 |
+| ---------- | ------ | ---------------------------------------------------- |
+| `/api/mcp` | POST   | Optional. The tools follow user access               |
+| `/api/mcp` | GET    | None. Always `405`, the server sends no event stream |
+
+The body and response are JSON-RPC messages, single or batched.
+
+### `@payloadcms/plugin-seo`
+
+| Endpoint                               | Method | Auth      |
+| -------------------------------------- | ------ | --------- |
+| `/api/plugin-seo/generate-title`       | POST   | Logged in |
+| `/api/plugin-seo/generate-description` | POST   | Logged in |
+| `/api/plugin-seo/generate-url`         | POST   | Logged in |
+| `/api/plugin-seo/generate-image`       | POST   | Logged in |
+
+Each returns `{ result }` from your generate function, or an empty string when you set none.
+
+### `@payloadcms/plugin-search`
+
+| Endpoint                | Method | Auth                                   |
+| ----------------------- | ------ | -------------------------------------- |
+| `/api/<search>/reindex` | POST   | `update` and `delete` access on search |
+
+`<search>` is `searchOverrides.slug`, `search` by default. The `collections` body field is an enum of the plugin's `collections`.
+
+### `@payloadcms/plugin-multi-tenant`
+
+| Endpoint                                 | Method | Auth      |
+| ---------------------------------------- | ------ | --------- |
+| `/api/<tenants>/populate-tenant-options` | GET    | Logged in |
+
+`<tenants>` is `tenantsSlug`, `tenants` by default.
+
+### `@payloadcms/plugin-import-export`
+
+| Endpoint                       | Method | Auth      |
+| ------------------------------ | ------ | --------- |
+| `/api/<export>/download`       | POST   | Logged in |
+| `/api/<export>/export-preview` | POST   | Optional  |
+| `/api/<import>/preview-data`   | POST   | Optional  |
+
+`<export>` and `<import>` are the export and import collections the plugin creates. The `collectionSlug` body field is an enum of the collections they serve.
+
+### `@payloadcms/storage-r2`
+
+| Endpoint                            | Method | Auth      |
+| ----------------------------------- | ------ | --------- |
+| `/api/storage-r2-multi-part-upload` | POST   | Logged in |
+
+Listed when `clientUploads` is on. One route takes three steps, chosen by the query params: start the upload, send each part as `application/octet-stream`, and complete it with the JSON list of parts. If another adapter already uses the path, the storage plugin adds a `-N` suffix, and the spec uses it.
+
 ## Not documented
 
 These endpoints exist but are not in the spec. They serve the admin panel or are internal.
@@ -129,7 +229,5 @@ These endpoints exist but are not in the spec. They serve the admin panel or are
 | Endpoint                         | Reason                                    |
 | -------------------------------- | ----------------------------------------- |
 | `GET /api/<slug>/paste-url/{id}` | Admin panel helper for `pasteURL` uploads |
-| `POST /api/reorder`              | Admin panel drag-and-drop for `orderable` |
 | `GET /api/og`                    | Admin panel Open Graph image (Next.js)    |
 | `POST /api/graphql`              | GraphQL, not REST                         |
-| `/api/payload-preferences/{key}` | Admin panel preferences                   |

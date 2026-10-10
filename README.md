@@ -20,7 +20,7 @@
 
 ## Features
 
-- **Full spec from your config** — collections, globals, auth, versions, uploads, and jobs are documented with zero annotation. See the [endpoint list](https://payload-plugin-openapi.seshuk.im/v1/reference/endpoints).
+- **Full spec from your config** — collections, globals, auth, versions, uploads, jobs, and the endpoints of official Payload plugins are documented with zero annotation. See the [endpoint list](https://payload-plugin-openapi.seshuk.im/v1/reference/endpoints).
 - **Interactive docs included** — mount Scalar or Swagger UI, or both on different paths.
 - **Native metadata** — document custom endpoints and refine field schemas through Payload's own `custom.openapi` key. No wrapper, no separate registry.
 - **Precise filtering** — choose exactly which entities and operations end up in the spec.
@@ -31,7 +31,7 @@
 
 ## Quick start
 
-Requires **Payload 4.0.0-canary.38**, **Next.js 16.4 or later** and **Node.js 24.15 or later**. On Payload 3, use `@seshuk/payload-plugin-openapi@0`.
+Requires **Payload 4.0.0-beta.0 or later**, **Next.js 16.4 or later** and **Node.js 24.15 or later**. On Payload 3, use `@seshuk/payload-plugin-openapi@0`.
 
 ### Install
 
@@ -39,7 +39,7 @@ Requires **Payload 4.0.0-canary.38**, **Next.js 16.4 or later** and **Node.js 24
 npm install @seshuk/payload-plugin-openapi@beta
 ```
 
-v1 is in beta under the `beta` npm tag, and Payload 4 is published under `canary`.
+v1 is in beta under the `beta` npm tag, and Payload 4 is published under `beta`.
 
 ### Configure
 
@@ -120,6 +120,10 @@ Full docs are at **<https://payload-plugin-openapi.seshuk.im/>**:
 - [Field metadata](https://payload-plugin-openapi.seshuk.im/v1/guides/field-metadata)
 - [CLI — `openapi:generate`](https://payload-plugin-openapi.seshuk.im/v1/cli/generate)
 - [Examples](https://payload-plugin-openapi.seshuk.im/v1/guides/examples)
+
+## Official plugins
+
+When you install an official Payload plugin, the spec documents the REST endpoints it mounts: `@payloadcms/plugin-ecommerce`, `plugin-stripe`, `plugin-mcp`, `plugin-seo`, `plugin-search`, `plugin-multi-tenant`, `plugin-import-export` and `storage-r2`. There is nothing to configure. Filter them with `excludeOperations: [{ plugin: '@payloadcms/plugin-stripe' }]` or `{ kind: 'plugin' }`. See [Official plugins](https://payload-plugin-openapi.seshuk.im/v1/reference/endpoints#official-plugins).
 
 ## For plugin authors
 

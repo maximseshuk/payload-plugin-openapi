@@ -62,6 +62,8 @@ export const myPlugin =
 
 That is the whole integration. When a user has the OpenAPI plugin installed, your endpoint appears in their spec under its own tag, and your field carries its description and example into the generated schemas. See [Custom endpoints](/v1/guides/custom-endpoints) for the operation shape and [Field metadata](/v1/guides/field-metadata) for everything fields support.
 
+To let users filter your endpoints by plugin, add `'x-payload-plugin': 'my-plugin'` to each `custom.openapi`. A rule such as `{ plugin: 'my-plugin' }` in [`excludeOperations`](/v1/configuration/filters#rules) then drops them all. The key is removed from the final document.
+
 ## Why plugin order does not matter
 
 The OpenAPI plugin does not read your config when it runs. It builds the document **lazily, on request, from the fully sanitized config**. By the time a request hits `/api/openapi.json`, every plugin in the `plugins` array has already run — so your endpoints, collections, and fields are visible no matter where either plugin sits in the list. There is no ordering constraint to document and nothing for your users to get wrong.

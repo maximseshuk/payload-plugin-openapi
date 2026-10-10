@@ -75,17 +75,33 @@ const ruleMatchesMethod = (rule: OperationRule, method: HttpMethod): boolean => 
   return Array.isArray(rule.method) ? rule.method.includes(method) : rule.method === method
 }
 
-const ruleMatchesSlug = (rule: OperationRule, slug: string | undefined): boolean => {
-  if (rule.slug === undefined) return true
-  if (slug === undefined) return false
-  return rule.slug instanceof RegExp ? rule.slug.test(slug) : rule.slug === slug
+const matchesOptional = (matcher: string | RegExp | undefined, value: string | undefined): boolean => {
+  if (matcher === undefined) return true
+  if (value === undefined) return false
+  return matcher instanceof RegExp ? matcher.test(value) : matcher === value
 }
 
-const ruleMatches = (rule: OperationRule, { method, slug, kind, path }: OperationContext): boolean =>
+const ruleMatches = (rule: OperationRule, { method, slug, kind, path, plugin }: OperationContext): boolean =>
   ruleMatchesMethod(rule, method) &&
-  ruleMatchesSlug(rule, slug) &&
+  matchesOptional(rule.slug, slug) &&
+  matchesOptional(rule.plugin, plugin) &&
   (rule.kind === undefined || rule.kind === kind) &&
   (rule.path === undefined || rule.path.test(path))
+
+export const PLUGIN_KEY = 'x-payload-plugin'
+
+export const operationPlugin = (operation: unknown, plugin: string | undefined): string | undefined => {
+  const marked = (operation as Record<string, unknown> | undefined)?.[PLUGIN_KEY]
+  return plugin ?? (typeof marked === 'string' ? marked : undefined)
+}
+
+export const stripPluginKeys = (paths: PathsObject): PathsObject => {
+  for (const item of Object.values(paths)) {
+    for (const method of HTTP_METHODS)
+      delete (item as Record<HttpMethod, Record<string, unknown> | undefined>)[method]?.[PLUGIN_KEY]
+  }
+  return paths
+}
 
 const isOperationExcluded = async (filters: ResolvedFilters, op: OperationContext): Promise<boolean> => {
   for (const rule of filters.excludeOperations) {
@@ -98,11 +114,13 @@ export const filterOperations = async ({
   paths,
   slug,
   kind,
+  plugin,
   filters,
 }: {
   paths: PathsObject
   slug?: string
   kind: OperationKind
+  plugin?: string
   filters: ResolvedFilters
 }): Promise<PathsObject> => {
   if (filters.excludeOperations.length === 0) return paths
@@ -113,7 +131,8 @@ export const filterOperations = async ({
     const ops = item as Record<HttpMethod, unknown>
     for (const method of HTTP_METHODS) {
       if (!ops[method]) continue
-      if (await isOperationExcluded(filters, { method, path, slug, kind })) {
+      const op = { method, path, slug, kind, plugin: operationPlugin(ops[method], plugin) }
+      if (await isOperationExcluded(filters, op)) {
         delete ops[method]
       } else {
         remaining += 1

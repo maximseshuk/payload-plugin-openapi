@@ -3,12 +3,12 @@ import type { Endpoint, SanitizedCollectionConfig, SanitizedConfig, SanitizedGlo
 
 import type { BuildContext } from '@/shared/types/index.js'
 
-const getOpenapiMeta = (endpoint: Endpoint): OperationObject | undefined => {
+export const getOpenapiMeta = (endpoint: Endpoint): OperationObject | undefined => {
   const meta = endpoint.custom?.openapi
   return meta && typeof meta === 'object' ? (meta as OperationObject) : undefined
 }
 
-const normalizePath = (prefix: string, path: string): string => {
+export const normalizePath = (prefix: string, path: string): string => {
   const joined = `${prefix}${path.startsWith('/') ? path : `/${path}`}`
   return joined.replace(/:([A-Za-z0-9_]+)/g, '{$1}')
 }

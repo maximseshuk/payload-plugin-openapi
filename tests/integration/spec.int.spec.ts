@@ -351,12 +351,22 @@ describe('generated document', () => {
     it('documents the file and upload instructions endpoints for upload collections', () => {
       expect(doc.paths['/api/media/file/{filename}']?.get).toBeDefined()
       expect(doc.paths['/api/users/file/{filename}']).toBeUndefined()
+      expect(doc.paths['/api/media/{id}/rename']?.post).toBeDefined()
+      expect(doc.paths['/api/users/{id}/rename']).toBeUndefined()
       const body = doc.paths['/api/upload-instructions']?.post?.requestBody as Body
       const bodySchema = body.content['application/json']!.schema as Schema
       const slug = bodySchema.properties?.collectionSlug as Schema
-      expect(slug.enum).toEqual(['media'])
+      expect(slug.enum).toEqual(['media', 'exports', 'imports'])
       expect(doc.paths['/api/upload-instructions/{uploadId}']?.put).toBeDefined()
       expect(doc.paths['/api/upload-instructions/{uploadId}']?.delete).toBeDefined()
+    })
+
+    it('documents `/reorder` for the target of an orderable join', () => {
+      const body = doc.paths['/api/reorder']?.post?.requestBody as Body
+      const bodySchema = body.content['application/json']!.schema as Schema
+      const slug = bodySchema.properties?.collectionSlug as Schema
+      expect(slug.enum).toEqual(['variantOptions'])
+      expect(doc.paths['/api/reorder']?.post?.security).toEqual([{ PayloadToken: [] }])
     })
   })
 
@@ -703,6 +713,50 @@ describe('generated document', () => {
       expect(doc.paths['/api/posts/versions']?.get?.tags).toContain('Posts')
       expect(doc.paths['/api/posts/versions']?.get?.tags).not.toContain('Posts Versions')
       expect(nestedDoc.paths['/api/posts/versions']?.get?.tags).toContain('Posts Versions')
+    })
+  })
+
+  describe('official plugins', () => {
+    it.each([
+      ['/api/plugin-seo/generate-title', 'post', 'SEO', true],
+      ['/api/plugin-seo/generate-image', 'post', 'SEO', true],
+      ['/api/search/reindex', 'post', 'Search', true],
+      ['/api/tenants/populate-tenant-options', 'get', 'Multi-tenant', true],
+      ['/api/exports/download', 'post', 'Import/Export', true],
+      ['/api/exports/export-preview', 'post', 'Import/Export', false],
+      ['/api/imports/preview-data', 'post', 'Import/Export', false],
+      ['/api/mcp', 'post', 'MCP', false],
+      ['/api/mcp', 'get', 'MCP', false],
+      ['/api/stripe/webhooks', 'post', 'Stripe', false],
+      ['/api/stripe/rest', 'post', 'Stripe', true],
+      ['/api/carts/{id}/add-item', 'post', 'Ecommerce', false],
+      ['/api/carts/{id}/merge', 'post', 'Ecommerce', true],
+      ['/api/payments/stripe/initiate', 'post', 'Ecommerce', false],
+      ['/api/payments/stripe/confirm-order', 'post', 'Ecommerce', false],
+      ['/api/payments/stripe/webhooks', 'post', 'Ecommerce', false],
+      ['/api/storage-r2-multi-part-upload', 'post', 'Storage R2', true],
+    ] as const)('documents %s %s under the %s tag', (path, method, tag, isSecured) => {
+      const operation = doc.paths[path]?.[method]
+      expect(operation?.tags).toEqual([tag])
+      expect(Boolean(operation?.security)).toBe(isSecured)
+    })
+
+    it('reads options from the installed plugin', () => {
+      const body = doc.paths['/api/search/reindex']?.post?.requestBody as Body
+      const bodySchema = body.content['application/json']!.schema as Schema
+      expect(bodySchema.properties?.collections).toMatchObject({ items: { enum: ['posts'] } })
+    })
+
+    it('groups the plugin tags under Plugins when `nestedTags` is on', () => {
+      const tags: TagObject[] = nestedDoc.tags ?? []
+      const children = tags.filter((tag) => tag.parent === 'Plugins').map((tag) => tag.name)
+      expect(tags.find((tag) => tag.name === 'Plugins')?.kind).toBe('nav')
+      expect(children.toSorted()).toEqual(
+        ['Ecommerce', 'Import/Export', 'MCP', 'Multi-tenant', 'SEO', 'Storage R2', 'Stripe'].toSorted(),
+      )
+      const names = tags.map((tag) => tag.name)
+      expect(names).toHaveLength(new Set(names).size)
+      expect(tags.find((tag) => tag.name === 'Search')?.parent).toBe('Collections')
     })
   })
 
