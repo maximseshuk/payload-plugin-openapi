@@ -95,6 +95,20 @@ export const sl: PluginDefaultTranslationsObject = {
     uploadStagePutSummary: 'Pošlji bajte datoteke za začasno nalaganje',
     uploadStageDeleteSummary: 'Izbriši začasno nalaganje',
     uploadStageResult: 'Končano, brez vsebine',
+    paramPreferenceKey: 'Ključ nastavitve, npr. `nav`.',
+    preferenceGet: 'Pridobi nastavitev trenutnega uporabnika',
+    preferenceGetResult: 'Shranjena nastavitev ali `value: null`, če je ni',
+    preferenceSet: 'Shrani nastavitev trenutnega uporabnika',
+    preferenceSetBody: 'Pošljite vrednost v `value`. Telo brez `value` se v celoti shrani kot vrednost.',
+    preferenceSetResult: 'Shranjena nastavitev',
+    preferenceDelete: 'Izbriši nastavitev trenutnega uporabnika',
+    preferenceDeleteResult: 'Izbrisana nastavitev',
+    reorder: 'Premakni dokumente na razvrstljivem seznamu',
+    reorderBody:
+      'Premakne `docsToMove` za `target` z `newKeyWillBe: "greater"` ali pred njega z `"less"`. `orderableFieldName` je `_order` za razvrstljivo zbirko ali polje vrstnega reda razvrstljivega joina. Brez `target.key` Payload le dodeli ključe vrstnega reda dokumentom, ki jih nimajo.',
+    reorderResult:
+      'Novi ključi vrstnega reda ali `message: "initial migration"`, ko je Payload prvič nastavil ključe vrstnega reda',
+    errorReorder400: 'Neveljavno telo zahteve; razlog je v `error`',
 
     error400: 'Napaka pri preverjanju ali poizvedbi (ValidationError, QueryError)',
     error401: 'Niste overjeni (AuthenticationError)',
@@ -118,6 +132,7 @@ export const sl: PluginDefaultTranslationsObject = {
     tagJobs: 'Opravila',
     tagUploads: 'Nalaganja',
     tagAccess: 'Dostop',
+    tagReorder: 'Vrstni red',
     tagPlugins: 'Vtičniki',
     tagPluginsDesc: 'Končne točke, ki jih dodajo uradni vtičniki Payload.',
     errorPlugin400: 'Neveljavna zahteva',

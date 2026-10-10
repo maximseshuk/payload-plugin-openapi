@@ -95,6 +95,20 @@ export const pl: PluginDefaultTranslationsObject = {
     uploadStagePutSummary: 'Wyślij bajty pliku do tymczasowego przesyłania',
     uploadStageDeleteSummary: 'Usuń tymczasowe przesyłanie',
     uploadStageResult: 'Gotowe, bez treści',
+    paramPreferenceKey: 'Klucz preferencji, np. `nav`.',
+    preferenceGet: 'Pobierz preferencję bieżącego użytkownika',
+    preferenceGetResult: 'Zapisana preferencja lub `value: null`, gdy jej brak',
+    preferenceSet: 'Zapisz preferencję bieżącego użytkownika',
+    preferenceSetBody: 'Wyślij wartość w `value`. Treść bez `value` jest zapisywana w całości jako wartość.',
+    preferenceSetResult: 'Zapisana preferencja',
+    preferenceDelete: 'Usuń preferencję bieżącego użytkownika',
+    preferenceDeleteResult: 'Usunięta preferencja',
+    reorder: 'Przenieś dokumenty na liście z kolejnością',
+    reorderBody:
+      'Przenosi `docsToMove` za `target` przy `newKeyWillBe: "greater"` lub przed niego przy `"less"`. `orderableFieldName` to `_order` dla kolekcji z kolejnością lub pole kolejności dla joina z kolejnością. Bez `target.key` Payload tylko nadaje klucze kolejności dokumentom, które ich nie mają.',
+    reorderResult:
+      'Nowe klucze kolejności lub `message: "initial migration"`, gdy Payload po raz pierwszy nadał klucze kolejności',
+    errorReorder400: 'Nieprawidłowa treść żądania; powód jest w `error`',
 
     error400: 'Błąd walidacji lub zapytania (ValidationError, QueryError)',
     error401: 'Brak uwierzytelnienia (AuthenticationError)',
@@ -118,6 +132,7 @@ export const pl: PluginDefaultTranslationsObject = {
     tagJobs: 'Zadania',
     tagUploads: 'Przesyłanie plików',
     tagAccess: 'Dostęp',
+    tagReorder: 'Kolejność',
     tagPlugins: 'Wtyczki',
     tagPluginsDesc: 'Endpointy dodane przez oficjalne wtyczki Payload.',
     errorPlugin400: 'Nieprawidłowe żądanie',

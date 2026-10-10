@@ -18,7 +18,7 @@ import type {
 
 import { buildAuthPaths } from '@/server/spec/paths/auth.js'
 import { buildCollectionPaths } from '@/server/spec/paths/collections.js'
-import { buildCustomEndpointPaths } from '@/server/spec/paths/custom.js'
+import { buildCustomEndpointPaths, getOpenapiMeta } from '@/server/spec/paths/custom.js'
 import { buildGlobalPaths } from '@/server/spec/paths/globals.js'
 import { buildJobsPaths } from '@/server/spec/paths/jobs.js'
 import { buildSystemPaths } from '@/server/spec/paths/system.js'
@@ -266,7 +266,20 @@ export const buildDocument = async (input: BuildInput): Promise<Document> => {
   }
 
   const uploadSlugs = collections.filter((c) => c.upload).map((c) => c.slug)
-  Object.assign(paths, await finalize(buildSystemPaths({ ctx, access, uploadSlugs }), 'system'))
+  const reorderMounted = config.endpoints?.some(
+    (e) => e.method === 'post' && e.path === '/reorder' && !getOpenapiMeta(e),
+  )
+  const orderableJoinTargets = new Set(
+    input.collections.flatMap((c) =>
+      Object.entries(c.joins ?? {})
+        .filter(([, joins]) => joins.some((j) => j.field.orderable))
+        .map(([slug]) => slug),
+    ),
+  )
+  const reorderSlugs = reorderMounted
+    ? collections.filter((c) => c.orderable || orderableJoinTargets.has(c.slug)).map((c) => c.slug)
+    : []
+  Object.assign(paths, await finalize(buildSystemPaths({ ctx, access, uploadSlugs, reorderSlugs }), 'system'))
 
   const pluginTags: string[] = []
   for (const plugin of OFFICIAL_PLUGINS) {
@@ -288,6 +301,7 @@ export const buildDocument = async (input: BuildInput): Promise<Document> => {
   const systemTags: SystemTag[] = []
   if (hasJobs) systemTags.push('Jobs')
   if (uploadSlugs.length > 0) systemTags.push('Uploads')
+  if (reorderSlugs.length > 0) systemTags.push('Reorder')
   if (access) systemTags.push('Access')
 
   const supportedTimezones = config.admin?.timezones?.supportedTimezones

@@ -94,6 +94,20 @@ export const lt: PluginDefaultTranslationsObject = {
     uploadStagePutSummary: 'Siųsti failo baitus laikinam įkėlimui',
     uploadStageDeleteSummary: 'Ištrinti laikiną įkėlimą',
     uploadStageResult: 'Atlikta, be turinio',
+    paramPreferenceKey: 'Nuostatos raktas, pvz., `nav`.',
+    preferenceGet: 'Gauti dabartinio naudotojo nuostatą',
+    preferenceGetResult: 'Išsaugota nuostata arba `value: null`, jei jos nėra',
+    preferenceSet: 'Išsaugoti dabartinio naudotojo nuostatą',
+    preferenceSetBody: 'Siųskite reikšmę lauke `value`. Turinys be `value` išsaugomas visas kaip reikšmė.',
+    preferenceSetResult: 'Išsaugota nuostata',
+    preferenceDelete: 'Ištrinti dabartinio naudotojo nuostatą',
+    preferenceDeleteResult: 'Ištrinta nuostata',
+    reorder: 'Perkelti dokumentus rikiuojamame sąraše',
+    reorderBody:
+      'Perkelia `docsToMove` po `target`, kai `newKeyWillBe: "greater"`, arba prieš jį, kai `"less"`. `orderableFieldName` yra `_order` rikiuojamai kolekcijai arba rikiuojamo join tvarkos laukas. Be `target.key` Payload tik priskiria tvarkos raktus dokumentams, kurie jų neturi.',
+    reorderResult:
+      'Nauji tvarkos raktai arba `message: "initial migration"`, kai Payload pirmą kartą nustatė tvarkos raktus',
+    errorReorder400: 'Netinkamas užklausos turinys; priežastis nurodyta `error`',
 
     error400: 'Patvirtinimo arba užklausos klaida (ValidationError, QueryError)',
     error401: 'Neautentifikuota (AuthenticationError)',
@@ -117,6 +131,7 @@ export const lt: PluginDefaultTranslationsObject = {
     tagJobs: 'Užduotys',
     tagUploads: 'Įkėlimai',
     tagAccess: 'Prieiga',
+    tagReorder: 'Tvarka',
     tagPlugins: 'Papildiniai',
     tagPluginsDesc: 'Oficialių Payload papildinių pridėti galiniai taškai.',
     errorPlugin400: 'Netinkama užklausa',

@@ -95,6 +95,20 @@ export const az: PluginDefaultTranslationsObject = {
     uploadStagePutSummary: 'Mərhələli yükləmə üçün fayl baytlarını göndərin',
     uploadStageDeleteSummary: 'Mərhələli yükləməni silin',
     uploadStageResult: 'Hazırdır, məzmun yoxdur',
+    paramPreferenceKey: 'Seçimin açarı, məs. `nav`.',
+    preferenceGet: 'Cari istifadəçinin seçimini al',
+    preferenceGetResult: 'Saxlanmış seçim, yoxdursa `value: null`',
+    preferenceSet: 'Cari istifadəçinin seçimini saxla',
+    preferenceSetBody: 'Dəyəri `value` daxilində göndərin. `value` olmayan gövdə bütövlükdə dəyər kimi saxlanılır.',
+    preferenceSetResult: 'Saxlanmış seçim',
+    preferenceDelete: 'Cari istifadəçinin seçimini sil',
+    preferenceDeleteResult: 'Silinmiş seçim',
+    reorder: 'Sıralana bilən siyahıda sənədləri köçür',
+    reorderBody:
+      '`docsToMove` sənədlərini `newKeyWillBe: "greater"` ilə `target`-dən sonraya, `"less"` ilə ondan əvvələ köçürür. `orderableFieldName` sıralana bilən kolleksiya üçün `_order`, sıralana bilən join üçün isə onun sıra sahəsidir. `target.key` olmadan Payload yalnız sıra açarı olmayan sənədlərə sıra açarı verir.',
+    reorderResult:
+      'Yeni sıra açarları və ya Payload sıra açarlarını ilk dəfə təyin etdikdə `message: "initial migration"`',
+    errorReorder400: 'Yanlış sorğu gövdəsi; səbəb `error` daxilindədir',
 
     error400: 'Doğrulama və ya sorğu xətası (ValidationError, QueryError)',
     error401: 'Autentifikasiya olunmayıb (AuthenticationError)',
@@ -118,6 +132,7 @@ export const az: PluginDefaultTranslationsObject = {
     tagJobs: 'İşlər',
     tagUploads: 'Yükləmələr',
     tagAccess: 'Giriş',
+    tagReorder: 'Sıralama',
     tagPlugins: 'Pluginlər',
     tagPluginsDesc: 'Rəsmi Payload pluginlərinin əlavə etdiyi endpointlər.',
     errorPlugin400: 'Yanlış sorğu',

@@ -95,6 +95,21 @@ export const tr: PluginDefaultTranslationsObject = {
     uploadStagePutSummary: 'Geçici yükleme için dosya baytlarını gönderin',
     uploadStageDeleteSummary: 'Geçici yüklemeyi silin',
     uploadStageResult: 'Tamamlandı, içerik yok',
+    paramPreferenceKey: 'Tercih anahtarı, örn. `nav`.',
+    preferenceGet: 'Geçerli kullanıcının bir tercihini getir',
+    preferenceGetResult: 'Kaydedilmiş tercih veya yoksa `value: null`',
+    preferenceSet: 'Geçerli kullanıcının bir tercihini kaydet',
+    preferenceSetBody:
+      'Değeri `value` içinde gönderin. `value` içermeyen bir gövde, olduğu gibi değer olarak kaydedilir.',
+    preferenceSetResult: 'Kaydedilen tercih',
+    preferenceDelete: 'Geçerli kullanıcının bir tercihini sil',
+    preferenceDeleteResult: 'Silinen tercih',
+    reorder: 'Sıralanabilir bir listede dokümanları taşı',
+    reorderBody:
+      '`docsToMove` öğelerini `newKeyWillBe: "greater"` ile `target` sonrasına, `"less"` ile öncesine taşır. `orderableFieldName`, sıralanabilir bir koleksiyon için `_order`, sıralanabilir bir join için ise onun sıra alanıdır. `target.key` olmadan Payload yalnızca sıra anahtarı olmayan dokümanlara sıra anahtarı atar.',
+    reorderResult:
+      'Yeni sıra anahtarları veya Payload sıra anahtarlarını ilk kez atadığında `message: "initial migration"`',
+    errorReorder400: 'Geçersiz istek gövdesi; neden `error` içinde',
 
     error400: 'Doğrulama veya sorgu hatası (ValidationError, QueryError)',
     error401: 'Kimlik doğrulanmadı (AuthenticationError)',
@@ -118,6 +133,7 @@ export const tr: PluginDefaultTranslationsObject = {
     tagJobs: 'İşler',
     tagUploads: 'Yüklemeler',
     tagAccess: 'Erişim',
+    tagReorder: 'Sıralama',
     tagPlugins: 'Eklentiler',
     tagPluginsDesc: 'Resmi Payload eklentilerinin eklediği uç noktalar.',
     errorPlugin400: 'Geçersiz istek',

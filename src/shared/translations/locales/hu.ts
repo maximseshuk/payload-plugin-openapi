@@ -94,6 +94,21 @@ export const hu: PluginDefaultTranslationsObject = {
     uploadStagePutSummary: 'A fájl bájtjainak küldése ideiglenes feltöltéshez',
     uploadStageDeleteSummary: 'Ideiglenes feltöltés törlése',
     uploadStageResult: 'Kész, nincs tartalom',
+    paramPreferenceKey: 'A beállítás kulcsa, pl. `nav`.',
+    preferenceGet: 'Az aktuális felhasználó egy beállításának lekérése',
+    preferenceGetResult: 'A mentett beállítás, vagy `value: null`, ha nincs ilyen',
+    preferenceSet: 'Az aktuális felhasználó egy beállításának mentése',
+    preferenceSetBody:
+      'Küldje az értéket a `value` mezőben. A `value` nélküli törzs teljes egészében értékként mentődik.',
+    preferenceSetResult: 'A mentett beállítás',
+    preferenceDelete: 'Az aktuális felhasználó egy beállításának törlése',
+    preferenceDeleteResult: 'A törölt beállítás',
+    reorder: 'Dokumentumok áthelyezése rendezhető listában',
+    reorderBody:
+      'A `docsToMove` dokumentumokat `newKeyWillBe: "greater"` esetén a `target` mögé, `"less"` esetén elé helyezi. Az `orderableFieldName` rendezhető gyűjteménynél `_order`, rendezhető joinnál annak sorrendmezője. `target.key` nélkül a Payload csak a sorrendkulccsal nem rendelkező dokumentumoknak ad sorrendkulcsot.',
+    reorderResult:
+      'Az új sorrendkulcsok, vagy `message: "initial migration"`, amikor a Payload először állította be a sorrendkulcsokat',
+    errorReorder400: 'Érvénytelen kéréstörzs; az ok az `error` mezőben van',
 
     error400: 'Érvényesítési vagy lekérdezési hiba (ValidationError, QueryError)',
     error401: 'Nincs hitelesítve (AuthenticationError)',
@@ -117,6 +132,7 @@ export const hu: PluginDefaultTranslationsObject = {
     tagJobs: 'Feladatok',
     tagUploads: 'Feltöltések',
     tagAccess: 'Hozzáférés',
+    tagReorder: 'Sorrend',
     tagPlugins: 'Bővítmények',
     tagPluginsDesc: 'A hivatalos Payload-bővítmények által hozzáadott végpontok.',
     errorPlugin400: 'Érvénytelen kérés',

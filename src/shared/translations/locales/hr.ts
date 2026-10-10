@@ -96,6 +96,20 @@ export const hr: PluginDefaultTranslationsObject = {
     uploadStagePutSummary: 'Pošalji bajtove datoteke za privremeni prijenos',
     uploadStageDeleteSummary: 'Izbriši privremeni prijenos',
     uploadStageResult: 'Gotovo, bez sadržaja',
+    paramPreferenceKey: 'Ključ postavke, npr. `nav`.',
+    preferenceGet: 'Dohvati postavku trenutnog korisnika',
+    preferenceGetResult: 'Spremljena postavka ili `value: null` ako je nema',
+    preferenceSet: 'Spremi postavku trenutnog korisnika',
+    preferenceSetBody: 'Pošaljite vrijednost u `value`. Tijelo bez `value` sprema se u cijelosti kao vrijednost.',
+    preferenceSetResult: 'Spremljena postavka',
+    preferenceDelete: 'Izbriši postavku trenutnog korisnika',
+    preferenceDeleteResult: 'Izbrisana postavka',
+    reorder: 'Premjesti dokumente na popisu s redoslijedom',
+    reorderBody:
+      'Premješta `docsToMove` iza `target` uz `newKeyWillBe: "greater"` ili ispred njega uz `"less"`. `orderableFieldName` je `_order` za kolekciju s redoslijedom ili polje redoslijeda za join s redoslijedom. Bez `target.key` Payload samo dodjeljuje ključeve redoslijeda dokumentima koji ih nemaju.',
+    reorderResult:
+      'Novi ključevi redoslijeda ili `message: "initial migration"` kada je Payload prvi put postavio ključeve redoslijeda',
+    errorReorder400: 'Nevažeće tijelo zahtjeva; razlog je u `error`',
 
     error400: 'Pogreška valjanosti ili upita (ValidationError, QueryError)',
     error401: 'Nije autenticirano (AuthenticationError)',
@@ -119,6 +133,7 @@ export const hr: PluginDefaultTranslationsObject = {
     tagJobs: 'Poslovi',
     tagUploads: 'Prijenosi',
     tagAccess: 'Pristup',
+    tagReorder: 'Redoslijed',
     tagPlugins: 'Dodaci',
     tagPluginsDesc: 'Krajnje točke koje dodaju službeni Payload dodaci.',
     errorPlugin400: 'Neispravan zahtjev',

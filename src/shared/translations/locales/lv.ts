@@ -95,6 +95,20 @@ export const lv: PluginDefaultTranslationsObject = {
     uploadStagePutSummary: 'Sūtīt faila baitus pagaidu augšupielādei',
     uploadStageDeleteSummary: 'Dzēst pagaidu augšupielādi',
     uploadStageResult: 'Gatavs, bez satura',
+    paramPreferenceKey: 'Iestatījuma atslēga, piem., `nav`.',
+    preferenceGet: 'Iegūt pašreizējā lietotāja iestatījumu',
+    preferenceGetResult: 'Saglabātais iestatījums vai `value: null`, ja tāda nav',
+    preferenceSet: 'Saglabāt pašreizējā lietotāja iestatījumu',
+    preferenceSetBody: 'Sūtiet vērtību laukā `value`. Pamatteksts bez `value` tiek saglabāts kā vērtība pilnībā.',
+    preferenceSetResult: 'Saglabātais iestatījums',
+    preferenceDelete: 'Dzēst pašreizējā lietotāja iestatījumu',
+    preferenceDeleteResult: 'Dzēstais iestatījums',
+    reorder: 'Pārvietot dokumentus kārtojamā sarakstā',
+    reorderBody:
+      'Pārvieto `docsToMove` aiz `target` ar `newKeyWillBe: "greater"` vai pirms tā ar `"less"`. `orderableFieldName` ir `_order` kārtojamai kolekcijai vai kārtojama join secības lauks. Bez `target.key` Payload tikai piešķir secības atslēgas dokumentiem, kuriem to nav.',
+    reorderResult:
+      'Jaunās secības atslēgas vai `message: "initial migration"`, kad Payload pirmo reizi iestatīja secības atslēgas',
+    errorReorder400: 'Nederīgs pieprasījuma pamatteksts; iemesls ir `error`',
 
     error400: 'Validācijas vai vaicājuma kļūda (ValidationError, QueryError)',
     error401: 'Nav autentificēts (AuthenticationError)',
@@ -118,6 +132,7 @@ export const lv: PluginDefaultTranslationsObject = {
     tagJobs: 'Darbi',
     tagUploads: 'Augšupielādes',
     tagAccess: 'Piekļuve',
+    tagReorder: 'Secība',
     tagPlugins: 'Spraudņi',
     tagPluginsDesc: 'Galapunkti, ko pievieno oficiālie Payload spraudņi.',
     errorPlugin400: 'Nederīgs pieprasījums',

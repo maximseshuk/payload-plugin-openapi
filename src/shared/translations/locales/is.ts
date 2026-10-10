@@ -95,6 +95,20 @@ export const is: PluginDefaultTranslationsObject = {
     uploadStagePutSummary: 'Senda bæti skrárinnar fyrir tímabundna upphleðslu',
     uploadStageDeleteSummary: 'Eyða tímabundinni upphleðslu',
     uploadStageResult: 'Lokið, ekkert efni',
+    paramPreferenceKey: 'Lykill stillingarinnar, t.d. `nav`.',
+    preferenceGet: 'Sækja stillingu núverandi notanda',
+    preferenceGetResult: 'Vistaða stillingin, eða `value: null` ef hún er ekki til',
+    preferenceSet: 'Vista stillingu núverandi notanda',
+    preferenceSetBody: 'Sendu gildið sem `value`. Meginmál án `value` er vistað í heild sem gildið.',
+    preferenceSetResult: 'Vistaða stillingin',
+    preferenceDelete: 'Eyða stillingu núverandi notanda',
+    preferenceDeleteResult: 'Stillingin sem var eytt',
+    reorder: 'Færa skjöl í raðanlegum lista',
+    reorderBody:
+      'Færir `docsToMove` á eftir `target` með `newKeyWillBe: "greater"`, eða á undan með `"less"`. `orderableFieldName` er `_order` fyrir raðanlegt safn, eða röðunarsvið raðanlegrar tengingar. Án `target.key` gefur Payload aðeins röðunarlykla þeim skjölum sem hafa enga.',
+    reorderResult:
+      'Nýju röðunarlyklarnir, eða `message: "initial migration"` þegar Payload setti röðunarlyklana í fyrsta sinn',
+    errorReorder400: 'Ógilt meginmál beiðnar; ástæðan er í `error`',
 
     error400: 'Staðfestingar- eða fyrirspurnarvilla (ValidationError, QueryError)',
     error401: 'Ekki auðkenndur (AuthenticationError)',
@@ -118,6 +132,7 @@ export const is: PluginDefaultTranslationsObject = {
     tagJobs: 'Verk',
     tagUploads: 'Upphleðslur',
     tagAccess: 'Aðgangur',
+    tagReorder: 'Röðun',
     tagPlugins: 'Viðbætur',
     tagPluginsDesc: 'Endapunktar sem opinberar Payload-viðbætur bæta við.',
     errorPlugin400: 'Ógild beiðni',

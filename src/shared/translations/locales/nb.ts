@@ -95,6 +95,20 @@ export const nb: PluginDefaultTranslationsObject = {
     uploadStagePutSummary: 'Send filens byte for en midlertidig opplasting',
     uploadStageDeleteSummary: 'Slett en midlertidig opplasting',
     uploadStageResult: 'Ferdig, uten innhold',
+    paramPreferenceKey: 'Nøkkelen til innstillingen, f.eks. `nav`.',
+    preferenceGet: 'Hent en innstilling for gjeldende bruker',
+    preferenceGetResult: 'Den lagrede innstillingen, eller `value: null` hvis den ikke finnes',
+    preferenceSet: 'Lagre en innstilling for gjeldende bruker',
+    preferenceSetBody: 'Send verdien som `value`. En body uten `value` lagres som selve verdien.',
+    preferenceSetResult: 'Den lagrede innstillingen',
+    preferenceDelete: 'Slett en innstilling for gjeldende bruker',
+    preferenceDeleteResult: 'Den slettede innstillingen',
+    reorder: 'Flytt dokumenter i en sorterbar liste',
+    reorderBody:
+      'Flytter `docsToMove` etter `target` med `newKeyWillBe: "greater"`, eller foran med `"less"`. `orderableFieldName` er `_order` for en sorterbar samling, eller rekkefølgefeltet til en sorterbar join. Uten `target.key` gir Payload bare rekkefølgenøkler til dokumenter som mangler dem.',
+    reorderResult:
+      'De nye rekkefølgenøklene, eller `message: "initial migration"` når Payload satte rekkefølgenøklene for første gang',
+    errorReorder400: 'Ugyldig forespørselsbody; årsaken står i `error`',
 
     error400: 'Validerings- eller spørringsfeil (ValidationError, QueryError)',
     error401: 'Ikke autentisert (AuthenticationError)',
@@ -118,6 +132,7 @@ export const nb: PluginDefaultTranslationsObject = {
     tagJobs: 'Jobber',
     tagUploads: 'Opplastinger',
     tagAccess: 'Tilgang',
+    tagReorder: 'Rekkefølge',
     tagPlugins: 'Plugins',
     tagPluginsDesc: 'Endepunkter lagt til av offisielle Payload-plugins.',
     errorPlugin400: 'Ugyldig forespørsel',

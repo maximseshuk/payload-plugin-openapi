@@ -96,6 +96,20 @@ export const fr: PluginDefaultTranslationsObject = {
     uploadStagePutSummary: 'Envoyer les octets du fichier pour un téléversement temporaire',
     uploadStageDeleteSummary: 'Supprimer un téléversement temporaire',
     uploadStageResult: 'Terminé, aucun contenu',
+    paramPreferenceKey: 'La clé de la préférence, par ex. `nav`.',
+    preferenceGet: "Obtenir une préférence de l'utilisateur actuel",
+    preferenceGetResult: "La préférence enregistrée, ou `value: null` s'il n'y en a pas",
+    preferenceSet: "Enregistrer une préférence de l'utilisateur actuel",
+    preferenceSetBody: 'Envoyez la valeur dans `value`. Un corps sans `value` est enregistré tel quel comme valeur.',
+    preferenceSetResult: 'La préférence enregistrée',
+    preferenceDelete: "Supprimer une préférence de l'utilisateur actuel",
+    preferenceDeleteResult: 'La préférence supprimée',
+    reorder: 'Déplacer des documents dans une liste ordonnable',
+    reorderBody:
+      'Déplace `docsToMove` après `target` avec `newKeyWillBe: "greater"`, ou avant avec `"less"`. `orderableFieldName` vaut `_order` pour une collection ordonnable, ou le champ d\'ordre d\'une jointure ordonnable. Sans `target.key`, Payload attribue seulement des clés d\'ordre aux documents qui n\'en ont pas.',
+    reorderResult:
+      'Les nouvelles clés d\'ordre, ou `message: "initial migration"` quand Payload a défini les clés d\'ordre pour la première fois',
+    errorReorder400: 'Corps de requête invalide, la raison figure dans `error`',
 
     error400: 'Erreur de validation ou de requête (ValidationError, QueryError)',
     error401: 'Non authentifié (AuthenticationError)',
@@ -119,6 +133,7 @@ export const fr: PluginDefaultTranslationsObject = {
     tagJobs: 'Jobs',
     tagUploads: 'Téléversements',
     tagAccess: 'Accès',
+    tagReorder: 'Réorganisation',
     tagPlugins: 'Plugins',
     tagPluginsDesc: 'Points de terminaison ajoutés par les plugins officiels de Payload.',
     errorPlugin400: 'Requête invalide',

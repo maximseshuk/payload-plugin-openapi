@@ -96,6 +96,20 @@ export const sv: PluginDefaultTranslationsObject = {
     uploadStagePutSummary: 'Skicka filens byte för en tillfällig uppladdning',
     uploadStageDeleteSummary: 'Ta bort en tillfällig uppladdning',
     uploadStageResult: 'Klart, inget innehåll',
+    paramPreferenceKey: 'Inställningens nyckel, t.ex. `nav`.',
+    preferenceGet: 'Hämta en inställning för den aktuella användaren',
+    preferenceGetResult: 'Den sparade inställningen, eller `value: null` om den saknas',
+    preferenceSet: 'Spara en inställning för den aktuella användaren',
+    preferenceSetBody: 'Skicka värdet som `value`. En body utan `value` sparas i sin helhet som värdet.',
+    preferenceSetResult: 'Den sparade inställningen',
+    preferenceDelete: 'Ta bort en inställning för den aktuella användaren',
+    preferenceDeleteResult: 'Den borttagna inställningen',
+    reorder: 'Flytta dokument i en sorterbar lista',
+    reorderBody:
+      'Flyttar `docsToMove` efter `target` med `newKeyWillBe: "greater"`, eller före med `"less"`. `orderableFieldName` är `_order` för en sorterbar samling, eller ordningsfältet för en sorterbar join. Utan `target.key` ger Payload bara ordningsnycklar till dokument som saknar dem.',
+    reorderResult:
+      'De nya ordningsnycklarna, eller `message: "initial migration"` när Payload satte ordningsnycklarna första gången',
+    errorReorder400: 'Ogiltig request-body; orsaken står i `error`',
 
     error400: 'Validerings- eller frågefel (ValidationError, QueryError)',
     error401: 'Inte autentiserad (AuthenticationError)',
@@ -119,6 +133,7 @@ export const sv: PluginDefaultTranslationsObject = {
     tagJobs: 'Jobb',
     tagUploads: 'Uppladdningar',
     tagAccess: 'Åtkomst',
+    tagReorder: 'Ordning',
     tagPlugins: 'Plugins',
     tagPluginsDesc: 'Slutpunkter som läggs till av officiella Payload-plugins.',
     errorPlugin400: 'Ogiltig begäran',

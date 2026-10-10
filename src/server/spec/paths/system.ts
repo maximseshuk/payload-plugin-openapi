@@ -8,10 +8,12 @@ export const buildSystemPaths = ({
   ctx,
   access,
   uploadSlugs,
+  reorderSlugs = [],
 }: {
   ctx: BuildContext
   access: boolean
   uploadSlugs: string[]
+  reorderSlugs?: string[]
 }): PathsObject => {
   const t = makeT(ctx.i18n)
   const paths: PathsObject = {}
@@ -104,6 +106,53 @@ export const buildSystemPaths = ({
         operationId: 'deleteStagedFile',
         summary: t('uploadStageDeleteSummary'),
         responses: staged,
+        security: [{ [SECURITY_SCHEME_NAME]: [] }],
+      },
+    }
+  }
+
+  if (reorderSlugs.length > 0) {
+    const idType = ctx.defaultIDType === 'number' ? 'integer' : 'string'
+    paths[`${ctx.apiRoute}/reorder`] = {
+      post: {
+        tags: ['Reorder'],
+        operationId: 'reorder',
+        summary: t('reorder'),
+        requestBody: {
+          ...jsonBody({
+            type: 'object',
+            properties: {
+              collectionSlug: { type: 'string', enum: reorderSlugs },
+              docsToMove: { type: 'array', minItems: 1, items: { type: idType } },
+              newKeyWillBe: { type: 'string', enum: ['greater', 'less'] },
+              orderableFieldName: { type: 'string' },
+              target: {
+                type: 'object',
+                properties: { id: { type: idType }, key: { type: 'string' } },
+                required: ['id'],
+              },
+            },
+            required: ['collectionSlug', 'docsToMove', 'newKeyWillBe', 'orderableFieldName', 'target'],
+          }),
+          description: t('reorderBody'),
+        },
+        responses: {
+          '200': jsonResponse(t('reorderResult'), {
+            type: 'object',
+            properties: {
+              success: { type: 'boolean' },
+              orderValues: { type: 'array', items: { type: 'string' } },
+              message: { type: 'string' },
+            },
+            required: ['success'],
+          }),
+          '400': jsonResponse(t('errorReorder400'), {
+            type: 'object',
+            properties: { error: { type: 'string' } },
+            required: ['error'],
+          }),
+          ...errorResponses(['403', '500'], t),
+        },
         security: [{ [SECURITY_SCHEME_NAME]: [] }],
       },
     }

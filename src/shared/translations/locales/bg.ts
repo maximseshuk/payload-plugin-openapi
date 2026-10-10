@@ -93,6 +93,20 @@ export const bg: PluginDefaultTranslationsObject = {
     uploadStagePutSummary: 'Изпращане на байтовете на файла за временно качване',
     uploadStageDeleteSummary: 'Изтриване на временно качване',
     uploadStageResult: 'Готово, без съдържание',
+    paramPreferenceKey: 'Ключът на настройката, напр. `nav`.',
+    preferenceGet: 'Вземане на настройка на текущия потребител',
+    preferenceGetResult: 'Запазената настройка или `value: null`, ако няма такава',
+    preferenceSet: 'Запазване на настройка на текущия потребител',
+    preferenceSetBody: 'Изпратете стойността в `value`. Тяло без `value` се запазва изцяло като стойност.',
+    preferenceSetResult: 'Запазената настройка',
+    preferenceDelete: 'Изтриване на настройка на текущия потребител',
+    preferenceDeleteResult: 'Изтритата настройка',
+    reorder: 'Преместване на документи в подреждаем списък',
+    reorderBody:
+      'Премества `docsToMove` след `target` при `newKeyWillBe: "greater"` или преди него при `"less"`. `orderableFieldName` е `_order` за подреждаема колекция или полето за ред на подреждаем join. Без `target.key` Payload само задава ключове за ред на документите, които нямат такива.',
+    reorderResult:
+      'Новите ключове за ред или `message: "initial migration"`, когато Payload за първи път е задал ключовете за ред',
+    errorReorder400: 'Невалидно тяло на заявката; причината е в `error`',
 
     error400: 'Грешка при валидация или заявка (ValidationError, QueryError)',
     error401: 'Не сте удостоверени (AuthenticationError)',
@@ -116,6 +130,7 @@ export const bg: PluginDefaultTranslationsObject = {
     tagJobs: 'Задачи',
     tagUploads: 'Качвания',
     tagAccess: 'Достъп',
+    tagReorder: 'Подредба',
     tagPlugins: 'Плъгини',
     tagPluginsDesc: 'Endpoint-и, добавени от официалните плъгини на Payload.',
     errorPlugin400: 'Невалидна заявка',

@@ -19,6 +19,8 @@ Notable changes per release. For the full commit-level history, see the [GitHub 
 - Endpoints of the official ecommerce, Stripe, MCP, SEO, search, multi-tenant, import-export and R2 storage plugins are documented when the plugin is installed. See [Official plugins](/v1/reference/endpoints#official-plugins).
 - `excludeOperations` rules take `plugin`, the package name of the plugin that added the operation. A custom endpoint sets it with `'x-payload-plugin'` in `custom.openapi`. See [Rules](/v1/configuration/filters#rules).
 - `POST /api/<slug>/{id}/rename` for upload collections, and the `version` query param on `GET /api/<slug>/file/{filename}`.
+- `POST /api/reorder` when a collection or join field is `orderable`. See [System](/v1/reference/endpoints#system).
+- With `includeSystem`, the `payload-preferences` routes that get, save and delete a preference by key. See [Preferences](/v1/reference/endpoints#preferences).
 
 </Update>
 

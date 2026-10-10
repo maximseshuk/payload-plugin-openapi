@@ -11,7 +11,12 @@ export const entityTagName = (base: string): string => base
 export const authTagName = (base: string): string => `${base} Auth`
 export const versionsTagName = (base: string): string => `${base} Versions`
 
-const SYSTEM_TAG_SUMMARIES = { Jobs: 'tagJobs', Uploads: 'tagUploads', Access: 'tagAccess' } as const
+const SYSTEM_TAG_SUMMARIES = {
+  Jobs: 'tagJobs',
+  Uploads: 'tagUploads',
+  Reorder: 'tagReorder',
+  Access: 'tagAccess',
+} as const
 
 export type SystemTag = keyof typeof SYSTEM_TAG_SUMMARIES
 

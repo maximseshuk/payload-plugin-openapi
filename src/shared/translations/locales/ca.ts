@@ -96,6 +96,20 @@ export const ca: PluginDefaultTranslationsObject = {
     uploadStagePutSummary: 'Envia els bytes del fitxer per a una pujada temporal',
     uploadStageDeleteSummary: 'Elimina una pujada temporal',
     uploadStageResult: 'Fet, sense contingut',
+    paramPreferenceKey: 'La clau de la preferència, p. ex. `nav`.',
+    preferenceGet: "Obté una preferència de l'usuari actual",
+    preferenceGetResult: "La preferència desada, o `value: null` si no n'hi ha",
+    preferenceSet: "Desa una preferència de l'usuari actual",
+    preferenceSetBody: 'Envia el valor a `value`. Un cos sense `value` es desa sencer com a valor.',
+    preferenceSetResult: 'La preferència desada',
+    preferenceDelete: "Elimina una preferència de l'usuari actual",
+    preferenceDeleteResult: 'La preferència eliminada',
+    reorder: 'Mou documents en una llista ordenable',
+    reorderBody:
+      'Mou `docsToMove` després de `target` amb `newKeyWillBe: "greater"`, o abans amb `"less"`. `orderableFieldName` és `_order` per a una col·lecció ordenable, o el camp d\'ordre d\'un join ordenable. Sense `target.key`, Payload només assigna claus d\'ordre als documents que no en tenen.',
+    reorderResult:
+      'Les noves claus d\'ordre, o `message: "initial migration"` quan Payload va assignar les claus d\'ordre per primer cop',
+    errorReorder400: 'Cos de la sol·licitud no vàlid; el motiu és a `error`',
 
     error400: 'Error de validació o de consulta (ValidationError, QueryError)',
     error401: 'No autenticat (AuthenticationError)',
@@ -119,6 +133,7 @@ export const ca: PluginDefaultTranslationsObject = {
     tagJobs: 'Tasques',
     tagUploads: 'Pujades',
     tagAccess: 'Accés',
+    tagReorder: 'Reordenació',
     tagPlugins: 'Plugins',
     tagPluginsDesc: 'Endpoints afegits pels plugins oficials de Payload.',
     errorPlugin400: 'Sol·licitud no vàlida',

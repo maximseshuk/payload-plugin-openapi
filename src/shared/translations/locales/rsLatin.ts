@@ -97,6 +97,20 @@ export const rsLatin: PluginDefaultTranslationsObject = {
     uploadStagePutSummary: 'Slanje bajtova datoteke za privremeno otpremanje',
     uploadStageDeleteSummary: 'Brisanje privremenog otpremanja',
     uploadStageResult: 'Gotovo, bez sadržaja',
+    paramPreferenceKey: 'Ključ podešavanja, npr. `nav`.',
+    preferenceGet: 'Preuzmi podešavanje trenutnog korisnika',
+    preferenceGetResult: 'Sačuvano podešavanje ili `value: null` ako ne postoji',
+    preferenceSet: 'Sačuvaj podešavanje trenutnog korisnika',
+    preferenceSetBody: 'Pošaljite vrednost u `value`. Telo bez `value` čuva se u celosti kao vrednost.',
+    preferenceSetResult: 'Sačuvano podešavanje',
+    preferenceDelete: 'Obriši podešavanje trenutnog korisnika',
+    preferenceDeleteResult: 'Obrisano podešavanje',
+    reorder: 'Premesti dokumente na listi sa redosledom',
+    reorderBody:
+      'Premešta `docsToMove` iza `target` uz `newKeyWillBe: "greater"` ili ispred njega uz `"less"`. `orderableFieldName` je `_order` za kolekciju sa redosledom ili polje redosleda za join sa redosledom. Bez `target.key` Payload samo dodeljuje ključeve redosleda dokumentima koji ih nemaju.',
+    reorderResult:
+      'Novi ključevi redosleda ili `message: "initial migration"` kada je Payload prvi put postavio ključeve redosleda',
+    errorReorder400: 'Nevažeće telo zahteva; razlog je u `error`',
 
     error400: 'Greška u validaciji ili upitu (ValidationError, QueryError)',
     error401: 'Niste autentifikovani (AuthenticationError)',
@@ -120,6 +134,7 @@ export const rsLatin: PluginDefaultTranslationsObject = {
     tagJobs: 'Poslovi',
     tagUploads: 'Otpremanja',
     tagAccess: 'Pristup',
+    tagReorder: 'Redosled',
     tagPlugins: 'Dodaci',
     tagPluginsDesc: 'Krajnje tačke koje dodaju zvanični Payload dodaci.',
     errorPlugin400: 'Neispravan zahtev',

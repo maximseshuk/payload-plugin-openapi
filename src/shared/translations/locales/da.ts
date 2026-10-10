@@ -95,6 +95,20 @@ export const da: PluginDefaultTranslationsObject = {
     uploadStagePutSummary: 'Send filens bytes til en midlertidig upload',
     uploadStageDeleteSummary: 'Slet en midlertidig upload',
     uploadStageResult: 'Udført, intet indhold',
+    paramPreferenceKey: 'Præferencens nøgle, f.eks. `nav`.',
+    preferenceGet: 'Hent en præference for den aktuelle bruger',
+    preferenceGetResult: 'Den gemte præference, eller `value: null` hvis der ikke er nogen',
+    preferenceSet: 'Gem en præference for den aktuelle bruger',
+    preferenceSetBody: 'Send værdien som `value`. En body uden `value` gemmes som selve værdien.',
+    preferenceSetResult: 'Den gemte præference',
+    preferenceDelete: 'Slet en præference for den aktuelle bruger',
+    preferenceDeleteResult: 'Den slettede præference',
+    reorder: 'Flyt dokumenter i en sorterbar liste',
+    reorderBody:
+      'Flytter `docsToMove` efter `target` med `newKeyWillBe: "greater"`, eller før med `"less"`. `orderableFieldName` er `_order` for en sorterbar collection, eller rækkefølgefeltet for en sorterbar join. Uden `target.key` giver Payload kun rækkefølgenøgler til dokumenter, der ikke har nogen.',
+    reorderResult:
+      'De nye rækkefølgenøgler, eller `message: "initial migration"` når Payload første gang satte rækkefølgenøglerne',
+    errorReorder400: 'Ugyldig request-body; årsagen står i `error`',
 
     error400: 'Validerings- eller forespørgselsfejl (ValidationError, QueryError)',
     error401: 'Ikke godkendt (AuthenticationError)',
@@ -118,6 +132,7 @@ export const da: PluginDefaultTranslationsObject = {
     tagJobs: 'Jobs',
     tagUploads: 'Uploads',
     tagAccess: 'Adgang',
+    tagReorder: 'Rækkefølge',
     tagPlugins: 'Plugins',
     tagPluginsDesc: 'Endepunkter tilføjet af officielle Payload-plugins.',
     errorPlugin400: 'Ugyldig anmodning',

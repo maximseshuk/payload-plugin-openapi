@@ -97,6 +97,20 @@ export const sk: PluginDefaultTranslationsObject = {
     uploadStagePutSummary: 'Odoslať bajty súboru pre dočasné nahranie',
     uploadStageDeleteSummary: 'Odstrániť dočasné nahranie',
     uploadStageResult: 'Hotovo, bez obsahu',
+    paramPreferenceKey: 'Kľúč predvoľby, napr. `nav`.',
+    preferenceGet: 'Získať predvoľbu aktuálneho používateľa',
+    preferenceGetResult: 'Uložená predvoľba alebo `value: null`, ak neexistuje',
+    preferenceSet: 'Uložiť predvoľbu aktuálneho používateľa',
+    preferenceSetBody: 'Pošlite hodnotu v `value`. Telo bez `value` sa uloží celé ako hodnota.',
+    preferenceSetResult: 'Uložená predvoľba',
+    preferenceDelete: 'Odstrániť predvoľbu aktuálneho používateľa',
+    preferenceDeleteResult: 'Odstránená predvoľba',
+    reorder: 'Presunúť dokumenty v zoraditeľnom zozname',
+    reorderBody:
+      'Presunie `docsToMove` za `target` s `newKeyWillBe: "greater"` alebo pred neho s `"less"`. `orderableFieldName` je `_order` pri zoraditeľnej kolekcii alebo pole poradia zoraditeľného joinu. Bez `target.key` Payload iba pridelí kľúče poradia dokumentom, ktoré ich nemajú.',
+    reorderResult:
+      'Nové kľúče poradia alebo `message: "initial migration"`, keď Payload prvýkrát nastavil kľúče poradia',
+    errorReorder400: 'Neplatné telo požiadavky; dôvod je v `error`',
 
     error400: 'Chyba validácie alebo dotazu (ValidationError, QueryError)',
     error401: 'Neprihlásený (AuthenticationError)',
@@ -120,6 +134,7 @@ export const sk: PluginDefaultTranslationsObject = {
     tagJobs: 'Úlohy',
     tagUploads: 'Nahrávanie',
     tagAccess: 'Prístup',
+    tagReorder: 'Poradie',
     tagPlugins: 'Pluginy',
     tagPluginsDesc: 'Endpointy pridané oficiálnymi pluginmi Payloadu.',
     errorPlugin400: 'Neplatná požiadavka',

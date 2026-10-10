@@ -96,6 +96,20 @@ export const ro: PluginDefaultTranslationsObject = {
     uploadStagePutSummary: 'Trimite octeții fișierului pentru o încărcare temporară',
     uploadStageDeleteSummary: 'Șterge o încărcare temporară',
     uploadStageResult: 'Gata, fără conținut',
+    paramPreferenceKey: 'Cheia preferinței, de ex. `nav`.',
+    preferenceGet: 'Obține o preferință a utilizatorului curent',
+    preferenceGetResult: 'Preferința salvată sau `value: null` dacă nu există',
+    preferenceSet: 'Salvează o preferință a utilizatorului curent',
+    preferenceSetBody: 'Trimiteți valoarea în `value`. Un corp fără `value` este salvat integral ca valoare.',
+    preferenceSetResult: 'Preferința salvată',
+    preferenceDelete: 'Șterge o preferință a utilizatorului curent',
+    preferenceDeleteResult: 'Preferința ștearsă',
+    reorder: 'Mută documente într-o listă ordonabilă',
+    reorderBody:
+      'Mută `docsToMove` după `target` cu `newKeyWillBe: "greater"` sau înainte cu `"less"`. `orderableFieldName` este `_order` pentru o colecție ordonabilă sau câmpul de ordine al unui join ordonabil. Fără `target.key`, Payload doar atribuie chei de ordine documentelor care nu au.',
+    reorderResult:
+      'Noile chei de ordine sau `message: "initial migration"` când Payload a setat cheile de ordine prima dată',
+    errorReorder400: 'Corp de cerere invalid; motivul este în `error`',
 
     error400: 'Eroare de validare sau de interogare (ValidationError, QueryError)',
     error401: 'Neautentificat (AuthenticationError)',
@@ -119,6 +133,7 @@ export const ro: PluginDefaultTranslationsObject = {
     tagJobs: 'Joburi',
     tagUploads: 'Încărcări',
     tagAccess: 'Acces',
+    tagReorder: 'Reordonare',
     tagPlugins: 'Pluginuri',
     tagPluginsDesc: 'Endpoint-uri adăugate de pluginurile oficiale Payload.',
     errorPlugin400: 'Cerere invalidă',

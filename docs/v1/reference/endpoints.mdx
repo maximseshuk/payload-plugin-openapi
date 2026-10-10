@@ -53,13 +53,28 @@ The plugin documents the REST endpoints that Payload 4 mounts for your config. A
 
 ## System
 
-| Endpoint                              | Method      | When                              | Filter                             |
-| ------------------------------------- | ----------- | --------------------------------- | ---------------------------------- |
-| `/api/access`                         | GET         | Always                            | `includeAuth` + `includeAdminAuth` |
-| `/api/upload-instructions`            | POST        | At least one upload collection    | —                                  |
-| `/api/upload-instructions/{uploadId}` | PUT, DELETE | At least one upload collection    | —                                  |
-| `/api/payload-jobs/run`               | GET         | Tasks or workflows are configured | `includeJobs`                      |
-| `/api/payload-jobs/handle-schedules`  | GET         | Tasks or workflows are configured | `includeJobs`                      |
+| Endpoint                              | Method      | When                                | Filter                             |
+| ------------------------------------- | ----------- | ----------------------------------- | ---------------------------------- |
+| `/api/access`                         | GET         | Always                              | `includeAuth` + `includeAdminAuth` |
+| `/api/upload-instructions`            | POST        | At least one upload collection      | —                                  |
+| `/api/upload-instructions/{uploadId}` | PUT, DELETE | At least one upload collection      | —                                  |
+| `/api/reorder`                        | POST        | A collection or join is `orderable` | —                                  |
+| `/api/payload-jobs/run`               | GET         | Tasks or workflows are configured   | `includeJobs`                      |
+| `/api/payload-jobs/handle-schedules`  | GET         | Tasks or workflows are configured   | `includeJobs`                      |
+
+`POST /api/reorder` is the drag-and-drop endpoint of `orderable` collections and orderable join fields. It is listed when Payload mounts it, and its `collectionSlug` is an enum of the documented collections that can be reordered. It needs a logged-in user with update access. A bad body returns `400` with `{ error }`, not the usual error shape.
+
+## Preferences
+
+The `payload-preferences` collection is hidden unless [`includeSystem`](/v1/configuration/filters) is on. With it, the spec lists the routes that store admin panel preferences for the current user:
+
+| Endpoint                        | Method | Does                                                       |
+| ------------------------------- | ------ | ---------------------------------------------------------- |
+| `/api/payload-preferences/{id}` | GET    | Returns the preference, or `{ message, value: null }`      |
+| `/api/payload-preferences/{id}` | POST   | Saves `value` from the body and returns `{ doc, message }` |
+| `/api/payload-preferences/{id}` | DELETE | Deletes the preference and returns it with `message`       |
+
+Here the `{id}` segment is the preference key, such as `nav`. Payload matches these routes before the standard ones, so `GET /count`, `POST /validate` and `POST /access` on this collection would read or save a preference named `count`, `validate` or `access`. The spec leaves them out. `PATCH /api/payload-preferences/{id}` still updates by document ID. Every route needs a logged-in user.
 
 ## Request and response bodies
 
@@ -214,7 +229,5 @@ These endpoints exist but are not in the spec. They serve the admin panel or are
 | Endpoint                         | Reason                                    |
 | -------------------------------- | ----------------------------------------- |
 | `GET /api/<slug>/paste-url/{id}` | Admin panel helper for `pasteURL` uploads |
-| `POST /api/reorder`              | Admin panel drag-and-drop for `orderable` |
 | `GET /api/og`                    | Admin panel Open Graph image (Next.js)    |
 | `POST /api/graphql`              | GraphQL, not REST                         |
-| `/api/payload-preferences/{key}` | Admin panel preferences                   |

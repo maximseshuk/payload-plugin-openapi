@@ -96,6 +96,20 @@ export const et: PluginDefaultTranslationsObject = {
     uploadStagePutSummary: 'Saada faili baidid ajutise üleslaadimise jaoks',
     uploadStageDeleteSummary: 'Kustuta ajutine üleslaadimine',
     uploadStageResult: 'Valmis, sisu puudub',
+    paramPreferenceKey: 'Eelistuse võti, nt `nav`.',
+    preferenceGet: 'Hangi praeguse kasutaja eelistus',
+    preferenceGetResult: 'Salvestatud eelistus või `value: null`, kui seda pole',
+    preferenceSet: 'Salvesta praeguse kasutaja eelistus',
+    preferenceSetBody: 'Saada väärtus väljal `value`. Ilma `value`-ta keha salvestatakse tervikuna väärtusena.',
+    preferenceSetResult: 'Salvestatud eelistus',
+    preferenceDelete: 'Kustuta praeguse kasutaja eelistus',
+    preferenceDeleteResult: 'Kustutatud eelistus',
+    reorder: 'Liiguta dokumente järjestatavas loendis',
+    reorderBody:
+      'Liigutab `docsToMove` `newKeyWillBe: "greater"` korral `target` järele või `"less"` korral selle ette. `orderableFieldName` on järjestatava kollektsiooni puhul `_order` või järjestatava joini järjestusväli. Ilma `target.key`-ta annab Payload järjestusvõtmed ainult dokumentidele, millel neid pole.',
+    reorderResult:
+      'Uued järjestusvõtmed või `message: "initial migration"`, kui Payload määras järjestusvõtmed esimest korda',
+    errorReorder400: 'Vigane päringu keha; põhjus on väljal `error`',
 
     error400: 'Valideerimis- või päringuviga (ValidationError, QueryError)',
     error401: 'Autentimata (AuthenticationError)',
@@ -119,6 +133,7 @@ export const et: PluginDefaultTranslationsObject = {
     tagJobs: 'Tööd',
     tagUploads: 'Üleslaadimised',
     tagAccess: 'Juurdepääs',
+    tagReorder: 'Järjestus',
     tagPlugins: 'Pluginad',
     tagPluginsDesc: 'Payloadi ametlike pluginate lisatud lõpp-punktid.',
     errorPlugin400: 'Vigane päring',

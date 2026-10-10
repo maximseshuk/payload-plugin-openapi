@@ -97,6 +97,20 @@ export const hy: PluginDefaultTranslationsObject = {
     uploadStagePutSummary: 'Ուղարկել ֆայլի բայթերը ժամանակավոր վերբեռնման համար',
     uploadStageDeleteSummary: 'Ջնջել ժամանակավոր վերբեռնումը',
     uploadStageResult: 'Պատրաստ է, առանց բովանդակության',
+    paramPreferenceKey: 'Նախընտրության բանալին, օրինակ՝ `nav`։',
+    preferenceGet: 'Ստանալ ընթացիկ օգտատիրոջ նախընտրությունը',
+    preferenceGetResult: 'Պահված նախընտրությունը կամ `value: null`, եթե այն չկա',
+    preferenceSet: 'Պահել ընթացիկ օգտատիրոջ նախընտրությունը',
+    preferenceSetBody: 'Ուղարկեք արժեքը `value`-ում։ Առանց `value`-ի մարմինը ամբողջությամբ պահվում է որպես արժեք։',
+    preferenceSetResult: 'Պահված նախընտրությունը',
+    preferenceDelete: 'Ջնջել ընթացիկ օգտատիրոջ նախընտրությունը',
+    preferenceDeleteResult: 'Ջնջված նախընտրությունը',
+    reorder: 'Տեղափոխել փաստաթղթերը դասավորվող ցանկում',
+    reorderBody:
+      'Տեղափոխում է `docsToMove`-ը `target`-ից հետո `newKeyWillBe: "greater"`-ով կամ դրանից առաջ `"less"`-ով։ `orderableFieldName`-ը `_order` է դասավորվող կոլեկցիայի համար կամ դասավորվող join-ի կարգի դաշտը։ Առանց `target.key`-ի Payload-ը միայն կարգի բանալիներ է տալիս այն փաստաթղթերին, որոնք դրանք չունեն։',
+    reorderResult:
+      'Կարգի նոր բանալիները կամ `message: "initial migration"`, երբ Payload-ը առաջին անգամ սահմանեց կարգի բանալիները',
+    errorReorder400: 'Հարցման անվավեր մարմին, պատճառը նշված է `error`-ում',
 
     error400: 'Վավերացման կամ հարցման սխալ (ValidationError, QueryError)',
     error401: 'Չնույնականացված (AuthenticationError)',
@@ -120,6 +134,7 @@ export const hy: PluginDefaultTranslationsObject = {
     tagJobs: 'Առաջադրանքներ',
     tagUploads: 'Վերբեռնումներ',
     tagAccess: 'Մուտք',
+    tagReorder: 'Դասավորում',
     tagPlugins: 'Պլագիններ',
     tagPluginsDesc: 'Payload-ի պաշտոնական պլագինների ավելացրած էնդփոյնթներ։',
     errorPlugin400: 'Անվավեր հարցում',

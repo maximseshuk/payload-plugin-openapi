@@ -94,6 +94,20 @@ export const rs: PluginDefaultTranslationsObject = {
     uploadStagePutSummary: 'Слање бајтова датотеке за привремено отпремање',
     uploadStageDeleteSummary: 'Брисање привременог отпремања',
     uploadStageResult: 'Готово, без садржаја',
+    paramPreferenceKey: 'Кључ подешавања, нпр. `nav`.',
+    preferenceGet: 'Преузми подешавање тренутног корисника',
+    preferenceGetResult: 'Сачувано подешавање или `value: null` ако не постоји',
+    preferenceSet: 'Сачувај подешавање тренутног корисника',
+    preferenceSetBody: 'Пошаљите вредност у `value`. Тело без `value` чува се у целости као вредност.',
+    preferenceSetResult: 'Сачувано подешавање',
+    preferenceDelete: 'Обриши подешавање тренутног корисника',
+    preferenceDeleteResult: 'Обрисано подешавање',
+    reorder: 'Премести документе на листи са редоследом',
+    reorderBody:
+      'Премешта `docsToMove` иза `target` уз `newKeyWillBe: "greater"` или испред њега уз `"less"`. `orderableFieldName` је `_order` за колекцију са редоследом или поље редоследа за join са редоследом. Без `target.key` Payload само додељује кључеве редоследа документима који их немају.',
+    reorderResult:
+      'Нови кључеви редоследа или `message: "initial migration"` када је Payload први пут поставио кључеве редоследа',
+    errorReorder400: 'Неважеће тело захтева; разлог је у `error`',
 
     error400: 'Грешка валидације или упита (ValidationError, QueryError)',
     error401: 'Није аутентификован (AuthenticationError)',
@@ -117,6 +131,7 @@ export const rs: PluginDefaultTranslationsObject = {
     tagJobs: 'Послови',
     tagUploads: 'Отпремања',
     tagAccess: 'Приступ',
+    tagReorder: 'Редослед',
     tagPlugins: 'Додаци',
     tagPluginsDesc: 'Крајње тачке које додају званични Payload додаци.',
     errorPlugin400: 'Неисправан захтев',

@@ -97,6 +97,21 @@ export const nl: PluginDefaultTranslationsObject = {
     uploadStagePutSummary: 'De bytes van het bestand verzenden voor een tijdelijke upload',
     uploadStageDeleteSummary: 'Een tijdelijke upload verwijderen',
     uploadStageResult: 'Klaar, geen inhoud',
+    paramPreferenceKey: 'De sleutel van de voorkeur, bijv. `nav`.',
+    preferenceGet: 'Een voorkeur van de huidige gebruiker ophalen',
+    preferenceGetResult: 'De opgeslagen voorkeur, of `value: null` als die er niet is',
+    preferenceSet: 'Een voorkeur van de huidige gebruiker opslaan',
+    preferenceSetBody:
+      'Stuur de waarde als `value`. Een body zonder `value` wordt in zijn geheel als waarde opgeslagen.',
+    preferenceSetResult: 'De opgeslagen voorkeur',
+    preferenceDelete: 'Een voorkeur van de huidige gebruiker verwijderen',
+    preferenceDeleteResult: 'De verwijderde voorkeur',
+    reorder: 'Documenten verplaatsen in een sorteerbare lijst',
+    reorderBody:
+      'Verplaatst `docsToMove` na `target` met `newKeyWillBe: "greater"`, of ervoor met `"less"`. `orderableFieldName` is `_order` voor een sorteerbare collectie, of het volgordeveld van een sorteerbare join. Zonder `target.key` geeft Payload alleen volgordesleutels aan documenten die er nog geen hebben.',
+    reorderResult:
+      'De nieuwe volgordesleutels, of `message: "initial migration"` wanneer Payload de volgordesleutels voor het eerst heeft gezet',
+    errorReorder400: 'Ongeldige request-body; de reden staat in `error`',
 
     error400: 'Validatie- of queryfout (ValidationError, QueryError)',
     error401: 'Niet geverifieerd (AuthenticationError)',
@@ -120,6 +135,7 @@ export const nl: PluginDefaultTranslationsObject = {
     tagJobs: 'Taken',
     tagUploads: 'Uploads',
     tagAccess: 'Toegang',
+    tagReorder: 'Volgorde',
     tagPlugins: 'Plugins',
     tagPluginsDesc: 'Endpoints die officiële Payload-plugins toevoegen.',
     errorPlugin400: 'Ongeldig verzoek',

@@ -96,6 +96,20 @@ export const fa: PluginDefaultTranslationsObject = {
     uploadStagePutSummary: 'ارسال بایت‌های فایل برای بارگذاری موقت',
     uploadStageDeleteSummary: 'حذف بارگذاری موقت',
     uploadStageResult: 'انجام شد، بدون محتوا',
+    paramPreferenceKey: 'کلید ترجیح، مثلاً `nav`.',
+    preferenceGet: 'دریافت یک ترجیح کاربر فعلی',
+    preferenceGetResult: 'ترجیح ذخیره‌شده، یا `value: null` اگر وجود نداشته باشد',
+    preferenceSet: 'ذخیره یک ترجیح کاربر فعلی',
+    preferenceSetBody: 'مقدار را در `value` بفرستید. بدنه‌ای بدون `value` به‌طور کامل به‌عنوان مقدار ذخیره می‌شود.',
+    preferenceSetResult: 'ترجیح ذخیره‌شده',
+    preferenceDelete: 'حذف یک ترجیح کاربر فعلی',
+    preferenceDeleteResult: 'ترجیح حذف‌شده',
+    reorder: 'جابه‌جایی اسناد در یک فهرست قابل مرتب‌سازی',
+    reorderBody:
+      '`docsToMove` را با `newKeyWillBe: "greater"` به بعد از `target` و با `"less"` به قبل از آن منتقل می‌کند. `orderableFieldName` برای مجموعه قابل مرتب‌سازی `_order` است، یا فیلد ترتیب یک join قابل مرتب‌سازی. بدون `target.key`، Payload فقط به اسنادی که کلید ترتیب ندارند کلید ترتیب می‌دهد.',
+    reorderResult:
+      'کلیدهای ترتیب جدید، یا `message: "initial migration"` وقتی Payload برای اولین بار کلیدهای ترتیب را تعیین کرد',
+    errorReorder400: 'بدنه درخواست نامعتبر است؛ دلیل در `error` آمده است',
 
     error400: 'خطای اعتبارسنجی یا پرس‌وجو (ValidationError, QueryError)',
     error401: 'احراز هویت نشده (AuthenticationError)',
@@ -119,6 +133,7 @@ export const fa: PluginDefaultTranslationsObject = {
     tagJobs: 'کارها',
     tagUploads: 'بارگذاری‌ها',
     tagAccess: 'دسترسی',
+    tagReorder: 'ترتیب‌دهی',
     tagPlugins: 'افزونه‌ها',
     tagPluginsDesc: 'نقاط پایانی که افزونه‌های رسمی Payload اضافه می‌کنند.',
     errorPlugin400: 'درخواست نامعتبر',

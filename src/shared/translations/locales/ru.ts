@@ -93,6 +93,20 @@ export const ru: PluginDefaultTranslationsObject = {
     uploadStagePutSummary: 'Отправить байты файла для временной загрузки',
     uploadStageDeleteSummary: 'Удалить временную загрузку',
     uploadStageResult: 'Готово, без содержимого',
+    paramPreferenceKey: 'Ключ настройки, например `nav`.',
+    preferenceGet: 'Получить настройку текущего пользователя',
+    preferenceGetResult: 'Сохранённая настройка или `value: null`, если её нет',
+    preferenceSet: 'Сохранить настройку текущего пользователя',
+    preferenceSetBody: 'Передайте значение в `value`. Тело без `value` сохраняется целиком как значение.',
+    preferenceSetResult: 'Сохранённая настройка',
+    preferenceDelete: 'Удалить настройку текущего пользователя',
+    preferenceDeleteResult: 'Удалённая настройка',
+    reorder: 'Переместить документы в упорядочиваемом списке',
+    reorderBody:
+      'Перемещает `docsToMove` после `target` при `newKeyWillBe: "greater"` или перед ним при `"less"`. `orderableFieldName` равно `_order` для упорядочиваемой коллекции или полю порядка упорядочиваемого join. Без `target.key` Payload только назначает ключи порядка документам, у которых их нет.',
+    reorderResult:
+      'Новые ключи порядка или `message: "initial migration"`, когда Payload впервые назначил ключи порядка',
+    errorReorder400: 'Некорректное тело запроса; причина указана в `error`',
 
     error400: 'Ошибка валидации или запроса (ValidationError, QueryError)',
     error401: 'Не аутентифицирован (AuthenticationError)',
@@ -116,6 +130,7 @@ export const ru: PluginDefaultTranslationsObject = {
     tagJobs: 'Задачи',
     tagUploads: 'Загрузки',
     tagAccess: 'Доступ',
+    tagReorder: 'Порядок',
     tagPlugins: 'Плагины',
     tagPluginsDesc: 'Эндпоинты официальных плагинов Payload.',
     errorPlugin400: 'Некорректный запрос',

@@ -591,6 +591,80 @@ describe('spec/buildDocument', () => {
       expect(open.paths?.['/api/payload-jobs/run']?.get?.security).toBeUndefined()
     })
   })
+
+  describe('reorder', () => {
+    const reorderEndpoint = { path: '/reorder', method: 'post', handler: () => new Response() }
+    const orderable = [
+      coll('posts', { orderable: true, fields: [] }),
+      coll('tags', { fields: [] }),
+      coll('options', { fields: [] }),
+      coll('types', {
+        fields: [],
+        joins: { options: [{ field: { orderable: true } }] } as unknown as SanitizedCollectionConfig['joins'],
+      }),
+      coll('secret', { orderable: true, fields: [] }),
+    ]
+    const build = (endpoints: unknown[], filters = {}) =>
+      buildDocument(
+        baseInput({
+          config: { endpoints } as unknown as SanitizedConfig,
+          collections: orderable,
+          options: resolveOptions({ info: { title: 'T', version: '1.0.0' }, nestedTags: true, filters }),
+        }),
+      )
+
+    it('documents `/reorder` only when Payload mounted it', async () => {
+      expect((await build([])).paths?.['/api/reorder']).toBeUndefined()
+      const doc = await build([reorderEndpoint], { exclude: ['secret'] })
+      const op = doc.paths?.['/api/reorder']?.post
+      expect(op?.tags).toEqual(['Reorder'])
+      expect(op?.security).toEqual([{ PayloadToken: [] }])
+      const requestBody = op?.requestBody as RequestBodyObject
+      const body = (requestBody.content['application/json'] as MediaTypeObject).schema as Schema
+      expect(body.properties?.collectionSlug).toEqual({ type: 'string', enum: ['posts', 'options'] })
+      expect(doc.tags?.find((tag) => tag.name === 'Reorder')?.parent).toBe(NAV_SYSTEM)
+      const result = await new Validator().validate(structuredClone(doc))
+      expect(result.valid).toBe(true)
+    })
+
+    it('leaves `/reorder` to `custom.openapi` when the endpoint has it', async () => {
+      const meta = { responses: { '200': { description: 'mine' } } }
+      const doc = await build([{ ...reorderEndpoint, custom: { openapi: meta } }])
+      expect(doc.paths?.['/api/reorder']?.post).toEqual(meta)
+    })
+  })
+
+  describe('preferences', () => {
+    const preferences = coll('payload-preferences', { fields: [], flattenedFields: [] })
+    const build = (includeSystem: boolean) =>
+      buildDocument(
+        baseInput({
+          config: { collections: [preferences], blocks: [] } as unknown as SanitizedConfig,
+          collections: [preferences],
+          options: resolveOptions({
+            info: { title: 'T', version: '1.0.0' },
+            filters: { includeSystem, includeAdminAuth: true },
+          }),
+        }),
+      )
+
+    it('documents the preference endpoints only with `includeSystem`', async () => {
+      expect((await build(false)).paths?.['/api/payload-preferences/{id}']).toBeUndefined()
+      const doc = await build(true)
+      const item = doc.paths?.['/api/payload-preferences/{id}']
+      for (const method of ['get', 'post', 'delete'] as const) {
+        expect(item?.[method]?.operationId).toMatch(/ByKey$/)
+        expect(item?.[method]?.security).toEqual([{ PayloadToken: [] }])
+        expect(item?.[method]?.parameters).toEqual([expect.objectContaining({ name: 'id', in: 'path' })])
+      }
+      expect(item?.patch?.operationId).toBe('updatePayloadPreferencesById')
+      expect(doc.paths?.['/api/payload-preferences/count']).toBeUndefined()
+      expect(doc.paths?.['/api/payload-preferences/validate']).toBeUndefined()
+      expect(doc.paths?.['/api/payload-preferences/access']).toBeUndefined()
+      const result = await new Validator().validate(structuredClone(doc))
+      expect(result.valid).toBe(true)
+    })
+  })
 })
 
 describe('spec/paths/jobs', () => {
@@ -630,6 +704,20 @@ describe('spec/paths/system', () => {
       const paths = buildSystemPaths({ ctx, access: false, uploadSlugs: ['media'] })
       expect(paths['/api/upload-instructions/{uploadId}']?.put?.security).toEqual([{ PayloadToken: [] }])
       expect(paths['/api/upload-instructions/{uploadId}']?.delete?.security).toEqual([{ PayloadToken: [] }])
+    })
+
+    it('adds the reorder endpoint only for orderable collections, with a `{ error }` 400', () => {
+      expect(buildSystemPaths({ ctx, access: false, uploadSlugs: [], reorderSlugs: [] })).toEqual({})
+      const op = buildSystemPaths({ ctx, access: false, uploadSlugs: [], reorderSlugs: ['posts'] })['/api/reorder']
+        ?.post
+      expect(op?.operationId).toBe('reorder')
+      expect(op?.security).toEqual([{ PayloadToken: [] }])
+      const bad = op?.responses?.['400'] as { content: Record<string, MediaTypeObject> }
+      expect(bad.content['application/json']?.schema).toEqual({
+        type: 'object',
+        properties: { error: { type: 'string' } },
+        required: ['error'],
+      })
     })
 
     it('adds the root access endpoint only when `access` is on', () => {

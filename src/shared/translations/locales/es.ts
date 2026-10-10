@@ -95,6 +95,20 @@ export const es: PluginDefaultTranslationsObject = {
     uploadStagePutSummary: 'Enviar los bytes del archivo para una subida temporal',
     uploadStageDeleteSummary: 'Eliminar una subida temporal',
     uploadStageResult: 'Hecho, sin contenido',
+    paramPreferenceKey: 'La clave de la preferencia, p. ej. `nav`.',
+    preferenceGet: 'Obtener una preferencia del usuario actual',
+    preferenceGetResult: 'La preferencia guardada, o `value: null` si no existe',
+    preferenceSet: 'Guardar una preferencia del usuario actual',
+    preferenceSetBody: 'Envía el valor en `value`. Un cuerpo sin `value` se guarda tal cual como valor.',
+    preferenceSetResult: 'La preferencia guardada',
+    preferenceDelete: 'Eliminar una preferencia del usuario actual',
+    preferenceDeleteResult: 'La preferencia eliminada',
+    reorder: 'Mover documentos en una lista ordenable',
+    reorderBody:
+      'Mueve `docsToMove` después de `target` con `newKeyWillBe: "greater"`, o antes con `"less"`. `orderableFieldName` es `_order` para una colección ordenable, o el campo de orden de un join ordenable. Sin `target.key`, Payload solo asigna claves de orden a los documentos que no tienen.',
+    reorderResult:
+      'Las nuevas claves de orden, o `message: "initial migration"` cuando Payload asignó las claves de orden por primera vez',
+    errorReorder400: 'Cuerpo de la solicitud no válido; el motivo está en `error`',
 
     error400: 'Error de validación o de consulta (ValidationError, QueryError)',
     error401: 'No autenticado (AuthenticationError)',
@@ -118,6 +132,7 @@ export const es: PluginDefaultTranslationsObject = {
     tagJobs: 'Trabajos',
     tagUploads: 'Subidas',
     tagAccess: 'Acceso',
+    tagReorder: 'Reordenar',
     tagPlugins: 'Plugins',
     tagPluginsDesc: 'Endpoints añadidos por los plugins oficiales de Payload.',
     errorPlugin400: 'Solicitud no válida',

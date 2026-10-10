@@ -85,6 +85,18 @@ export type PluginDefaultTranslationsObject = {
     uploadStagePutSummary: string
     uploadStageDeleteSummary: string
     uploadStageResult: string
+    paramPreferenceKey: string
+    preferenceGet: string
+    preferenceGetResult: string
+    preferenceSet: string
+    preferenceSetBody: string
+    preferenceSetResult: string
+    preferenceDelete: string
+    preferenceDeleteResult: string
+    reorder: string
+    reorderBody: string
+    reorderResult: string
+    errorReorder400: string
 
     error400: string
     error401: string
@@ -106,6 +118,7 @@ export type PluginDefaultTranslationsObject = {
     tagJobs: string
     tagUploads: string
     tagAccess: string
+    tagReorder: string
     tagPlugins: string
     tagPluginsDesc: string
     errorPlugin400: string

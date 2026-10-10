@@ -360,6 +360,14 @@ describe('generated document', () => {
       expect(doc.paths['/api/upload-instructions/{uploadId}']?.put).toBeDefined()
       expect(doc.paths['/api/upload-instructions/{uploadId}']?.delete).toBeDefined()
     })
+
+    it('documents `/reorder` for the target of an orderable join', () => {
+      const body = doc.paths['/api/reorder']?.post?.requestBody as Body
+      const bodySchema = body.content['application/json']!.schema as Schema
+      const slug = bodySchema.properties?.collectionSlug as Schema
+      expect(slug.enum).toEqual(['variantOptions'])
+      expect(doc.paths['/api/reorder']?.post?.security).toEqual([{ PayloadToken: [] }])
+    })
   })
 
   describe('query params', () => {

@@ -97,6 +97,20 @@ export const de: PluginDefaultTranslationsObject = {
     uploadStagePutSummary: 'Die Bytes der Datei für einen Zwischen-Upload senden',
     uploadStageDeleteSummary: 'Einen Zwischen-Upload löschen',
     uploadStageResult: 'Erledigt, kein Inhalt',
+    paramPreferenceKey: 'Der Schlüssel der Einstellung, z. B. `nav`.',
+    preferenceGet: 'Eine Einstellung des aktuellen Benutzers abrufen',
+    preferenceGetResult: 'Die gespeicherte Einstellung oder `value: null`, wenn keine vorhanden ist',
+    preferenceSet: 'Eine Einstellung des aktuellen Benutzers speichern',
+    preferenceSetBody: 'Senden Sie den Wert als `value`. Ein Body ohne `value` wird selbst als Wert gespeichert.',
+    preferenceSetResult: 'Die gespeicherte Einstellung',
+    preferenceDelete: 'Eine Einstellung des aktuellen Benutzers löschen',
+    preferenceDeleteResult: 'Die gelöschte Einstellung',
+    reorder: 'Dokumente in einer sortierbaren Liste verschieben',
+    reorderBody:
+      'Verschiebt `docsToMove` mit `newKeyWillBe: "greater"` hinter `target` oder mit `"less"` davor. `orderableFieldName` ist `_order` für eine sortierbare Collection oder das Sortierfeld eines sortierbaren Joins. Ohne `target.key` vergibt Payload nur Sortierschlüssel an Dokumente, die noch keinen haben.',
+    reorderResult:
+      'Die neuen Sortierschlüssel oder `message: "initial migration"`, wenn Payload die Sortierschlüssel erstmals gesetzt hat',
+    errorReorder400: 'Ungültiger Request-Body; der Grund steht in `error`',
 
     error400: 'Validierungs- oder Abfragefehler (ValidationError, QueryError)',
     error401: 'Nicht authentifiziert (AuthenticationError)',
@@ -120,6 +134,7 @@ export const de: PluginDefaultTranslationsObject = {
     tagJobs: 'Jobs',
     tagUploads: 'Uploads',
     tagAccess: 'Zugriff',
+    tagReorder: 'Sortierung',
     tagPlugins: 'Plugins',
     tagPluginsDesc: 'Endpunkte offizieller Payload-Plugins.',
     errorPlugin400: 'Ungültige Anfrage',

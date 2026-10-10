@@ -95,6 +95,20 @@ export const id: PluginDefaultTranslationsObject = {
     uploadStagePutSummary: 'Kirim byte file untuk unggahan sementara',
     uploadStageDeleteSummary: 'Hapus unggahan sementara',
     uploadStageResult: 'Selesai, tanpa konten',
+    paramPreferenceKey: 'Kunci preferensi, mis. `nav`.',
+    preferenceGet: 'Ambil preferensi pengguna saat ini',
+    preferenceGetResult: 'Preferensi yang tersimpan, atau `value: null` jika tidak ada',
+    preferenceSet: 'Simpan preferensi pengguna saat ini',
+    preferenceSetBody: 'Kirim nilai di `value`. Body tanpa `value` disimpan utuh sebagai nilai.',
+    preferenceSetResult: 'Preferensi yang tersimpan',
+    preferenceDelete: 'Hapus preferensi pengguna saat ini',
+    preferenceDeleteResult: 'Preferensi yang dihapus',
+    reorder: 'Pindahkan dokumen dalam daftar yang dapat diurutkan',
+    reorderBody:
+      'Memindahkan `docsToMove` ke setelah `target` dengan `newKeyWillBe: "greater"`, atau ke sebelumnya dengan `"less"`. `orderableFieldName` adalah `_order` untuk koleksi yang dapat diurutkan, atau field urutan dari join yang dapat diurutkan. Tanpa `target.key`, Payload hanya memberi kunci urutan pada dokumen yang belum memilikinya.',
+    reorderResult:
+      'Kunci urutan baru, atau `message: "initial migration"` saat Payload pertama kali mengatur kunci urutan',
+    errorReorder400: 'Body permintaan tidak valid; alasannya ada di `error`',
 
     error400: 'Galat validasi atau kueri (ValidationError, QueryError)',
     error401: 'Tidak terautentikasi (AuthenticationError)',
@@ -118,6 +132,7 @@ export const id: PluginDefaultTranslationsObject = {
     tagJobs: 'Job',
     tagUploads: 'Unggahan',
     tagAccess: 'Akses',
+    tagReorder: 'Pengurutan',
     tagPlugins: 'Plugin',
     tagPluginsDesc: 'Endpoint yang ditambahkan oleh plugin resmi Payload.',
     errorPlugin400: 'Permintaan tidak valid',

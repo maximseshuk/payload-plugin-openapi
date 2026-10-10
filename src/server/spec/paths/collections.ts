@@ -12,6 +12,7 @@ import {
   ERRORS,
   docAccessOperation,
   errorResponses,
+  jsonBody,
   jsonOk,
   jsonResponse,
   uploadRequestBody,
@@ -27,7 +28,7 @@ import {
   writeParams,
   type WriteOperation,
 } from '@/server/spec/params.js'
-import type { EntitySecurity } from '@/server/spec/security.js'
+import { type EntitySecurity, securedRequirement } from '@/server/spec/security.js'
 import { makeT } from '@/shared/translations/index.js'
 import type { BuildContext } from '@/shared/types/index.js'
 
@@ -300,6 +301,64 @@ export const buildCollectionPaths = ({
         },
         responses: updateResponse,
         security: secUpdate,
+      },
+    }
+  }
+
+  if (collection.slug === 'payload-preferences') {
+    delete paths[`${base}/count`]
+    delete paths[`${base}/validate`]
+    delete paths[`${base}/access`]
+    const keyParam: ParameterObject[] = [
+      { name: 'id', in: 'path', required: true, description: t('paramPreferenceKey'), schema: { type: 'string' } },
+    ]
+    const secured = securedRequirement()
+    paths[`${base}/{id}`] = {
+      ...paths[`${base}/{id}`],
+      get: {
+        tags: [name],
+        operationId: `find${name}ByKey`,
+        summary: t('preferenceGet'),
+        parameters: keyParam,
+        responses: {
+          ...jsonOk(t('preferenceGetResult'), {
+            anyOf: [
+              docRef,
+              {
+                type: 'object',
+                properties: { message: { type: 'string' }, value: { const: null } },
+                required: ['message', 'value'],
+              },
+            ],
+          }),
+          ...errorResponses(['500'], t),
+        },
+        security: secured,
+      },
+      post: {
+        tags: [name],
+        operationId: `upsert${name}ByKey`,
+        summary: t('preferenceSet'),
+        parameters: keyParam,
+        requestBody: {
+          ...jsonBody({ type: 'object', properties: { value: {} }, required: ['value'] }),
+          description: t('preferenceSetBody'),
+        },
+        responses: { ...jsonOk(t('preferenceSetResult'), mutationSchema), ...errorResponses(['401', '500'], t) },
+        security: secured,
+      },
+      delete: {
+        tags: [name],
+        operationId: `delete${name}ByKey`,
+        summary: t('preferenceDelete'),
+        parameters: keyParam,
+        responses: {
+          ...jsonOk(t('preferenceDeleteResult'), {
+            allOf: [docRef, { type: 'object', properties: { message: { type: 'string' } } }],
+          }),
+          ...errorResponses(['401', '404', '500'], t),
+        },
+        security: secured,
       },
     }
   }
