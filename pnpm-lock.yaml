@@ -183,7 +183,7 @@ importers:
     dependencies:
       '@scalar/openapi-types':
         specifier: ^0.9.7
-        version: 0.9.7
+        version: 0.9.8
     devDependencies:
       '@payloadcms/db-sqlite':
         specifier: 4.0.0-beta.0
@@ -2696,8 +2696,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@scalar/openapi-types@0.9.7':
-    resolution: {integrity: sha512-UVSgxRxcTaIbTZGtNRdQJHZC60uyYi29zfDqQVp0lxx07BNczIHbf9jycgI/+W3Uxxod+yUUt7hzxnKllOHE0w==}
+  '@scalar/openapi-types@0.9.8':
+    resolution: {integrity: sha512-pGcpkZObsGBC7nRKYte+6gstoe0C4hp7B2UWQYjg5To1wE68s3OHVvin+muL3tn3ZAoahXeJAkn1+aEcMi802w==}
     engines: {node: '>=22'}
 
   '@scarf/scarf@1.4.0':
@@ -9622,7 +9622,7 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.60.4':
     optional: true
 
-  '@scalar/openapi-types@0.9.7': {}
+  '@scalar/openapi-types@0.9.8': {}
 
   '@scarf/scarf@1.4.0': {}
 
