@@ -31,7 +31,7 @@
 
 ## Quick start
 
-Requires **Payload 4.0.0-beta.0 or later**, **Next.js 16.4 or later** and **Node.js 24.15 or later**. On Payload 3, use `@seshuk/payload-plugin-openapi@0`.
+Requires **Payload 4.0.0-beta.4 or later**, **Next.js 16.4 or later** and **Node.js 24.22.1 or later**. On Payload 3, use `@seshuk/payload-plugin-openapi@0`.
 
 ### Install
 

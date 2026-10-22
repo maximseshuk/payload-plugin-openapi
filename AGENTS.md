@@ -4,7 +4,7 @@ Payload 4 plugin. Builds OpenAPI 3.0/3.1/3.2 document from sanitized Payload con
 
 ## Environment
 
-- pnpm 12. Node.js 24.15+. Payload 4.
+- pnpm 12. Node.js 24.22.1+. Payload 4.
 - Shared dev config from `@seshuk/payload-plugin-tooling` (oxlint, oxfmt, tsconfig, tsdown, test DB, CI/release workflows, changelog).
 - Secrets from env only. Never hardcode keys.
 
@@ -84,10 +84,10 @@ tests/
 
 ## Branches
 
-| Branch | Major | Payload | Node   | Takes                          |
-| ------ | ----- | ------- | ------ | ------------------------------ |
-| `main` | v1    | 4       | 24.15+ | all work; PRs target `main`    |
-| `0.x`  | v0    | 3       | 20+    | critical fixes only, from main |
+| Branch | Major | Payload | Node     | Takes                          |
+| ------ | ----- | ------- | -------- | ------------------------------ |
+| `main` | v1    | 4       | 24.22.1+ | all work; PRs target `main`    |
+| `0.x`  | v0    | 3       | 20+      | critical fixes only, from main |
 
 ## Releases
 
