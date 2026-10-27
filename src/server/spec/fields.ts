@@ -2,7 +2,7 @@ import type { Field, NamedTab } from 'payload'
 
 export const isHiddenField = (field: Field): boolean => 'hidden' in field && field.hidden === true
 
-export const AUTH_FIELDS = new Set([
+export const AUTH_FIELDS: Set<string> = new Set([
   'salt',
   'hash',
   'password',

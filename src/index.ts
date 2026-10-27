@@ -1,5 +1,6 @@
 import { fileURLToPath } from 'node:url'
 
+import type { Plugin } from 'payload'
 import { definePlugin } from 'payload'
 
 import { interactiveAuthHandler } from '@/server/endpoints/interactiveAuth.js'
@@ -19,7 +20,7 @@ const resolveCommandPath = (): string => {
   return `${fileURLToPath(new URL(`./cli/generateSpec${ext}`, selfUrl))}#generateSpecCommand`
 }
 
-export const openapi = definePlugin<OpenApiPluginOptions>({
+export const openapi: (options: OpenApiPluginOptions) => Plugin = definePlugin<OpenApiPluginOptions>({
   slug: PLUGIN_NAME,
   plugin: ({ config, options, plugins }) => {
     const resolved = resolveOptions(options)

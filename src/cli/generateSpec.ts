@@ -1,6 +1,7 @@
 import { writeFile } from 'node:fs/promises'
 import path from 'node:path'
 
+import type { CLICommand } from 'payload'
 import { strictObject, z } from 'payload'
 import { defineCLICommand } from 'payload/cli'
 
@@ -10,7 +11,7 @@ import type { ResolvedOptions } from '@/shared/types/index.js'
 
 const optionalString = (description: string) => z.optional(z.string()).check(z.describe(description))
 
-export const generateSpecCommand = defineCLICommand({
+export const generateSpecCommand: CLICommand = defineCLICommand({
   description: 'Write the OpenAPI document to a file.',
   input: strictObject({
     lang: optionalString(

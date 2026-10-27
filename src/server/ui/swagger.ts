@@ -1,4 +1,7 @@
+import type { Plugin } from 'payload'
+
 import { SWAGGER_UI_PLUGIN_NAME } from '@/shared/constants.js'
+import type { UiPluginOptions } from '@/shared/types/index.js'
 
 import { createUiPlugin } from './createUiPlugin.js'
 import { escapeHtml, htmlPage, integrityAttrs, jsonForScript, specUrlExpr } from './html.js'
@@ -6,7 +9,7 @@ import { escapeHtml, htmlPage, integrityAttrs, jsonForScript, specUrlExpr } from
 const STYLE_INTEGRITY = 'sha384-Ov4/wv3j2bmct8cDc5X4ngJZohVPzEmc6uDPH8WeljUxO5vtoykvMEfbu9Vh6RaW'
 const SCRIPT_INTEGRITY = 'sha384-ZPehFMQommnnuaZ4rpxgkgTT2DKFVp4hZC/7pLit+9Lek9T1YGSo23eHFbvNkXkw'
 
-export const swaggerUi = createUiPlugin({
+export const swaggerUi: (options?: UiPluginOptions) => Plugin = createUiPlugin({
   slug: SWAGGER_UI_PLUGIN_NAME,
   defaultDocsUrl: '/docs',
   defaultCdnBase: 'https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.33.1',

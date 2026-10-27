@@ -1,3 +1,4 @@
+import type { Plugin } from 'payload'
 import { definePlugin, Forbidden } from 'payload'
 
 import { assertNoRemovedKeys } from '@/server/options/resolveOptions.js'
@@ -19,7 +20,7 @@ export interface UiPluginSpec {
   render: (args: UiRenderArgs) => string
 }
 
-export const createUiPlugin = (spec: UiPluginSpec) =>
+export const createUiPlugin = (spec: UiPluginSpec): ((options?: UiPluginOptions) => Plugin) =>
   definePlugin<UiPluginOptions | undefined>({
     slug: spec.slug,
     plugin: ({ config, options = {} }) => {
