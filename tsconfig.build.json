@@ -4,7 +4,10 @@
     "jsx": "react-jsx",
     "rootDir": "./src",
     "outDir": "./dist",
-    "noEmit": false
+    "noEmit": false,
+    "declaration": true,
+    "isolatedDeclarations": true,
+    "allowJs": false
   },
   "include": ["./src/**/*.ts", "./src/**/*.tsx"],
   "exclude": ["./tests"]
