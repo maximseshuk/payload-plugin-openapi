@@ -1,4 +1,5 @@
 import { getTranslation } from '@payloadcms/translations'
+import type { I18n } from '@payloadcms/translations'
 import { entityToJSONSchema } from 'payload'
 import type { Block, Field, SanitizedConfig, SchemaVariant } from 'payload'
 
@@ -20,12 +21,14 @@ const toComponentSchema = ({
   config,
   source,
   idType,
+  i18n,
   defs = new Map(),
   variant,
 }: {
   config: SanitizedConfig
   source: Entity | Block
   idType: IDType
+  i18n?: I18n
   defs?: Map<string, unknown>
   variant?: SchemaVariant
 }): Schema => {
@@ -36,7 +39,7 @@ const toComponentSchema = ({
     idType,
     new Set(),
     undefined,
-    undefined,
+    i18n,
     undefined,
     variant,
   )
@@ -205,8 +208,8 @@ export const buildEntitySchemas = async ({
   const source = stripInterfaceName(entity)
   const defs = new Map<string, unknown>()
   const idType = ctx.defaultIDType
-  const read = toComponentSchema({ config, source, idType, defs })
-  const write = toComponentSchema({ config, source, idType, defs, variant: 'input' })
+  const read = toComponentSchema({ config, source, idType, i18n: ctx.i18n, defs })
+  const write = toComponentSchema({ config, source, idType, i18n: ctx.i18n, defs, variant: 'input' })
   const isAuth = 'auth' in entity && Boolean(entity.auth)
 
   for (const schema of [read, write]) {
@@ -237,8 +240,8 @@ export const buildEntitySchemas = async ({
   return { read, create, update }
 }
 
-export const buildBlockSchema = (block: Block, config: SanitizedConfig): Schema => {
-  const schema = toComponentSchema({ config, source: stripInterfaceName(block), idType: 'text' })
+export const buildBlockSchema = (block: Block, config: SanitizedConfig, i18n?: I18n): Schema => {
+  const schema = toComponentSchema({ config, source: stripInterfaceName(block), idType: 'text', i18n })
   const blockType: Schema = { type: 'string', enum: [block.slug] }
   const properties = { ...schema.properties, blockType }
   const required = [...new Set(['blockType', ...(schema.required ?? [])])]
