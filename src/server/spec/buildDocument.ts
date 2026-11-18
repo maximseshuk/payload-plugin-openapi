@@ -119,7 +119,7 @@ export const buildDocument = async (input: BuildInput): Promise<Document> => {
 
   for (const block of config.blocks ?? []) {
     try {
-      schemas[blockSchemaName(block.slug)] = buildBlockSchema(block, config)
+      schemas[blockSchemaName(block.slug)] = buildBlockSchema(block, config, ctx.i18n)
     } catch (error) {
       logger.warn(`${PLUGIN_NAME}: skipped block "${block.slug}": ${(error as Error).message}`)
     }

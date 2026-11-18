@@ -1356,6 +1356,20 @@ describe('spec/entitySchemas', () => {
     expect(update.properties).not.toHaveProperty('lockedLater')
     expect(update.properties).toHaveProperty('adminOnly')
   })
+
+  it('resolves a locale-keyed field description without an `en` key', async () => {
+    const { buildEntitySchemas } = await import('@/server/spec/entitySchemas.js')
+    const fields = [{ name: 'title', type: 'text', admin: { description: { de: 'Titel' } } }] as Field[]
+    const entity = {
+      slug: 'posts',
+      fields,
+      flattenedFields: flattenAllFields({ fields }),
+    } as unknown as SanitizedCollectionConfig
+    const config = { collections: [entity], blocks: [] } as unknown as SanitizedConfig
+    const deCtx = { ...ctx, i18n: { ...ctx.i18n, language: 'de' } as I18n }
+    const { read } = await buildEntitySchemas({ entity, config, ctx: deCtx })
+    expect(read.properties?.title).toMatchObject({ description: 'Titel' })
+  })
 })
 
 describe('spec/params', () => {
